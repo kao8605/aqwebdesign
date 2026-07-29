@@ -51,6 +51,15 @@ document.querySelectorAll('a[href^="#"]').forEach(function(a) {
 });
 
 
+var adminOpen = document.getElementById("adminOpen");
+if (adminOpen) {
+    adminOpen.addEventListener("click", function(e) {
+        e.preventDefault();
+        var target = adminOpen.getAttribute("data-admin-url") || adminOpen.getAttribute("href");
+        if (target) window.location.href = target;
+    });
+}
+
 var searchOv = document.getElementById('searchOv');
 
 document.getElementById('navSearchBtn').addEventListener('click', function() {

@@ -4,6 +4,7 @@ const path = require('path');
 const crypto = require('crypto');
 
 const ROOT = __dirname;
+const ADMIN_ROOT = path.resolve(ROOT, "../../inapp/dist");
 const DATA_DIR = path.join(ROOT, 'data');
 const DB_PATH = path.join(DATA_DIR, 'db.json');
 const PORT = Number(process.env.PORT || 8080);
@@ -306,12 +307,9 @@ async function handleApi(req, res) {
   }
 }
 
-function serveStatic(req, res) {
-  const url = new URL(req.url, 'http://localhost');
-  let filePath = decodeURIComponent(url.pathname);
-  if (filePath === '/') filePath = '/index.html';
-  const resolved = path.normalize(path.join(ROOT, filePath));
-  if (!resolved.startsWith(ROOT)) {
+function serveFileFromRoot(baseRoot, filePath, res) {
+  const resolved = path.normalize(path.join(baseRoot, filePath));
+  if (!resolved.startsWith(baseRoot)) {
     res.writeHead(403);
     return res.end('Forbidden');
   }
@@ -325,8 +323,23 @@ function serveStatic(req, res) {
   });
 }
 
+function serveAdmin(req, res) {
+  const url = new URL(req.url, 'http://localhost');
+  let filePath = decodeURIComponent(url.pathname).replace(/^\/admin/, '');
+  if (!filePath || filePath === '/') filePath = '/index.html';
+  return serveFileFromRoot(ADMIN_ROOT, filePath, res);
+}
+
+function serveStatic(req, res) {
+  const url = new URL(req.url, 'http://localhost');
+  let filePath = decodeURIComponent(url.pathname);
+  if (filePath === '/') filePath = '/index.html';
+  return serveFileFromRoot(ROOT, filePath, res);
+}
+
 http.createServer((req, res) => {
   if (req.url.startsWith('/api/')) return handleApi(req, res);
+  if (req.url === '/admin' || req.url.startsWith('/admin/')) return serveAdmin(req, res);
   return serveStatic(req, res);
 }).listen(PORT, () => {
   console.log('Patria backend running at http://127.0.0.1:' + PORT);

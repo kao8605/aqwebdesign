@@ -11,3 +11,27 @@ import '../scss/style.scss';
 
 loadAdminDashboard();
 loadInventory();
+
+
+function setupAdminAuthRedirect() {
+  const page = window.location.pathname.split('/').pop();
+  if (page !== 'signin.html' && page !== 'signup.html') return;
+
+  const form = document.querySelector('form.needs-validation');
+  if (!form) return;
+
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!form.checkValidity()) {
+      form.classList.add('was-validated');
+      return;
+    }
+
+    sessionStorage.setItem('patriaAdminSignedIn', 'true');
+    window.location.href = 'index.html';
+  });
+}
+
+setupAdminAuthRedirect();

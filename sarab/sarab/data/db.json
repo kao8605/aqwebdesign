@@ -55,8 +55,10 @@
       "createdAt": "2026-07-29T10:33:51.992Z"
     }
   },
-  "guestCarts": {
-    "ms5y6ue2tvirtjvsnr": [
+  "guestCarts": {},
+  "userCarts": {
+    "6e351042aab2f8387e5a72e9ca5e3ed8851c1f74f3dcc2f7d2ffe46c00c9cf4b": [],
+    "af6a671ffdc4474cdc7d8dfdc37ab0a4cdb76984440d7b5fe86c46c61588a907": [
       {
         "id": "chicken-noodle-lunch-set",
         "title": "Chicken Noodle Lunch Set",
@@ -68,9 +70,6 @@
         "qty": 3
       }
     ]
-  },
-  "userCarts": {
-    "6e351042aab2f8387e5a72e9ca5e3ed8851c1f74f3dcc2f7d2ffe46c00c9cf4b": []
   },
   "orders": [
     {

@@ -162,6 +162,7 @@ img {
   gap: 18px;
 }
 #navSearchBtn,
+#adminOpen,
 #accountOpen,
 #orderOpen {
   background: none;
@@ -174,12 +175,14 @@ img {
   transition: 0.3s;
   line-height: 1;
 }
-#navSearchBtn {
+#navSearchBtn,
+#adminOpen {
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
-#navSearchBtn:hover {
+#navSearchBtn:hover,
+#adminOpen:hover {
   background: rgba(232, 40, 26, 0.08);
   color: var(--primary);
 }
