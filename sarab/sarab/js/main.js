@@ -84,8 +84,11 @@ function productSlug(text) {
     return String(text).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
+var PATRIA_API_BASE = window.PATRIA_API_BASE || "";
+
 function apiUrl(path) {
     if (String(path).indexOf("http://") === 0 || String(path).indexOf("https://") === 0) return path;
+    if (PATRIA_API_BASE) return PATRIA_API_BASE.replace(/\/$/, "") + path;
     if (window.location.protocol === "file:") return "http://127.0.0.1:8080" + path;
     return path;
 }
@@ -107,52 +110,13 @@ function apiRequest(path, options) {
                 try {
                     data = JSON.parse(text);
                 } catch (err) {
-                    throw new Error("Backend is not returning JSON.");
+                    throw new Error("Backend API is not available. Please deploy sarab/sarab/server.js and connect /api routes.");
                 }
             }
             if (!res.ok) throw new Error(data.error || "Request failed.");
             return data;
         });
     });
-}
-
-function localCartRead() {
-    try {
-        return JSON.parse(localStorage.getItem("patriaLocalCart") || "[]");
-    } catch (err) {
-        return [];
-    }
-}
-
-function localCartWrite(items) {
-    localStorage.setItem("patriaLocalCart", JSON.stringify(items));
-    return { items: items };
-}
-
-function localCartAdd(item, qty) {
-    var items = localCartRead();
-    var id = item.productId || item.id || productSlug(item.title);
-    var existing = items.find(function(cartItem) { return cartItem.id === id; });
-    if (existing) existing.qty += qty;
-    else items.push({
-        id: id,
-        productId: id,
-        img: item.img,
-        title: item.title,
-        cat: item.cat,
-        price: item.price,
-        priceValue: item.priceValue,
-        qty: qty
-    });
-    return localCartWrite(items);
-}
-
-function localCartUpdate(productId, qty) {
-    var items = localCartRead();
-    var item = items.find(function(cartItem) { return cartItem.id === productId || cartItem.productId === productId; });
-    if (item) item.qty = Math.max(0, Number(qty || 0));
-    items = items.filter(function(cartItem) { return cartItem.qty > 0; });
-    return localCartWrite(items);
 }
 
 function setAuth(data) {
@@ -432,16 +396,16 @@ function updateCartItem(index, action) {
     if (!item) return;
 
     if (action === "remove") {
-        apiRequest("/api/cart/item", { method: "DELETE", body: { productId: item.id, guestId: guestId } })
-            .then(syncCart)
-            .catch(function() { syncCart(localCartUpdate(item.id, 0)); });
+        apiRequest("/api/cart/item", { method: "DELETE", body: { productId: item.id, guestId: guestId } }).then(syncCart).catch(function(err) {
+            alert(err.message);
+        });
         return;
     }
 
     var qty = item.qty + (action === "inc" ? 1 : -1);
-    apiRequest("/api/cart/item", { method: "PATCH", body: { productId: item.id, qty: qty, guestId: guestId } })
-        .then(syncCart)
-        .catch(function() { syncCart(localCartUpdate(item.id, qty)); });
+    apiRequest("/api/cart/item", { method: "PATCH", body: { productId: item.id, qty: qty, guestId: guestId } }).then(syncCart).catch(function(err) {
+        alert(err.message);
+    });
 }
 
 function checkoutOrder() {
@@ -469,8 +433,6 @@ function addCartItem(item, qty) {
     return apiRequest("/api/cart/add", {
         method: "POST",
         body: { productId: item.productId, title: item.title, qty: qty, guestId: guestId }
-    }).catch(function() {
-        return localCartAdd(item, qty);
     }).then(function(data) {
         syncCart(data);
     });
@@ -876,9 +838,7 @@ window.addEventListener('scroll', function() {
     }
 });
 
-apiRequest('/api/cart').then(syncCart).catch(function() {
-    syncCart({ items: localCartRead() });
-});
+apiRequest('/api/cart').then(syncCart).catch(function() {});
 if (authToken) {
     apiRequest('/api/me').then(function(data) {
         currentUser = data.user;

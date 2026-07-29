@@ -9,15 +9,66 @@
       "passwordHash": "b25a63e18aafaf8c9b2bddb56d3bf4e75bbef369e31102641146edc89dcfdbc05dbd8ac9e70f150a26c41b98dc79b95c76aacc4978da47fea9489c8eb5587e64",
       "address": null,
       "createdAt": "2026-07-29T09:35:35.070Z"
+    },
+    {
+      "id": "23d5457a62a1980c3e75f31d2704329b2e60fc6314491c70ab4872076bf76d41",
+      "name": "Test User",
+      "email": "codex-test-1785321129@example.com",
+      "phone": "123",
+      "salt": "91d234e91fe9b1aa4280f7d5a9b705a9",
+      "passwordHash": "4593ede316052453c0322de5af8769e38e2d034bc8a8871c8a830b2631b2a1c8d1860f57854f8dfc8ee1cc427f9270025ce37aba6618b7dca8d2fa9acfab88b7",
+      "address": null,
+      "createdAt": "2026-07-29T10:32:09.940Z"
+    },
+    {
+      "id": "f5a7d19b30560cc00b6b635f7c9520b78a778c178399aa977b6d2e1635639bdf",
+      "name": "Browser Test",
+      "email": "browser-test-1785321231@example.com",
+      "phone": "123",
+      "salt": "482fdda229ee1c948b4534b67b6f8298",
+      "passwordHash": "35873318d950c1744e0cd3e1c1a948269903bd66215a8cefa96b4d1595c30a4d75fbc3243840dfdf5aaec41afbb0a2a4dc61616cb5874d80950b191b5b05fca8",
+      "address": null,
+      "createdAt": "2026-07-29T10:33:51.986Z"
+    },
+    {
+      "id": "af6a671ffdc4474cdc7d8dfdc37ab0a4cdb76984440d7b5fe86c46c61588a907",
+      "name": "kao",
+      "email": "jinfeng8605@gmail.com",
+      "phone": "0906843286",
+      "salt": "f6bf2c5292e2a078f349502690b32ecb",
+      "passwordHash": "ea8456f8f4e41d0910074258256d62d59bbb345e3323d5b7ab20ddc168f0e71fad1d51510a9f50b5518425a0e4ca346e57a9fdabfb0ce91330ae287f9cb2c8cd",
+      "address": null,
+      "createdAt": "2026-07-29T10:35:04.202Z"
     }
   ],
   "sessions": {
     "7c7054a352e6b57fd26bae9da182ecf0477842287c132fefa7fbb761e40336be": {
       "userId": "6e351042aab2f8387e5a72e9ca5e3ed8851c1f74f3dcc2f7d2ffe46c00c9cf4b",
       "createdAt": "2026-07-29T09:35:35.070Z"
+    },
+    "3c80aa318e2241c26e702ba2eed6f3ddd0d93924700f0323255005f7e1966e69": {
+      "userId": "23d5457a62a1980c3e75f31d2704329b2e60fc6314491c70ab4872076bf76d41",
+      "createdAt": "2026-07-29T10:32:09.943Z"
+    },
+    "17e201c6ee2f4d2f50a1086c809d40e32de48dfcf11feada9b993716de0bc312": {
+      "userId": "f5a7d19b30560cc00b6b635f7c9520b78a778c178399aa977b6d2e1635639bdf",
+      "createdAt": "2026-07-29T10:33:51.992Z"
     }
   },
-  "guestCarts": {},
+  "guestCarts": {
+    "ms5y6ue2tvirtjvsnr": [
+      {
+        "id": "chicken-noodle-lunch-set",
+        "title": "Chicken Noodle Lunch Set",
+        "cat": "NOODLES",
+        "price": "$11.99",
+        "priceValue": 11.99,
+        "img": "img/QuickMeals/2.png",
+        "desc": "A fast lunch set with stir-fried noodles, chicken, broccoli, peppers, onions and shiitake mushrooms.",
+        "qty": 3
+      }
+    ]
+  },
   "userCarts": {
     "6e351042aab2f8387e5a72e9ca5e3ed8851c1f74f3dcc2f7d2ffe46c00c9cf4b": []
   },
