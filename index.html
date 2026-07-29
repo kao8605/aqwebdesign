@@ -142,23 +142,23 @@
                     <span class="portfolio-filter-count">共 4 件作品</span>
                 </div>
                 <div class="portfolio-filter-list">
-                    <button type="button" class="portfolio-filter-pill is-active">全部</button>
-                    <button type="button" class="portfolio-filter-pill">企業官網</button>
-                    <button type="button" class="portfolio-filter-pill">電商平台</button>
-                    <button type="button" class="portfolio-filter-pill">系統</button>
+                    <button type="button" class="portfolio-filter-pill is-active" data-filter="all">全部</button>
+                    <button type="button" class="portfolio-filter-pill" data-filter="corporate">企業官網</button>
+                    <button type="button" class="portfolio-filter-pill" data-filter="ecommerce">電商平台</button>
+                    <button type="button" class="portfolio-filter-pill" data-filter="system">系統站</button>
                 </div>
             </div>
             <div class="portfolio-preview">
-                <a href="./cafe/index.html" aria-label="查看 La lumière 作品集">
+                <a href="./cafe/index.html" data-category="corporate" aria-label="查看 La lumière 作品集">
                     <img src="截圖 2026-07-18 凌晨2.36.14.png" alt="La lumière 作品集預覽">
                 </a>
-                <a href="./app/index.html" aria-label="查看 Gestione 作品集">
+                <a href="./app/index.html" data-category="corporate" aria-label="查看 Gestione 作品集">
                     <img src="截圖 2026-07-20 晚上11.41.13.png" alt="Gestione 作品集預覽">
                 </a>
-                <a href="./sarab/sarab/index.html" aria-label="查看 Patria 作品集">
+                <a href="./sarab/sarab/index.html" data-category="ecommerce" aria-label="查看 Patria 作品集">
                     <img src="截圖 2026-07-29 下午2.41.13.png" alt="Patria 作品集預覽">
                 </a>
-                <a href="https://thesis.24cc.cc/thesis.html" aria-label="查看第四個作品">
+                <a href="https://thesis.24cc.cc/thesis.html" data-category="corporate" aria-label="查看第四個作品">
                     <img src="Image20267011915.png" alt="第四個作品預覽">
                 </a>
             </div>
@@ -315,6 +315,30 @@
                 });
             }
             
+
+            const portfolioButtons = document.querySelectorAll('.portfolio-filter-pill');
+            const portfolioItems = document.querySelectorAll('.portfolio-preview > a');
+            const portfolioCount = document.querySelector('.portfolio-filter-count');
+
+            function updatePortfolioFilter(filter) {
+                let visibleCount = 0;
+                portfolioItems.forEach(item => {
+                    const shouldShow = filter === 'all' || item.dataset.category === filter;
+                    item.style.display = shouldShow ? '' : 'none';
+                    if (shouldShow) visibleCount += 1;
+                });
+                if (portfolioCount) portfolioCount.textContent = '共 ' + visibleCount + ' 件作品';
+            }
+
+            portfolioButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    portfolioButtons.forEach(btn => btn.classList.remove('is-active'));
+                    this.classList.add('is-active');
+                    updatePortfolioFilter(this.dataset.filter || 'all');
+                });
+            });
+            updatePortfolioFilter('all');
+
             // 平滑滚动函数
             function smoothScroll(target, duration) {
                 const start = window.scrollY;
