@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_PATRIA_API_BASE || '';
+const API_BASE = import.meta.env.VITE_PATRIA_API_BASE || (window.location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
 const STATIC_BASE = import.meta.env.VITE_PATRIA_STATIC_BASE || 'http://127.0.0.1:8080';
 
 async function api(path, options = {}) {
@@ -87,9 +87,15 @@ function renderInventory(products) {
 export async function loadAdminDashboard() {
   if (!document.querySelector('[data-admin-page="dashboard"]')) return;
   try {
-    const result = await Promise.all([api('/api/products'), api('/api/admin/orders')]);
-    const products = result[0].products || [];
-    const orders = result[1].orders || [];
+    const productsData = await api('/api/products');
+    const products = productsData.products || [];
+    let orders = [];
+    try {
+      const ordersData = await api('/api/admin/orders');
+      orders = ordersData.orders || [];
+    } catch (ordersError) {
+      console.warn('Admin orders API is not available yet. Restart sarab/sarab/server.js to enable it.', ordersError);
+    }
     const totalSales = orders.reduce((sum, order) => sum + Number(order.total || 0), 0);
     const itemCount = orders.reduce((sum, order) => sum + (order.items || []).reduce((s, item) => s + Number(item.qty || 0), 0), 0);
     setText('[data-admin-stat="sales"]', money(totalSales));
@@ -98,6 +104,7 @@ export async function loadAdminDashboard() {
     setText('[data-admin-stat="items"]', String(itemCount));
     renderTopProducts(products);
     renderRecentOrders(orders);
+    setText('[data-admin-status]', orders.length ? 'Connected to Patria backend.' : 'Products connected. Restart Patria backend to load orders.');
   } catch (error) {
     console.error(error);
     setText('[data-admin-status]', 'Cannot connect to Patria backend.');
