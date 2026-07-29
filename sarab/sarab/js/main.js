@@ -88,6 +88,8 @@ localStorage.setItem("patriaGuestId", guestId);
 var currentUser = null;
 var isLoggedIn = Boolean(authToken);
 var pendingCheckout = false;
+var accountOrders = [];
+var accountOrdersTimer = null;
 
 function productSlug(text) {
     return String(text).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -128,6 +130,177 @@ function apiRequest(path, options) {
     });
 }
 
+function escapeHtml(value) {
+    return String(value == null ? "" : value).replace(/[&<>"']/g, function(char) {
+        return {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            "\"": "&quot;",
+            "'": "&#39;"
+        }[char];
+    });
+}
+
+function formatMoney(value) {
+    return "$" + Number(value || 0).toFixed(2);
+}
+
+function formatOrderDate(value) {
+    if (!value) return "Just now";
+    return new Date(value).toLocaleString([], {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+}
+
+function orderStatusLabel(status) {
+    return String(status || "created").toLowerCase() === "completed" ? "Completed" : "Processing";
+}
+
+function renderAccountOrderRows(orders, compact) {
+    if (!orders.length) {
+        return "<div class=\"account-empty-row\"><span>You have not placed an order yet.</span><button type=\"button\" class=\"account-start-order\">Browse Menu</button></div>";
+    }
+    return "<div class=\"account-order-list\">" + orders.map(function(order) {
+        var qty = (order.items || []).reduce(function(sum, item) {
+            return sum + Number(item.qty || 0);
+        }, 0);
+        var first = order.items && order.items[0] ? order.items[0] : {};
+        var completed = String(order.status || "").toLowerCase() === "completed";
+        return "<article class=\"account-order-row" + (completed ? " completed" : "") + "\">" +
+            "<img src=\"" + escapeHtml(first.img || "images/menu/menu-1.png") + "\" alt=\"" + escapeHtml(first.title || "Order") + "\">" +
+            "<div class=\"account-order-copy\">" +
+            "<strong>Order #" + escapeHtml(order.id) + "</strong>" +
+            "<span>" + qty + " items · " + formatMoney(order.total) + " · " + formatOrderDate(order.createdAt) + "</span>" +
+            (completed ? "<em>Your order is completed.</em>" : "") +
+            (!compact && order.items ? "<small>" + order.items.map(function(item) { return escapeHtml(item.title) + " x " + Number(item.qty || 0); }).join(", ") + "</small>" : "") +
+            "</div>" +
+            "<b class=\"account-order-status\">" + orderStatusLabel(order.status) + "</b>" +
+            "</article>";
+    }).join("") + "</div>";
+}
+
+function renderAccountCartRows() {
+    if (!cartItems.length) {
+        return "<div class=\"account-cart-box empty\"><span>Your cart is empty.</span><button type=\"button\" class=\"account-start-order\">Browse Menu</button></div>";
+    }
+    var total = cartItems.reduce(function(sum, item) {
+        return sum + Number(item.priceValue || 0) * Number(item.qty || 0);
+    }, 0);
+    return "<div class=\"account-cart-box\">" +
+        "<div class=\"account-cart-list\">" + cartItems.map(function(item, index) {
+            var itemTotal = Number(item.priceValue || 0) * Number(item.qty || 0);
+            return "<article class=\"account-cart-row\">" +
+                "<img src=\"" + escapeHtml(item.img || "images/menu/menu-1.png") + "\" alt=\"" + escapeHtml(item.title || "Cart item") + "\">" +
+                "<div class=\"account-order-copy\">" +
+                "<strong>" + escapeHtml(item.title || "Untitled item") + "</strong>" +
+                "<span>" + escapeHtml(item.cat || "Menu") + " · " + escapeHtml(item.price || formatMoney(item.priceValue)) + "</span>" +
+                "<small>Qty " + Number(item.qty || 0) + " · " + formatMoney(itemTotal) + "</small>" +
+                "</div>" +
+                "<div class=\"account-cart-controls\">" +
+                "<button type=\"button\" data-cart-action=\"dec\" data-cart-index=\"" + index + "\">-</button>" +
+                "<b>" + Number(item.qty || 0) + "</b>" +
+                "<button type=\"button\" data-cart-action=\"inc\" data-cart-index=\"" + index + "\">+</button>" +
+                "<button type=\"button\" data-cart-action=\"remove\" data-cart-index=\"" + index + "\">Remove</button>" +
+                "</div>" +
+                "</article>";
+        }).join("") + "</div>" +
+        "<div class=\"account-cart-total\"><span>Total</span><strong>" + formatMoney(total) + "</strong></div>" +
+        "<button type=\"button\" class=\"account-checkout-btn\" data-cart-action=\"checkout\">Checkout</button>" +
+        "<p class=\"account-cart-note\">" + (isLoggedIn ? "This cart is synced with Your Order." : "Please log in before checkout.") + "</p>" +
+        "</div>";
+}
+
+function renderAccountNotifications(orders) {
+    var completed = orders.filter(function(order) {
+        return String(order.status || "").toLowerCase() === "completed";
+    });
+    if (!completed.length) return "";
+    var latest = completed[completed.length - 1];
+    return "<div class=\"account-order-notice\">" +
+        "<i class=\"fas fa-circle-check\"></i>" +
+        "<div><strong>Order completed</strong><span>Your order #" + escapeHtml(latest.id) + " is ready. Thank you for ordering from Patria.</span></div>" +
+        "</div>";
+}
+
+function bindAccountStartOrderButtons() {
+    accountOv.querySelectorAll(".account-start-order").forEach(function(btn) {
+        if (btn.getAttribute("data-start-order-bound") === "true") return;
+        btn.setAttribute("data-start-order-bound", "true");
+        btn.addEventListener("click", function() {
+            closeAccount();
+            document.getElementById("category").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+    });
+}
+
+function renderAccountOrders() {
+    if (!accountOv) return;
+    var dashboardPanel = accountOv.querySelector("[data-account-page-panel=\"dashboard\"]");
+    var ordersPanel = accountOv.querySelector("[data-account-page-panel=\"orders\"]");
+    var recentSection = dashboardPanel && dashboardPanel.querySelector(".account-section");
+    var ordersSection = ordersPanel && ordersPanel.querySelector(".account-section");
+    var ordered = accountOrders.slice().sort(function(a, b) {
+        return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+    });
+
+    var stats = accountOv.querySelectorAll(".account-stat span");
+    if (stats[0]) stats[0].textContent = ordered.length + (ordered.length === 1 ? " order" : " orders");
+
+    if (recentSection) {
+        recentSection.innerHTML = "<div class=\"account-section-head\"><h3>Recent Orders</h3><button type=\"button\" data-account-page=\"orders\">View All Orders</button></div>" +
+            renderAccountNotifications(ordered) +
+            renderAccountOrderRows(ordered.slice(0, 3), true);
+    }
+    if (ordersSection) {
+        ordersSection.innerHTML = "<div class=\"account-section-head\"><h3>Current Cart</h3><button type=\"button\" class=\"account-start-order\">Add More</button></div>" +
+            renderAccountCartRows() +
+            "<div class=\"account-section-head account-history-head\"><h3>Recent Orders</h3><button type=\"button\" class=\"account-start-order\">Start an order</button></div>" +
+            renderAccountNotifications(ordered) +
+            renderAccountOrderRows(ordered, false);
+    }
+
+    accountOv.querySelectorAll("[data-account-page]").forEach(function(btn) {
+        if (btn.getAttribute("data-account-page-bound") === "true") return;
+        btn.setAttribute("data-account-page-bound", "true");
+        btn.addEventListener("click", function() {
+            showAccountDashboard(btn.getAttribute("data-account-page"));
+        });
+    });
+    bindAccountStartOrderButtons();
+}
+
+function loadAccountOrders() {
+    if (!isLoggedIn) return Promise.resolve([]);
+    return apiRequest("/api/orders", { method: "GET" }).then(function(data) {
+        accountOrders = data.orders || [];
+        renderAccountOrders();
+        return accountOrders;
+    }).catch(function(err) {
+        console.warn(err.message);
+        return accountOrders;
+    });
+}
+
+function startAccountOrdersPolling() {
+    if (accountOrdersTimer || !isLoggedIn) return;
+    accountOrdersTimer = setInterval(function() {
+        if (accountOv && accountOv.classList.contains("open") && isLoggedIn) {
+            loadAccountOrders();
+        }
+    }, 10000);
+}
+
+function stopAccountOrdersPolling() {
+    if (!accountOrdersTimer) return;
+    clearInterval(accountOrdersTimer);
+    accountOrdersTimer = null;
+}
+
 function setAuth(data) {
     if (data.token) {
         authToken = data.token;
@@ -137,6 +310,7 @@ function setAuth(data) {
     isLoggedIn = Boolean(authToken);
     if (data.cart) cartItems = data.cart.items || [];
     updateAccountDashboard();
+    loadAccountOrders();
 }
 
 function updateAccountDashboard() {
@@ -187,6 +361,12 @@ if (accountOv && accountOpen && accountClose) {
 
     accountClose.addEventListener("click", closeAccount);
 
+    accountOv.querySelectorAll(".account-nav a").forEach(function(link) {
+        link.addEventListener("click", function() {
+            closeAccount();
+        });
+    });
+
     accountOv.addEventListener("click", function(e) {
         if (e.target === accountOv) closeAccount();
     });
@@ -224,11 +404,14 @@ function showAccountDashboard(page) {
     if (panel) panel.style.display = "none";
     if (accountDashboard) accountDashboard.classList.add("open");
     setAccountPage(page || "dashboard");
+    loadAccountOrders();
+    startAccountOrdersPolling();
 }
 
 function closeAccount() {
     accountOv.classList.remove("open");
     document.body.style.overflow = "";
+    stopAccountOrdersPolling();
 }
 
 if (accountOv) {
@@ -280,17 +463,14 @@ if (accountOv) {
     });
 
     accountOv.querySelectorAll("[data-account-page]").forEach(function(btn) {
+        if (btn.getAttribute("data-account-page-bound") === "true") return;
+        btn.setAttribute("data-account-page-bound", "true");
         btn.addEventListener("click", function() {
             showAccountDashboard(btn.getAttribute("data-account-page"));
         });
     });
 
-    accountOv.querySelectorAll(".account-start-order").forEach(function(btn) {
-        btn.addEventListener("click", function() {
-            closeAccount();
-            document.getElementById("category").scrollIntoView({ behavior: "smooth", block: "start" });
-        });
-    });
+    bindAccountStartOrderButtons();
 
     accountOv.querySelectorAll(".account-save-btn").forEach(function(btn) {
         btn.addEventListener("click", function() {
@@ -393,6 +573,7 @@ function renderOrder() {
 function syncCart(data) {
     cartItems = data.items || [];
     renderOrder();
+    renderAccountOrders();
 }
 
 function updateCartItem(index, action) {
@@ -432,6 +613,7 @@ function checkoutOrder() {
     apiRequest("/api/checkout", { method: "POST" }).then(function(data) {
         pendingCheckout = false;
         syncCart(data.cart || { items: [] });
+        loadAccountOrders();
         alert("Order created: " + data.order.id);
     }).catch(function(err) {
         alert(err.message);

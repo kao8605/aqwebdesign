@@ -53,23 +53,29 @@
     "17e201c6ee2f4d2f50a1086c809d40e32de48dfcf11feada9b993716de0bc312": {
       "userId": "f5a7d19b30560cc00b6b635f7c9520b78a778c178399aa977b6d2e1635639bdf",
       "createdAt": "2026-07-29T10:33:51.992Z"
+    },
+    "6a7fdaf6c2c347f40d04c57b9ab0ff713521761980d3b8db6bd00e3b4bba4554": {
+      "userId": "af6a671ffdc4474cdc7d8dfdc37ab0a4cdb76984440d7b5fe86c46c61588a907",
+      "createdAt": "2026-07-29T12:51:56.542Z"
     }
   },
-  "guestCarts": {},
-  "userCarts": {
-    "6e351042aab2f8387e5a72e9ca5e3ed8851c1f74f3dcc2f7d2ffe46c00c9cf4b": [],
-    "af6a671ffdc4474cdc7d8dfdc37ab0a4cdb76984440d7b5fe86c46c61588a907": [
+  "guestCarts": {
+    "ms5wjva64xyz8b8u8mj": [
       {
         "id": "chicken-noodle-lunch-set",
         "title": "Chicken Noodle Lunch Set",
         "cat": "NOODLES",
         "price": "$11.99",
         "priceValue": 11.99,
-        "img": "img/QuickMeals/2.png",
+        "img": "img/QuickMeals/2.webp",
         "desc": "A fast lunch set with stir-fried noodles, chicken, broccoli, peppers, onions and shiitake mushrooms.",
-        "qty": 3
+        "qty": 1
       }
     ]
+  },
+  "userCarts": {
+    "6e351042aab2f8387e5a72e9ca5e3ed8851c1f74f3dcc2f7d2ffe46c00c9cf4b": [],
+    "af6a671ffdc4474cdc7d8dfdc37ab0a4cdb76984440d7b5fe86c46c61588a907": []
   },
   "orders": [
     {
@@ -90,6 +96,36 @@
       "total": 27.98,
       "status": "created",
       "createdAt": "2026-07-29T09:35:35.072Z"
+    },
+    {
+      "id": "05fcc7df804d",
+      "userId": "af6a671ffdc4474cdc7d8dfdc37ab0a4cdb76984440d7b5fe86c46c61588a907",
+      "items": [
+        {
+          "id": "chicken-noodle-lunch-set",
+          "title": "Chicken Noodle Lunch Set",
+          "cat": "NOODLES",
+          "price": "$11.99",
+          "priceValue": 11.99,
+          "img": "img/QuickMeals/2.png",
+          "desc": "A fast lunch set with stir-fried noodles, chicken, broccoli, peppers, onions and shiitake mushrooms.",
+          "qty": 3
+        },
+        {
+          "id": "chicken-fried-rice-set",
+          "title": "Chicken Fried Rice Set",
+          "cat": "RICE",
+          "price": "$12.99",
+          "priceValue": 12.99,
+          "img": "img/QuickMeals/3.webp",
+          "desc": "A satisfying fried rice lunch set with egg, peas, carrots, scallions, chicken and broccoli.",
+          "qty": 1
+        }
+      ],
+      "total": 48.96,
+      "status": "completed",
+      "createdAt": "2026-07-29T13:05:00.377Z",
+      "updatedAt": "2026-07-29T17:48:10.483Z"
     }
   ]
 }

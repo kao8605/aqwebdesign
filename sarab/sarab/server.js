@@ -16,6 +16,7 @@ const MIME = {
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
+  '.webp': 'image/webp',
   '.svg': 'image/svg+xml',
   '.woff': 'font/woff',
   '.woff2': 'font/woff2',
@@ -24,7 +25,7 @@ const MIME = {
 };
 
 fs.mkdirSync(DATA_DIR, { recursive: true });
-if (!fs.existsSync(DB_PATH)) writeDb({ users: [], sessions: {}, guestCarts: {}, userCarts: {}, orders: [] });
+if (!fs.existsSync(DB_PATH)) writeDb({ users: [], sessions: {}, guestCarts: {}, userCarts: {}, orders: [], productOverrides: {}, deletedProducts: [] });
 
 function readDb() {
   return JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
@@ -120,6 +121,18 @@ function productsFromHtml() {
   return products;
 }
 
+function productsWithOverrides(db) {
+  const overrides = db.productOverrides || {};
+  const deleted = new Set(db.deletedProducts || []);
+  return productsFromHtml().filter(product => !deleted.has(product.id)).map(product => {
+    const edited = overrides[product.id] || {};
+    const merged = { ...product, ...edited, id: product.id };
+    merged.priceValue = Number(merged.priceValue || String(merged.price || '').replace(/[^0-9.]/g, '')) || 0;
+    merged.price = merged.price || ('$' + merged.priceValue.toFixed(2));
+    return merged;
+  });
+}
+
 function slug(text) {
   return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
@@ -154,12 +167,52 @@ async function handleApi(req, res) {
   if (req.method === 'OPTIONS') return send(res, 200, { ok: true });
   const url = new URL(req.url, 'http://localhost');
   const db = readDb();
-  const products = productsFromHtml();
+  const products = productsWithOverrides(db);
   const auth = getAuth(req, db);
   const guestId = req.headers['x-guest-id'];
 
   try {
     if (req.method === 'GET' && url.pathname === '/api/products') return send(res, 200, { products });
+
+    if (req.method === 'PATCH' && url.pathname === '/api/admin/products') {
+      const body = await readBody(req);
+      const product = products.find(p => p.id === body.id);
+      if (!product) return send(res, 404, { error: 'Product not found.' });
+      const title = String(body.title || product.title).trim();
+      const cat = String(body.cat || product.cat || 'Menu').trim();
+      const img = String(body.img || product.img || '').trim();
+      const desc = String(body.desc || product.desc || '').trim();
+      const quantity = Math.max(0, Number(body.quantity ?? product.quantity ?? 0));
+      const priceValue = Number(body.priceValue || String(body.price || product.price).replace(/[^0-9.]/g, ''));
+      if (!title) return send(res, 400, { error: 'Product title is required.' });
+      if (!Number.isFinite(priceValue) || priceValue < 0) return send(res, 400, { error: 'Product price is invalid.' });
+      if (!Number.isFinite(quantity)) return send(res, 400, { error: 'Product quantity is invalid.' });
+
+      db.productOverrides ||= {};
+      db.productOverrides[product.id] = {
+        title,
+        cat,
+        img,
+        desc,
+        quantity,
+        priceValue: Number(priceValue.toFixed(2)),
+        price: '$' + Number(priceValue).toFixed(2),
+        updatedAt: new Date().toISOString()
+      };
+      writeDb(db);
+      return send(res, 200, { product: { ...product, ...db.productOverrides[product.id], id: product.id } });
+    }
+
+    if (req.method === 'DELETE' && url.pathname === '/api/admin/products') {
+      const body = await readBody(req);
+      const product = products.find(p => p.id === body.id);
+      if (!product) return send(res, 404, { error: 'Product not found.' });
+      db.deletedProducts ||= [];
+      if (!db.deletedProducts.includes(product.id)) db.deletedProducts.push(product.id);
+      if (db.productOverrides) delete db.productOverrides[product.id];
+      writeDb(db);
+      return send(res, 200, { ok: true, id: product.id });
+    }
 
     if (req.method === 'POST' && url.pathname === '/api/register') {
       const body = await readBody(req);
@@ -298,7 +351,30 @@ async function handleApi(req, res) {
     }
 
     if (req.method === 'GET' && url.pathname === '/api/admin/orders') {
-      return send(res, 200, { orders: db.orders });
+      const adminOrders = db.orders.map(order => {
+        const user = db.users.find(u => u.id === order.userId);
+        return {
+          ...order,
+          customer: user ? { name: user.name, email: user.email, phone: user.phone || '' } : null
+        };
+      });
+      return send(res, 200, { orders: adminOrders });
+    }
+
+    if (req.method === 'PATCH' && url.pathname === '/api/admin/orders/status') {
+      const body = await readBody(req);
+      const order = db.orders.find(o => o.id === body.orderId);
+      if (!order) return send(res, 404, { error: 'Order not found.' });
+      order.status = String(body.status || 'completed').trim() || 'completed';
+      order.updatedAt = new Date().toISOString();
+      writeDb(db);
+      const user = db.users.find(u => u.id === order.userId);
+      return send(res, 200, {
+        order: {
+          ...order,
+          customer: user ? { name: user.name, email: user.email, phone: user.phone || '' } : null
+        }
+      });
     }
 
     return send(res, 404, { error: 'API not found.' });
