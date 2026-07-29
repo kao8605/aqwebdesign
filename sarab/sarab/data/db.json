@@ -1,0 +1,45 @@
+{
+  "users": [
+    {
+      "id": "6e351042aab2f8387e5a72e9ca5e3ed8851c1f74f3dcc2f7d2ffe46c00c9cf4b",
+      "name": "Test User",
+      "email": "test1785317734967@example.com",
+      "phone": "123",
+      "salt": "4bb9b84915322932b8638c427fdaf9c5",
+      "passwordHash": "b25a63e18aafaf8c9b2bddb56d3bf4e75bbef369e31102641146edc89dcfdbc05dbd8ac9e70f150a26c41b98dc79b95c76aacc4978da47fea9489c8eb5587e64",
+      "address": null,
+      "createdAt": "2026-07-29T09:35:35.070Z"
+    }
+  ],
+  "sessions": {
+    "7c7054a352e6b57fd26bae9da182ecf0477842287c132fefa7fbb761e40336be": {
+      "userId": "6e351042aab2f8387e5a72e9ca5e3ed8851c1f74f3dcc2f7d2ffe46c00c9cf4b",
+      "createdAt": "2026-07-29T09:35:35.070Z"
+    }
+  },
+  "guestCarts": {},
+  "userCarts": {
+    "6e351042aab2f8387e5a72e9ca5e3ed8851c1f74f3dcc2f7d2ffe46c00c9cf4b": []
+  },
+  "orders": [
+    {
+      "id": "e68624460f77",
+      "userId": "6e351042aab2f8387e5a72e9ca5e3ed8851c1f74f3dcc2f7d2ffe46c00c9cf4b",
+      "items": [
+        {
+          "id": "chicken-rice-lunch-set",
+          "title": "Chicken Rice Lunch Set",
+          "cat": "RICE",
+          "price": "$13.99",
+          "priceValue": 13.99,
+          "img": "img/QuickMeals/1.png",
+          "desc": "A quick lunch set with steamed rice, saucy chicken, broccoli, baby corn, mushrooms and cabbage.",
+          "qty": 2
+        }
+      ],
+      "total": 27.98,
+      "status": "created",
+      "createdAt": "2026-07-29T09:35:35.072Z"
+    }
+  ]
+}

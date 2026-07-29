@@ -1,4 +1,4 @@
-# Sarab – Free Fast Food & Restaurant HTML Template
+# Patria – Free Fast Food & Restaurant HTML Template
 #### Preview
 
  - [Demo](https://themewagon.github.io/sarab/)

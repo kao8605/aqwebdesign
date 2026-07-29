@@ -73,6 +73,357 @@ function closeSearch() {
     document.body.style.overflow = '';
 }
 
+var authToken = localStorage.getItem("patriaAuthToken") || "";
+var guestId = localStorage.getItem("patriaGuestId") || (Date.now().toString(36) + Math.random().toString(36).slice(2));
+localStorage.setItem("patriaGuestId", guestId);
+var currentUser = null;
+var isLoggedIn = Boolean(authToken);
+var pendingCheckout = false;
+
+function productSlug(text) {
+    return String(text).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
+function apiRequest(path, options) {
+    options = options || {};
+    options.headers = options.headers || {};
+    options.headers["Content-Type"] = "application/json";
+    options.headers["X-Guest-Id"] = guestId;
+    if (authToken) options.headers.Authorization = "Bearer " + authToken;
+    if (options.body && typeof options.body !== "string") options.body = JSON.stringify(options.body);
+
+    return fetch(path, options).then(function(res) {
+        return res.json().then(function(data) {
+            if (!res.ok) throw new Error(data.error || "Request failed.");
+            return data;
+        });
+    });
+}
+
+function setAuth(data) {
+    if (data.token) {
+        authToken = data.token;
+        localStorage.setItem("patriaAuthToken", authToken);
+    }
+    if (data.user) currentUser = data.user;
+    isLoggedIn = Boolean(authToken);
+    if (data.cart) cartItems = data.cart.items || [];
+    updateAccountDashboard();
+}
+
+function updateAccountDashboard() {
+    var name = currentUser && currentUser.name ? currentUser.name : "jinfeng8605";
+    accountOv && accountOv.querySelectorAll(".account-main h2").forEach(function(h2) {
+        if (h2.textContent.indexOf("Welcome back") >= 0) h2.innerHTML = "Welcome back,<br/>" + name;
+    });
+    accountOv && accountOv.querySelectorAll(".account-stat span").forEach(function(span) {
+        if (span.textContent === "jinfeng8605") span.textContent = name;
+    });
+}
+
+function setAccountError(form, message) {
+    var error = form && form.querySelector(".account-error");
+    if (error) error.textContent = message || "";
+}
+
+function validateAccountForm(form) {
+    var fields = form.querySelectorAll("input[type=\"text\"], input[type=\"email\"], input[type=\"password\"]");
+    var valid = true;
+    fields.forEach(function(field) {
+        var empty = !field.value.trim();
+        field.classList.toggle("field-error", empty);
+        if (empty) valid = false;
+    });
+    if (!valid) setAccountError(form, "Please fill in all required fields.");
+    else setAccountError(form, "");
+    return valid;
+}
+
+
+var accountOv = document.getElementById("accountOv");
+var accountOpen = document.getElementById("accountOpen");
+var accountClose = document.getElementById("accountClose");
+var accountDashboard = document.getElementById("accountDashboard");
+
+if (accountOv && accountOpen && accountClose) {
+    accountOpen.addEventListener("click", function(e) {
+        e.preventDefault();
+        if (isLoggedIn) {
+            showAccountDashboard();
+        } else {
+            showAccountForm();
+        }
+        accountOv.classList.add("open");
+        document.body.style.overflow = "hidden";
+    });
+
+    accountClose.addEventListener("click", closeAccount);
+
+    accountOv.addEventListener("click", function(e) {
+        if (e.target === accountOv) closeAccount();
+    });
+
+    accountOv.querySelectorAll(".account-password button").forEach(function(btn) {
+        btn.addEventListener("click", function() {
+            var input = btn.parentElement.querySelector("input");
+            input.type = input.type === "password" ? "text" : "password";
+        });
+    });
+}
+
+function showAccountForm() {
+    var hero = accountOv.querySelector(".account-hero");
+    var panel = accountOv.querySelector(".account-panel");
+    if (hero) hero.style.display = "block";
+    if (panel) panel.style.display = "block";
+    if (accountDashboard) accountDashboard.classList.remove("open");
+}
+
+function setAccountPage(page) {
+    accountOv.querySelectorAll("[data-account-page]").forEach(function(btn) {
+        btn.classList.toggle("active", btn.getAttribute("data-account-page") === page);
+    });
+    accountOv.querySelectorAll("[data-account-page-panel]").forEach(function(panel) {
+        panel.classList.toggle("active", panel.getAttribute("data-account-page-panel") === page);
+    });
+}
+
+function showAccountDashboard(page) {
+    isLoggedIn = true;
+    var hero = accountOv.querySelector(".account-hero");
+    var panel = accountOv.querySelector(".account-panel");
+    if (hero) hero.style.display = "block";
+    if (panel) panel.style.display = "none";
+    if (accountDashboard) accountDashboard.classList.add("open");
+    setAccountPage(page || "dashboard");
+}
+
+function closeAccount() {
+    accountOv.classList.remove("open");
+    document.body.style.overflow = "";
+}
+
+if (accountOv) {
+    accountOv.querySelectorAll(".account-card").forEach(function(form) {
+        form.addEventListener("submit", function(e) {
+            e.preventDefault();
+        });
+    });
+
+    accountOv.querySelectorAll(".account-btn").forEach(function(btn) {
+        btn.addEventListener("click", function(e) {
+            e.preventDefault();
+            var form = btn.closest(".account-card");
+            if (!validateAccountForm(form)) return;
+
+            var action = btn.getAttribute("data-account-action");
+            var fields = form.querySelectorAll("input[type=\"text\"], input[type=\"email\"], input[type=\"password\"]");
+            var body;
+
+            if (action === "register") {
+                body = {
+                    name: fields[0].value.trim(),
+                    email: fields[1].value.trim(),
+                    phone: fields[2].value.trim(),
+                    password: fields[3].value,
+                    guestId: guestId
+                };
+                apiRequest("/api/register", { method: "POST", body: body }).then(function(data) {
+                    setAuth(data);
+                    showAccountDashboard();
+                    renderOrder();
+                    if (pendingCheckout) checkoutOrder();
+                }).catch(function(err) {
+                    setAccountError(form, err.message);
+                });
+                return;
+            }
+
+            body = { login: fields[0].value.trim(), password: fields[1].value, guestId: guestId };
+            apiRequest("/api/login", { method: "POST", body: body }).then(function(data) {
+                setAuth(data);
+                showAccountDashboard();
+                renderOrder();
+                if (pendingCheckout) checkoutOrder();
+            }).catch(function(err) {
+                setAccountError(form, err.message);
+            });
+        });
+    });
+
+    accountOv.querySelectorAll("[data-account-page]").forEach(function(btn) {
+        btn.addEventListener("click", function() {
+            showAccountDashboard(btn.getAttribute("data-account-page"));
+        });
+    });
+
+    accountOv.querySelectorAll(".account-start-order").forEach(function(btn) {
+        btn.addEventListener("click", function() {
+            closeAccount();
+            document.getElementById("category").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+    });
+
+    accountOv.querySelectorAll(".account-save-btn").forEach(function(btn) {
+        btn.addEventListener("click", function() {
+            var panel = btn.closest("[data-account-page-panel]");
+            var inputs = panel.querySelectorAll("input");
+            if (panel.getAttribute("data-account-page-panel") === "addresses") {
+                apiRequest("/api/address", {
+                    method: "PUT",
+                    body: { fullName: inputs[0].value, phone: inputs[1].value, address: inputs[2].value, city: inputs[3].value, zip: inputs[4].value }
+                }).then(function(data) {
+                    currentUser = data.user;
+                    alert("Address saved.");
+                }).catch(function(err) { alert(err.message); });
+                return;
+            }
+            apiRequest("/api/me", {
+                method: "PUT",
+                body: { name: inputs[0].value, email: inputs[1].value, phone: inputs[2].value, password: inputs[3].value }
+            }).then(function(data) {
+                currentUser = data.user;
+                updateAccountDashboard();
+                alert("Account details saved.");
+            }).catch(function(err) { alert(err.message); });
+        });
+    });
+
+    var accountLogout = document.getElementById("accountLogout");
+    if (accountLogout) {
+        accountLogout.addEventListener("click", function() {
+            apiRequest("/api/logout", { method: "POST" }).finally(function() {
+                authToken = "";
+                currentUser = null;
+                isLoggedIn = false;
+                localStorage.removeItem("patriaAuthToken");
+                showAccountForm();
+                renderOrder();
+            });
+        });
+    }
+}
+
+var orderOv = document.getElementById("orderOv");
+var orderOpen = document.getElementById("orderOpen");
+var orderClose = document.getElementById("orderClose");
+
+if (orderOv && orderOpen && orderClose) {
+    orderOpen.addEventListener("click", function(e) {
+        e.preventDefault();
+        renderOrder();
+        orderOv.classList.add("open");
+        document.body.style.overflow = "hidden";
+    });
+
+    orderClose.addEventListener("click", closeOrder);
+
+    orderOv.addEventListener("click", function(e) {
+        if (e.target === orderOv) closeOrder();
+    });
+}
+
+function closeOrder() {
+    orderOv.classList.remove("open");
+    document.body.style.overflow = "";
+}
+
+function renderOrder() {
+    var orderBody = document.getElementById("orderBody");
+    if (!orderBody) return;
+
+    if (!cartItems.length) {
+        orderBody.classList.add("is-empty");
+        orderBody.innerHTML = "<p class=\"order-empty\">No products in the cart.</p>";
+        return;
+    }
+
+    orderBody.classList.remove("is-empty");
+    var total = cartItems.reduce(function(sum, item) {
+        return sum + item.priceValue * item.qty;
+    }, 0);
+
+    orderBody.innerHTML = "<div class=\"order-list\">" + cartItems.map(function(item, index) {
+        var itemTotal = item.priceValue * item.qty;
+        return "<div class=\"order-item\">" +
+            "<img src=\"" + item.img + "\" alt=\"" + item.title + "\"/>" +
+            "<div class=\"order-item-info\"><div class=\"order-item-title\">" + item.title + "</div>" +
+            "<div class=\"order-item-meta\">" + item.cat + " · " + item.price + "</div>" +
+            "<div class=\"order-controls\">" +
+            "<button type=\"button\" class=\"order-qty-btn\" data-cart-action=\"dec\" data-cart-index=\"" + index + "\">-</button>" +
+            "<span class=\"order-qty\">" + item.qty + "</span>" +
+            "<button type=\"button\" class=\"order-qty-btn\" data-cart-action=\"inc\" data-cart-index=\"" + index + "\">+</button>" +
+            "<button type=\"button\" class=\"order-remove\" data-cart-action=\"remove\" data-cart-index=\"" + index + "\">Remove</button>" +
+            "</div>" +
+            "<div class=\"order-item-total\">$" + itemTotal.toFixed(2) + "</div></div>" +
+            "</div>";
+    }).join("") + "<div class=\"order-summary\"><span>Total</span><span>$" + total.toFixed(2) + "</span></div>" +
+        "<button type=\"button\" class=\"order-checkout\" data-cart-action=\"checkout\">Checkout</button>" +
+        "<p class=\"order-login-note\">" + (isLoggedIn ? "You are logged in and ready to checkout." : "Please log in before checkout.") + "</p></div>";
+}
+
+function syncCart(data) {
+    cartItems = data.items || [];
+    renderOrder();
+}
+
+function updateCartItem(index, action) {
+    if (action === "checkout") {
+        checkoutOrder();
+        return;
+    }
+
+    var item = cartItems[index];
+    if (!item) return;
+
+    if (action === "remove") {
+        apiRequest("/api/cart/item", { method: "DELETE", body: { productId: item.id, guestId: guestId } }).then(syncCart);
+        return;
+    }
+
+    var qty = item.qty + (action === "inc" ? 1 : -1);
+    apiRequest("/api/cart/item", { method: "PATCH", body: { productId: item.id, qty: qty, guestId: guestId } }).then(syncCart);
+}
+
+function checkoutOrder() {
+    if (!cartItems.length) return;
+
+    if (!isLoggedIn) {
+        pendingCheckout = true;
+        closeOrder();
+        showAccountForm();
+        accountOv.classList.add("open");
+        document.body.style.overflow = "hidden";
+        return;
+    }
+
+    apiRequest("/api/checkout", { method: "POST" }).then(function(data) {
+        pendingCheckout = false;
+        syncCart(data.cart || { items: [] });
+        alert("Order created: " + data.order.id);
+    }).catch(function(err) {
+        alert(err.message);
+    });
+}
+
+function addCartItem(item, qty) {
+    return apiRequest("/api/cart/add", {
+        method: "POST",
+        body: { productId: item.productId, title: item.title, qty: qty, guestId: guestId }
+    }).then(function(data) {
+        syncCart(data);
+    });
+}
+
+document.addEventListener("click", function(e) {
+    var btn = e.target.closest("[data-cart-action]");
+    if (!btn) return;
+
+    var index = parseInt(btn.getAttribute("data-cart-index"), 10);
+    var action = btn.getAttribute("data-cart-action");
+    updateCartItem(index, action);
+});
+
 // Category buttons inside search box
 document.querySelectorAll('.sovcat').forEach(function(btn) {
     btn.addEventListener('click', function() {
@@ -165,6 +516,8 @@ document.querySelectorAll('.catcard').forEach(function(card) {
 
 var menuPop = document.getElementById('menuPop');
 var mpQty = 1;
+var currentMenuItem = null;
+var cartItems = [];
 
 function openMenuPop(card) {
     var img = card.getAttribute('data-img');
@@ -178,6 +531,14 @@ function openMenuPop(card) {
     var time = card.getAttribute('data-time');
     var desc = card.getAttribute('data-desc');
     var tags = card.getAttribute('data-tags') || '';
+    currentMenuItem = {
+        img: img,
+        title: title,
+        cat: cat,
+        price: price,
+        priceValue: parseFloat(String(price).replace(/[^0-9.]/g, '')) || 0,
+        productId: productSlug(title)
+    };
 
     document.getElementById('mpImg').setAttribute('src', img);
     document.getElementById('mpCat').textContent = cat;
@@ -260,16 +621,22 @@ document.getElementById('mpMinus').addEventListener('click', function() {
 
 // Add to cart button
 document.getElementById('mpAddCart').addEventListener('click', function() {
-    var cnt = parseInt(document.getElementById('cartCount').textContent) + mpQty;
-    document.getElementById('cartCount').textContent = cnt;
-    this.innerHTML = '<i class="fas fa-check"></i> Added to Cart!';
-    this.style.background = 'linear-gradient(135deg,var(--green),#1a4a35)';
+    if (!currentMenuItem) return;
+
     var self = this;
-    setTimeout(function() {
-        closeMenuPop();
-        self.innerHTML = '<i class="fas fa-shopping-cart"></i> Add to Cart';
-        self.style.background = '';
-    }, 1000);
+    addCartItem(currentMenuItem, mpQty).then(function() {
+        self.innerHTML = '<i class="fas fa-check"></i> Added to Cart!';
+        self.style.background = 'linear-gradient(135deg,var(--green),#1a4a35)';
+        setTimeout(function() {
+            closeMenuPop();
+            self.innerHTML = '<i class="fas fa-shopping-cart"></i> Add to Cart';
+            self.style.background = '';
+            orderOv.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }, 650);
+    }).catch(function(err) {
+        alert(err.message);
+    });
 });
 
 
@@ -447,3 +814,16 @@ window.addEventListener('scroll', function() {
         });
     }
 });
+
+apiRequest('/api/cart').then(syncCart).catch(function() {});
+if (authToken) {
+    apiRequest('/api/me').then(function(data) {
+        currentUser = data.user;
+        isLoggedIn = true;
+        updateAccountDashboard();
+    }).catch(function() {
+        authToken = '';
+        isLoggedIn = false;
+        localStorage.removeItem('patriaAuthToken');
+    });
+}
