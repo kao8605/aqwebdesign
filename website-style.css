@@ -23,7 +23,7 @@
 #hero.home-hero {
     --hero-glow-x: 50%;
     --hero-glow-y: 50%;
-    background-image: url('ChatGPT Image 2026年7月17日 下午07_51_07.png');
+    background-image: url('ChatGPT Image 2026年7月17日 下午07_51_07.webp');
     background-color: var(--site-bg);
     background-size: cover;
     background-position: center;
@@ -79,7 +79,7 @@
 }
 
 #hero.corporate-website-hero {
-    background-image: url('ChatGPT Image 2026年6月20日 上午12_38_49.png');
+    background-image: url('ChatGPT Image 2026年6月20日 上午12_38_49.webp');
     background-color: var(--site-bg);
     background-size: 100% auto;
     background-position: center -30px;
@@ -100,7 +100,7 @@ body:has(#hero.corporate-website-hero) main {
 }
 
 #hero.ecommerce-store-hero {
-    background-image: url('ChatGPT Image 2026年6月20日 上午01_30_37.png');
+    background-image: url('ChatGPT Image 2026年6月20日 上午01_30_37.webp');
     background-color: var(--site-bg);
     background-size: contain;
     background-position: center;
@@ -285,7 +285,7 @@ body:has(#hero.corporate-website-hero) main {
     margin: 0;
     padding: 0;
     scroll-margin-top: 90px;
-    background-image: url('ChatGPT Image 2026年6月20日 上午01_30_37.png');
+    background-image: url('ChatGPT Image 2026年6月20日 上午01_30_37.webp');
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;

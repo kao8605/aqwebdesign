@@ -4083,7 +4083,7 @@ td:last-child {
     left: 0;
     z-index: 1;
     pointer-events: none;
-    background-image: url("../20267251153.png");
+    background-image: url("../20267251153.webp");
     background-repeat: no-repeat;
     background-position: right -370px top -210px;
     background-size: min(78vw, 1080px) auto;
@@ -4508,7 +4508,7 @@ td:last-child {
     left: -300px;
     z-index: 1;
     pointer-events: none;
-    background-image: url("../20267251244.png");
+    background-image: url("../20267251244.webp");
     background-repeat: no-repeat;
     background-position: left 1150px top 100px;
     background-size: min(78vw, 1080px) auto;
