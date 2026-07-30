@@ -108,30 +108,47 @@
 
         if (!(toggleButton && mainNavWrap)) return;
 
+        const closeMenu = function() {
+            toggleButton.classList.remove('is-clicked');
+            siteBody.classList.remove('menu-is-open');
+        };
+
         toggleButton.addEventListener('click', function(event) {
             event.preventDefault();
-            toggleButton.classList.toggle('is-clicked');
-            siteBody.classList.toggle('menu-is-open');
+            const isOpen = siteBody.classList.contains('menu-is-open');
+            if (isOpen) {
+                closeMenu();
+            } else {
+                toggleButton.classList.add('is-clicked');
+                siteBody.classList.add('menu-is-open');
+            }
         });
 
         mainNavWrap.querySelectorAll('.s-header__nav a').forEach(function(link) {
 
             link.addEventListener("click", function(event) {
 
-                // at 800px and below
-                if (window.matchMedia('(max-width: 800px)').matches) {
-                    toggleButton.classList.toggle('is-clicked');
-                    siteBody.classList.toggle('menu-is-open');
+                // at 900px and below
+                if (window.matchMedia('(max-width: 900px)').matches) {
+                    closeMenu();
                 }
             });
         });
 
+        window.addEventListener('scroll', function() {
+            if (
+                window.matchMedia('(max-width: 900px)').matches &&
+                siteBody.classList.contains('menu-is-open')
+            ) {
+                closeMenu();
+            }
+        }, { passive: true });
+
         window.addEventListener('resize', function() {
 
-            // above 800px
-            if (window.matchMedia('(min-width: 801px)').matches) {
-                if (siteBody.classList.contains('menu-is-open')) siteBody.classList.remove('menu-is-open');
-                if (toggleButton.classList.contains('is-clicked')) toggleButton.classList.remove('is-clicked');
+            // above 900px
+            if (window.matchMedia('(min-width: 901px)').matches) {
+                closeMenu();
             }
         });
 

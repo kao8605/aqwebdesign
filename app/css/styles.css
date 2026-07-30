@@ -889,7 +889,7 @@ textarea {
 /* --------------------------------------------------------------------
  * ## tablet devices 
  * -------------------------------------------------------------------- */
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 900px) {
     .tab-1 {
         flex  : none;
         width : 8.33333%;
@@ -1646,7 +1646,7 @@ hr.fancy::before {
     color       : var(--color-text-light);
 }
 
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 900px) {
     .lead,
     .attention-getter {
         font-size   : calc(var(--text-size) * 1.0556);
@@ -3201,7 +3201,7 @@ img.u-pull-left {
     }
 }
 
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 900px) {
     .s-header {
         --logo-width : 80px;
         top          : var(--vspace-0_5);
@@ -3222,32 +3222,41 @@ img.u-pull-left {
 
     .s-header__logo {
         position  : absolute;
-        left      : 0;
+        left      : 50%;
         top       : 50%;
-        transform : translate(4.2rem, -50%);
+        transform : translate(-50%, -50%);
     }
 
     .s-header__nav {
+        opacity          : 0;
+        visibility       : hidden;
+        pointer-events   : none;
         transform        : scaleY(0);
-        transform-origin : center top;
+        transform-origin : right top;
         display          : block;
-        background-color : var(--color-gray-19);
-        width            : 100%;
-        padding-top      : calc(var(--header-height) + var(--vspace-1_25));
-        padding-right    : 4.2rem;
-        padding-left     : 4.2rem;
-        padding-bottom   : 4rem;
+        background-color : rgba(255, 255, 255, 0.96);
+        width            : min(26rem, calc(100vw - 4.8rem));
+        padding          : var(--vspace-0_75) var(--vspace-1);
+        border-radius    : var(--border-radius);
+        box-shadow       : 0 18px 45px rgba(0, 0, 0, 0.16);
+        backdrop-filter  : blur(12px);
         margin           : 0;
         position         : absolute;
-        top              : calc(var(--vspace-0_5) * -1);
-        left             : 0;
+        top              : calc(var(--header-height) + 0.8rem);
+        right            : 2.4rem;
+        left             : auto;
     }
 
     .s-header__nav a {
         display     : inline-block;
+        color       : var(--color-text-dark);
         font-size   : calc(var(--text-size) * 0.9444);
         line-height : 1;
-        padding     : var(--vspace-0_5) 0;
+        padding     : var(--vspace-0_375) 0;
+    }
+
+    .s-header__nav .current a {
+        color : var(--color-1);
     }
 
     .s-header__nav ul {
@@ -3263,14 +3272,32 @@ img.u-pull-left {
     }
 
     .s-header__menu-toggle {
-        display : block;
+        display          : block;
+        width            : 4.8rem;
+        height           : 4.8rem;
+        top              : calc((var(--header-height) - 4.8rem) / 2);
+        right            : 2.4rem;
+        border-radius    : 50%;
+        background-color : transparent;
+        backdrop-filter  : none;
+        box-shadow       : none;
+        z-index          : 20;
+    }
+
+    .s-header__menu-toggle span {
+        right            : 1.3rem;
+        background-color : white;
+        filter           : drop-shadow(0 2px 5px rgba(0, 0, 0, 0.55));
     }
 
     .menu-is-open .s-header {
-        height : auto;
+        height : var(--header-height);
     }
 
     .menu-is-open .s-header__nav {
+        opacity          : 1;
+        visibility       : visible;
+        pointer-events   : auto;
         transform        : scaleY(1);
         transition       : transform 0.4s cubic-bezier(0.215, 0.61, 0.355, 1);
         transition-delay : 0s;
@@ -3293,7 +3320,7 @@ img.u-pull-left {
 
 @media screen and (max-width: 400px) {
     .s-header__logo {
-        transform : translate(6.1vw, -50%);
+        transform : translate(-50%, -50%);
     }
 
     .s-header__nav {
@@ -3302,7 +3329,7 @@ img.u-pull-left {
     }
 
     .s-header__menu-toggle {
-        right : 0.4rem;
+        right : 1.6rem;
     }
 }
 
@@ -3646,12 +3673,32 @@ img.u-pull-left {
 }
 
 @media screen and (max-width: 600px) {
+    .s-intro {
+        height     : auto;
+        min-height : 92svh;
+    }
+
+    .s-intro__bg {
+        background-position : 42% center;
+    }
+
+    .s-intro__content {
+        min-height      : 92svh;
+        padding-top     : 18vh;
+        padding-bottom  : 6.8rem;
+        align-items     : flex-end;
+    }
+
     .s-intro__content-inner {
         padding-right : 4rem;
     }
 
     .s-intro__content-title {
         --text-multiplier : 0.56;
+    }
+
+    .s-intro__content-buttons {
+        transform : none;
     }
 
     .s-intro__social {
@@ -3674,12 +3721,24 @@ img.u-pull-left {
 }
 
 @media screen and (max-width: 400px) {
+    .s-intro {
+        min-height : 88svh;
+    }
+
+    .s-intro__content {
+        min-height     : 88svh;
+        padding-top    : 16vh;
+        padding-bottom : 5.8rem;
+    }
+
     .s-intro__content-inner {
         padding-right : 0;
     }
 
     .s-intro__content-title {
-        font-size : var(--text-xxxl);
+        font-size     : var(--text-xxxl);
+        line-height   : 1.12;
+        margin-bottom : var(--vspace-0_5);
     }
 
     .s-intro__content-btn {
@@ -3821,17 +3880,24 @@ img.u-pull-left {
     }
 
     .s-about__info-slider {
-        overflow: visible;
+        overflow-x : auto;
+        overflow-y : visible;
+        padding-bottom : var(--vspace-1);
+        scroll-snap-type : x mandatory;
+        -webkit-overflow-scrolling : touch;
     }
 
     .s-about__info-slider .swiper-wrapper {
-        display: block;
+        display: flex;
+        gap: var(--vspace-0_75);
         transform: none !important;
     }
 
     .s-about__info-slide {
-        width: 100% !important;
-        margin-bottom: var(--vspace-1);
+        flex: 0 0 82%;
+        width: 82% !important;
+        margin-bottom: 0;
+        scroll-snap-align: start;
     }
 }
 
@@ -4146,6 +4212,112 @@ img.u-pull-left {
 }
 
 @media screen and (max-width: 700px) {
+    .s-about__screens-block {
+        margin-top : var(--vspace-2);
+    }
+
+    .s-about__screens {
+        display  : block;
+        height   : min(118vw, 560px);
+        margin   : 0 auto;
+        overflow : hidden;
+    }
+
+    .s-about__screen,
+    .s-about__screen:nth-child(1),
+    .s-about__screen:nth-child(2),
+    .s-about__screen:nth-child(3) {
+        position : absolute;
+        top      : 0;
+        width    : min(68vw, 280px);
+    }
+
+    .s-about__screen img {
+        width  : 100%;
+        height : auto;
+    }
+
+    .s-about__screen:nth-child(1) {
+        left      : 7%;
+        transform : translateX(-16%) scale(0.94);
+        opacity   : 0.7;
+        z-index   : 1;
+    }
+
+    .s-about__screen:nth-child(2) {
+        left      : 50%;
+        transform : translateX(-50%) scale(0.97);
+        opacity   : 0.86;
+        z-index   : 2;
+    }
+
+    .s-about__screen:nth-child(3) {
+        right     : 7%;
+        transform : translateX(6%) scale(1);
+        opacity   : 1;
+        z-index   : 3;
+    }
+
+    .s-about__howto .s-about__howto-screens-block {
+        margin-top : var(--vspace-1_5);
+    }
+
+    .s-about__howto-screens {
+        width    : 100%;
+        height   : min(118vw, 560px);
+        margin   : 0 auto;
+        overflow : hidden;
+    }
+
+    .s-about__howto-screens img {
+        top       : 0;
+        width     : min(68vw, 280px);
+        height    : auto;
+        opacity   : 1;
+        right     : auto;
+        transform : none;
+        box-shadow : -13px 8px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .s-about__howto-screens img:nth-child(1) {
+        left      : 7%;
+        transform : translateX(-16%) scale(0.94);
+        opacity   : 0.7;
+        z-index   : 1;
+    }
+
+    .s-about__howto-screens img:nth-child(2) {
+        left      : 50%;
+        transform : translateX(-50%) scale(0.97);
+        opacity   : 0.86;
+        z-index   : 2;
+    }
+
+    .s-about__howto-screens img:nth-child(3) {
+        right     : 7%;
+        left      : auto;
+        transform : translateX(6%) scale(1);
+        opacity   : 1;
+        z-index   : 3;
+    }
+
+    .s-about__howto-screens img:nth-child(n+4) {
+        left      : 50%;
+        transform : translateX(-50%) scale(0.9);
+        opacity   : 0;
+        z-index   : 0;
+        pointer-events : none;
+    }
+
+    .s-about__howto-screens img.is-active {
+        left      : 50%;
+        right     : auto;
+        transform : translateX(-50%) scale(1.04);
+        opacity   : 1;
+        z-index   : 5;
+        box-shadow : 0 18px 40px rgba(0, 0, 0, 0.18);
+    }
+
     .s-about__howto-process {
         display : block;
     }
