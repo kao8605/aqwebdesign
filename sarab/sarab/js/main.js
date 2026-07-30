@@ -157,8 +157,27 @@ function formatOrderDate(value) {
     });
 }
 
+function orderLeadDays(items) {
+    return (items || []).reduce(function(max, item) {
+        var days = Number(item.day == null || item.day === "" ? 5 : item.day);
+        return Math.max(max, Number.isFinite(days) ? days : 5);
+    }, 0);
+}
+
+function dateAfterDays(days) {
+    var date = new Date();
+    date.setHours(0, 0, 0, 0);
+    date.setDate(date.getDate() + Number(days || 0));
+    var month = String(date.getMonth() + 1).padStart(2, "0");
+    var day = String(date.getDate()).padStart(2, "0");
+    return date.getFullYear() + "-" + month + "-" + day;
+}
+
 function orderStatusLabel(status) {
-    return String(status || "created").toLowerCase() === "completed" ? "Completed" : "Processing";
+    var value = String(status || "created").toLowerCase();
+    if (value === "picked_up") return "Picked Up";
+    if (value === "completed") return "Completed";
+    return "Processing";
 }
 
 function renderAccountOrderRows(orders, compact) {
@@ -170,13 +189,15 @@ function renderAccountOrderRows(orders, compact) {
             return sum + Number(item.qty || 0);
         }, 0);
         var first = order.items && order.items[0] ? order.items[0] : {};
-        var completed = String(order.status || "").toLowerCase() === "completed";
+        var status = String(order.status || "").toLowerCase();
+        var completed = status === "completed" || status === "picked_up";
+        var statusNote = status === "picked_up" ? "Your order has been picked up." : "Your order is completed.";
         return "<article class=\"account-order-row" + (completed ? " completed" : "") + "\">" +
             "<img src=\"" + escapeHtml(first.img || "images/menu/menu-1.png") + "\" alt=\"" + escapeHtml(first.title || "Order") + "\">" +
             "<div class=\"account-order-copy\">" +
             "<strong>Order #" + escapeHtml(order.id) + "</strong>" +
-            "<span>" + qty + " items · " + formatMoney(order.total) + " · " + formatOrderDate(order.createdAt) + "</span>" +
-            (completed ? "<em>Your order is completed.</em>" : "") +
+            "<span>" + qty + " items · " + formatMoney(order.total) + " · Pickup " + escapeHtml(order.fulfillmentDate || "-") + " · " + formatOrderDate(order.createdAt) + "</span>" +
+            (completed ? "<em>" + statusNote + "</em>" : "") +
             (!compact && order.items ? "<small>" + order.items.map(function(item) { return escapeHtml(item.title) + " x " + Number(item.qty || 0); }).join(", ") + "</small>" : "") +
             "</div>" +
             "<b class=\"account-order-status\">" + orderStatusLabel(order.status) + "</b>" +
@@ -274,6 +295,64 @@ function renderAccountOrders() {
     bindAccountStartOrderButtons();
 }
 
+function fillAccountProfile() {
+    if (!accountOv || !currentUser) return;
+    var name = currentUser.name || "Customer";
+    var email = currentUser.email || "";
+    var phone = currentUser.phone || "";
+    var address = currentUser.address || {};
+    var stats = accountOv.querySelectorAll(".account-stat span");
+    if (stats[1]) stats[1].textContent = address.address ? "Address saved" : "Add an address";
+    if (stats[2]) stats[2].textContent = name;
+
+    var miniCards = accountOv.querySelectorAll(".account-mini-card");
+    if (miniCards[0]) {
+        var ps = miniCards[0].querySelectorAll("p");
+        if (ps[0]) ps[0].textContent = name;
+        if (ps[1]) ps[1].textContent = address.address ? [address.address, address.city, address.zip].filter(Boolean).join(", ") : "No address saved yet.";
+    }
+
+    var addressPanel = accountOv.querySelector("[data-account-page-panel=\"addresses\"]");
+    if (addressPanel) {
+        var addressInputs = addressPanel.querySelectorAll("input");
+        if (addressInputs[0]) addressInputs[0].value = address.fullName || name;
+        if (addressInputs[1]) addressInputs[1].value = address.phone || phone;
+        if (addressInputs[2]) addressInputs[2].value = address.address || "";
+        if (addressInputs[3]) addressInputs[3].value = address.city || "";
+        if (addressInputs[4]) addressInputs[4].value = address.zip || "";
+    }
+
+    var detailsPanel = accountOv.querySelector("[data-account-page-panel=\"details\"]");
+    if (detailsPanel) {
+        var detailInputs = detailsPanel.querySelectorAll("input");
+        if (detailInputs[0]) detailInputs[0].value = name;
+        if (detailInputs[1]) detailInputs[1].value = email;
+        if (detailInputs[2]) detailInputs[2].value = phone;
+        if (detailInputs[3]) detailInputs[3].value = "";
+        if (detailInputs[4]) detailInputs[4].value = "";
+    }
+}
+
+function loadAccountProfile() {
+    if (!isLoggedIn) return Promise.resolve(null);
+    return apiRequest("/api/me", { method: "GET" }).then(function(data) {
+        currentUser = data.user || currentUser;
+        updateAccountDashboard();
+        fillAccountProfile();
+        return currentUser;
+    }).catch(function(err) {
+        console.warn(err.message);
+        if (err.message === "Not logged in.") {
+            authToken = "";
+            currentUser = null;
+            isLoggedIn = false;
+            localStorage.removeItem("patriaAuthToken");
+            showAccountForm();
+        }
+        return null;
+    });
+}
+
 function loadAccountOrders() {
     if (!isLoggedIn) return Promise.resolve([]);
     return apiRequest("/api/orders", { method: "GET" }).then(function(data) {
@@ -310,6 +389,7 @@ function setAuth(data) {
     isLoggedIn = Boolean(authToken);
     if (data.cart) cartItems = data.cart.items || [];
     updateAccountDashboard();
+    fillAccountProfile();
     loadAccountOrders();
 }
 
@@ -321,6 +401,7 @@ function updateAccountDashboard() {
     accountOv && accountOv.querySelectorAll(".account-stat span").forEach(function(span) {
         if (span.textContent === "jinfeng8605") span.textContent = name;
     });
+    fillAccountProfile();
 }
 
 function setAccountError(form, message) {
@@ -404,6 +485,7 @@ function showAccountDashboard(page) {
     if (panel) panel.style.display = "none";
     if (accountDashboard) accountDashboard.classList.add("open");
     setAccountPage(page || "dashboard");
+    loadAccountProfile();
     loadAccountOrders();
     startAccountOrdersPolling();
 }
@@ -482,6 +564,8 @@ if (accountOv) {
                     body: { fullName: inputs[0].value, phone: inputs[1].value, address: inputs[2].value, city: inputs[3].value, zip: inputs[4].value }
                 }).then(function(data) {
                     currentUser = data.user;
+                    updateAccountDashboard();
+                    fillAccountProfile();
                     alert("Address saved.");
                 }).catch(function(err) { alert(err.message); });
                 return;
@@ -492,6 +576,7 @@ if (accountOv) {
             }).then(function(data) {
                 currentUser = data.user;
                 updateAccountDashboard();
+                fillAccountProfile();
                 alert("Account details saved.");
             }).catch(function(err) { alert(err.message); });
         });
@@ -515,6 +600,7 @@ if (accountOv) {
 var orderOv = document.getElementById("orderOv");
 var orderOpen = document.getElementById("orderOpen");
 var orderClose = document.getElementById("orderClose");
+var selectedOrderDate = "";
 
 if (orderOv && orderOpen && orderClose) {
     orderOpen.addEventListener("click", function(e) {
@@ -550,6 +636,9 @@ function renderOrder() {
     var total = cartItems.reduce(function(sum, item) {
         return sum + item.priceValue * item.qty;
     }, 0);
+    var leadDays = orderLeadDays(cartItems);
+    var minOrderDate = dateAfterDays(leadDays);
+    if (selectedOrderDate && selectedOrderDate < minOrderDate) selectedOrderDate = "";
 
     orderBody.innerHTML = "<div class=\"order-list\">" + cartItems.map(function(item, index) {
         var itemTotal = item.priceValue * item.qty;
@@ -566,6 +655,8 @@ function renderOrder() {
             "<div class=\"order-item-total\">$" + itemTotal.toFixed(2) + "</div></div>" +
             "</div>";
     }).join("") + "<div class=\"order-summary\"><span>Total</span><span>$" + total.toFixed(2) + "</span></div>" +
+        "<label class=\"order-date-field\">Pickup date<input type=\"date\" id=\"orderDate\" min=\"" + minOrderDate + "\" value=\"" + escapeHtml(selectedOrderDate) + "\"/></label>" +
+        "<p class=\"order-login-note\">Earliest available date is " + minOrderDate + " because this order requires " + leadDays + " days notice.</p>" +
         "<button type=\"button\" class=\"order-checkout\" data-cart-action=\"checkout\">Checkout</button>" +
         "<p class=\"order-login-note\">" + (isLoggedIn ? "You are logged in and ready to checkout." : "Please log in before checkout.") + "</p></div>";
 }
@@ -610,8 +701,18 @@ function checkoutOrder() {
         return;
     }
 
-    apiRequest("/api/checkout", { method: "POST" }).then(function(data) {
+    var leadDays = orderLeadDays(cartItems);
+    var minOrderDate = dateAfterDays(leadDays);
+    if (!selectedOrderDate || selectedOrderDate < minOrderDate) {
+        orderOv.classList.add("open");
+        document.body.style.overflow = "hidden";
+        alert("Please choose a pickup date on or after " + minOrderDate + ".");
+        return;
+    }
+
+    apiRequest("/api/checkout", { method: "POST", body: { fulfillmentDate: selectedOrderDate } }).then(function(data) {
         pendingCheckout = false;
+        selectedOrderDate = "";
         syncCart(data.cart || { items: [] });
         loadAccountOrders();
         alert("Order created: " + data.order.id);
@@ -638,6 +739,12 @@ document.addEventListener("click", function(e) {
     updateCartItem(index, action);
 });
 
+document.addEventListener("change", function(e) {
+    if (e.target && e.target.id === "orderDate") {
+        selectedOrderDate = e.target.value;
+    }
+});
+
 // Category buttons inside search box
 document.querySelectorAll('.sovcat').forEach(function(btn) {
     btn.addEventListener('click', function() {
@@ -662,6 +769,29 @@ document.querySelectorAll('.sovtrend .ttag').forEach(function(t) {
     t.addEventListener('click', function() {
         document.getElementById('searchInput').value = this.textContent.trim();
         document.getElementById('searchInput').focus();
+    });
+});
+
+document.getElementById('searchInput').addEventListener('keydown', function(e) {
+    if (e.key !== 'Enter') return;
+    var query = this.value.trim();
+    if (!query) return;
+    e.preventDefault();
+    apiRequest('/api/search', { method: 'POST', body: { query: query } }).then(function(data) {
+        var found = {};
+        (data.products || []).forEach(function(product) {
+            found[product.id || productSlug(product.title)] = true;
+            found[productSlug(product.title)] = true;
+        });
+        document.querySelectorAll('.mwrap').forEach(function(wrap) {
+            var card = wrap.querySelector('.mcard');
+            var id = card ? (card.getAttribute('data-product-id') || productSlug(card.getAttribute('data-title'))) : '';
+            wrap.style.display = found[id] || found[productSlug(card && card.getAttribute('data-title'))] ? '' : 'none';
+        });
+        closeSearch();
+        document.getElementById('menu').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }).catch(function(err) {
+        alert(err.message);
     });
 });
 
@@ -727,6 +857,69 @@ document.querySelectorAll('.catcard').forEach(function(card) {
     });
 });
 
+function menuFilterCode(cat) {
+    var key = String(cat || '').trim().toUpperCase();
+    if (key === 'NOODLES' || key === 'BURGERS') return 'burgers';
+    if (key === 'DIM SUM' || key === 'DIMSUM' || key === 'WRAPS') return 'wraps';
+    if (key === 'RICE' || key === 'DESSERTS') return 'desserts';
+    if (key === 'SOUP' || key === 'PASTA') return 'pasta';
+    return 'burgers';
+}
+
+function bindMenuCard(card) {
+    if (!card || card.getAttribute('data-menu-bound') === 'true') return;
+    card.setAttribute('data-menu-bound', 'true');
+    card.addEventListener('click', function() {
+        openMenuPop(this);
+    });
+}
+
+function bindMenuAddButton(btn) {
+    if (!btn || btn.getAttribute('data-menu-add-bound') === 'true') return;
+    btn.setAttribute('data-menu-add-bound', 'true');
+    btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        openMenuPop(this.closest('.mcard'));
+    });
+}
+
+function renderMenuProducts(products) {
+    var grid = document.getElementById('mgrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    (products || []).filter(function(product) {
+        return !String(product.img || '').includes('/QuickMeals/');
+    }).forEach(function(product) {
+        var title = product.title || 'Menu Item';
+        var cat = product.cat || 'NOODLES';
+        var price = product.price || formatMoney(product.priceValue);
+        var old = product.old || '';
+        var img = product.img || 'img/menu/1.webp';
+        var desc = product.desc || 'Freshly prepared Patria Chinese food.';
+        var rating = product.rating || '4.8';
+        var reviews = product.reviews || '24';
+        var cal = product.cal || '520';
+        var time = product.time || '15';
+        var wrap = document.createElement('div');
+        wrap.className = 'col-sm-6 col-lg-4 mwrap';
+        wrap.setAttribute('data-c', menuFilterCode(cat));
+        wrap.innerHTML =
+            '<div class="mcard" data-product-id="' + escapeHtml(product.id || productSlug(title)) + '" data-img="' + escapeHtml(img) + '" data-title="' + escapeHtml(title) + '" data-cat="' + escapeHtml(cat) + '" data-price="' + escapeHtml(price) + '" data-old="' + escapeHtml(old) + '" data-rating="' + escapeHtml(rating) + '" data-reviews="' + escapeHtml(reviews) + '" data-cal="' + escapeHtml(cal) + '" data-time="' + escapeHtml(time) + '" data-desc="' + escapeHtml(desc) + '" data-tags="' + escapeHtml(product.tags || cat + ',Patria') + '">' +
+            '<div class="mimg"><img src="' + escapeHtml(img) + '" alt="' + escapeHtml(title) + '"><div class="mbdg hot"><i class="fas fa-star"></i> New</div><div class="mhrt"><i class="far fa-heart"></i></div></div>' +
+            '<div class="mbody"><div class="mcat">' + escapeHtml(cat) + '</div><div class="mtit">' + escapeHtml(title) + '</div><div class="mdesc">' + escapeHtml(desc) + '</div><div class="mfoot"><div><div class="mprice">' + escapeHtml(price) + '</div><div class="mstars"><i class="fas fa-star"></i> <span style="color:#bbb;font-size:.7rem;">(' + escapeHtml(reviews) + ')</span></div></div><button class="madd" title="View Details"><i class="fas fa-plus"></i></button></div></div>' +
+            '</div>';
+        grid.appendChild(wrap);
+        bindMenuCard(wrap.querySelector('.mcard'));
+        bindMenuAddButton(wrap.querySelector('.madd'));
+    });
+    var active = document.querySelector('.filtbtn.active');
+    filterMenu(active ? active.getAttribute('data-f') : 'all');
+}
+
+apiRequest('/api/products').then(function(data) {
+    renderMenuProducts(data.products || []);
+}).catch(function() {});
+
 
 var menuPop = document.getElementById('menuPop');
 var mpQty = 1;
@@ -751,7 +944,7 @@ function openMenuPop(card) {
         cat: cat,
         price: price,
         priceValue: parseFloat(String(price).replace(/[^0-9.]/g, '')) || 0,
-        productId: productSlug(title)
+        productId: card.getAttribute('data-product-id') || productSlug(title)
     };
 
     document.getElementById('mpImg').setAttribute('src', img);
@@ -789,19 +982,10 @@ function openMenuPop(card) {
 }
 
 // Card click open popup
-document.querySelectorAll('.mcard').forEach(function(card) {
-    card.addEventListener('click', function() {
-        openMenuPop(this);
-    });
-});
+document.querySelectorAll('.mcard').forEach(bindMenuCard);
 
 // + button  open popup (stop propagation to avoid double firing)
-document.querySelectorAll('.madd').forEach(function(btn) {
-    btn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        openMenuPop(this.closest('.mcard'));
-    });
-});
+document.querySelectorAll('.madd').forEach(bindMenuAddButton);
 
 // Heart toggle (no popup)
 document.querySelectorAll('.mhrt').forEach(function(btn) {
@@ -856,35 +1040,69 @@ document.getElementById('mpAddCart').addEventListener('click', function() {
 
 document.getElementById('resBtn').addEventListener('click', function() {
     var btn = this;
+    var box = btn.closest('.fcard');
+    var fields = box.querySelectorAll('.fctrl');
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Booking...';
     btn.disabled = true;
-    setTimeout(function() {
+    apiRequest('/api/reservations', {
+        method: 'POST',
+        body: {
+            name: fields[0].value,
+            phone: fields[1].value,
+            email: fields[2].value,
+            guests: fields[3].value,
+            date: fields[4].value,
+            time: fields[5].value,
+            requests: fields[6].value
+        }
+    }).then(function() {
         btn.innerHTML = '<i class="fas fa-calendar-check"></i> Confirm Reservation';
         btn.disabled = false;
+        fields.forEach(function(field) { field.value = ''; });
         var ok = document.getElementById('resOk');
         ok.style.display = 'block';
         ok.scrollIntoView({
             behavior: 'smooth',
             block: 'nearest'
         });
-    }, 1500);
+    }).catch(function(err) {
+        btn.innerHTML = '<i class="fas fa-calendar-check"></i> Confirm Reservation';
+        btn.disabled = false;
+        alert(err.message);
+    });
 });
 
 
 document.getElementById('ctcBtn').addEventListener('click', function() {
     var btn = this;
+    var box = btn.closest('.fcard');
+    var fields = box.querySelectorAll('.fctrl');
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
     btn.disabled = true;
-    setTimeout(function() {
+    apiRequest('/api/contact', {
+        method: 'POST',
+        body: {
+            name: fields[0].value,
+            email: fields[1].value,
+            phone: fields[2].value,
+            subject: fields[3].value,
+            message: fields[4].value
+        }
+    }).then(function() {
         btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Message';
         btn.disabled = false;
+        fields.forEach(function(field) { field.value = ''; });
         var ok = document.getElementById('ctcOk');
         ok.style.display = 'block';
         ok.scrollIntoView({
             behavior: 'smooth',
             block: 'nearest'
         });
-    }, 1500);
+    }).catch(function(err) {
+        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Message';
+        btn.disabled = false;
+        alert(err.message);
+    });
 });
 
 
@@ -992,15 +1210,24 @@ document.getElementById('nlBtn').addEventListener('click', function() {
     var email = document.getElementById('nlEmail').value;
     if (email && email.includes('@')) {
         var btn = this;
-        btn.textContent = 'âœ“ Subscribed!';
-        btn.style.background = '#4ade80';
-        btn.style.color = '#222';
-        document.getElementById('nlEmail').value = '';
-        setTimeout(function() {
+        btn.textContent = 'Subscribing...';
+        btn.disabled = true;
+        apiRequest('/api/newsletter', { method: 'POST', body: { email: email } }).then(function() {
+            btn.textContent = 'Subscribed!';
+            btn.style.background = '#4ade80';
+            btn.style.color = '#222';
+            document.getElementById('nlEmail').value = '';
+            setTimeout(function() {
+                btn.textContent = 'Subscribe';
+                btn.style.background = '';
+                btn.style.color = '';
+                btn.disabled = false;
+            }, 3000);
+        }).catch(function(err) {
             btn.textContent = 'Subscribe';
-            btn.style.background = '';
-            btn.style.color = '';
-        }, 3000);
+            btn.disabled = false;
+            alert(err.message);
+        });
     }
 });
 

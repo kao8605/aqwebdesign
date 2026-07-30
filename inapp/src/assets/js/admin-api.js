@@ -65,16 +65,33 @@ async function markOrderCompleted(orderId) {
   renderOrderDetailCard(data.order);
 }
 
-function renderTopProducts(products) {
+async function markOrderPickedUp(orderId) {
+  const data = await api('/api/admin/orders/status', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ orderId, status: 'picked_up' })
+  });
+  latestAdminOrders = latestAdminOrders.map(order => order.id === orderId ? data.order : order);
+  renderRecentOrders(latestAdminOrders);
+  renderOrderDetailCard(data.order);
+}
+
+function renderTopProducts(products, orders = []) {
   const list = document.querySelector('[data-admin-list="top-products"]');
   if (!list) return;
-  list.innerHTML = products.slice(0, 5).map((product, index) => {
+  const sold = productSalesFromOrders(orders);
+  const rows = sold.length ? sold.slice(0, 5) : products.slice(0, 5).map(product => ({ ...product, qty: 0, revenue: 0 }));
+  if (!rows.length) {
+    list.innerHTML = '<li class="list-group-item text-secondary">No product data yet.</li>';
+    return;
+  }
+  list.innerHTML = rows.map((product, index) => {
     return '<li class="list-group-item d-flex align-items-center gap-3">'
-      + '<img src="' + productImage(product.img) + '" class="rounded object-fit-cover" width="48" height="48" alt="' + product.title + '">'
+      + '<img src="' + productImage(product.img) + '" class="rounded object-fit-cover" width="48" height="48" alt="' + escapeHtml(product.title || 'Product') + '">'
       + '<div class="flex-grow-1">'
-      + '<p class="mb-1">' + product.title + '</p>'
+      + '<p class="mb-1">' + escapeHtml(product.title || 'Untitled product') + '</p>'
       + '<div class="d-flex align-items-center gap-2 text-muted">'
-      + '<small class="fw-semibold">' + product.price + '</small><small>•</small><small>' + (product.cat || 'Menu') + '</small>'
+      + '<small class="fw-semibold">' + Number(product.qty || 0) + ' sold</small><small>•</small><small>' + money(product.revenue || 0) + '</small>'
       + '</div></div>'
       + '<span class="badge bg-primary-subtle text-primary border border-primary">#' + (index + 1) + '</span>'
       + '</li>';
@@ -84,16 +101,24 @@ function renderTopProducts(products) {
 function renderLowStockProducts(products) {
   const list = document.querySelector('[data-admin-list="low-stock-products"]');
   if (!list) return;
-  list.innerHTML = products.slice(-5).map((product, index) => {
-    const stock = String(3 + index * 2).padStart(2, '0');
+  const rows = products
+    .map((product, index) => ({ product, stock: inventoryQuantity(product, index) }))
+    .filter(item => item.stock > 0 && item.stock < 10)
+    .sort((a, b) => a.stock - b.stock)
+    .slice(0, 5);
+  if (!rows.length) {
+    list.innerHTML = '<li class="list-group-item text-secondary">No low stock products.</li>';
+    return;
+  }
+  list.innerHTML = rows.map(({ product, stock }) => {
     return '<li class="list-group-item d-flex align-items-center gap-3">'
-      + '<img src="' + productImage(product.img) + '" class="rounded object-fit-cover" width="48" height="48" alt="' + product.title + '">'
+      + '<img src="' + productImage(product.img) + '" class="rounded object-fit-cover" width="48" height="48" alt="' + escapeHtml(product.title || 'Product') + '">'
       + '<div class="flex-grow-1">'
-      + '<p class="mb-1">' + product.title + '</p>'
-      + '<small>ID: #' + product.id.toUpperCase().slice(0, 8) + '</small>'
+      + '<p class="mb-1">' + escapeHtml(product.title || 'Untitled product') + '</p>'
+      + '<small>ID: #' + escapeHtml(String(product.id || '').toUpperCase().slice(0, 8)) + '</small>'
       + '</div>'
       + '<div class="d-flex flex-column gap-0 align-items-center">'
-      + '<span class="fw-semibold text-primary">' + stock + '</span>'
+      + '<span class="fw-semibold text-primary">' + String(stock).padStart(2, '0') + '</span>'
       + '<small class="text-muted">In Stock</small>'
       + '</div>'
       + '</li>';
@@ -107,7 +132,9 @@ function renderOrderDetailCard(order) {
   const customer = order.customer || {};
   const items = order.items || [];
   const qty = items.reduce((sum, item) => sum + Number(item.qty || 0), 0);
-  const isCompleted = String(order.status || '').toLowerCase() === 'completed';
+  const status = String(order.status || '').toLowerCase();
+  const isCompleted = status === 'completed' || status === 'picked_up';
+  const isPickedUp = status === 'picked_up';
   const itemRows = items.map(item => {
     const lineTotal = Number(item.priceValue || 0) * Number(item.qty || 0);
     return '<div class="admin-order-item">'
@@ -127,11 +154,15 @@ function renderOrderDetailCard(order) {
     + '<div><small>Customer</small><strong>' + escapeHtml(customer.name || 'Guest customer') + '</strong><span>' + escapeHtml(customer.email || '') + '</span></div>'
     + '<div><small>Status</small><strong>' + escapeHtml(order.status || 'created') + '</strong><span>' + formatOrderDate(order.createdAt) + '</span></div>'
     + '<div><small>Items</small><strong>' + qty + '</strong><span>Total quantity</span></div>'
+    + '<div><small>Pickup Date</small><strong>' + escapeHtml(order.fulfillmentDate || '-') + '</strong><span>' + Number(order.leadDays || 0) + ' days notice</span></div>'
     + '</div>'
     + '<div class="admin-order-items">' + itemRows + '</div>'
     + '<div class="admin-order-total"><span>Total</span><strong>' + money(order.total) + '</strong></div>'
     + '<button type="button" class="btn btn-primary w-100 admin-order-complete" data-order-complete="' + escapeHtml(order.id) + '"' + (isCompleted ? ' disabled' : '') + '>'
     + (isCompleted ? '已完成' : '標記為已完成')
+    + '</button>'
+    + '<button type="button" class="btn btn-outline-primary w-100 mt-2 admin-order-picked-up" data-order-picked-up="' + escapeHtml(order.id) + '"' + (isPickedUp ? ' disabled' : '') + '>'
+    + (isPickedUp ? '已取貨' : '標記為已取貨')
     + '</button>'
     + '</div>';
 
@@ -152,13 +183,27 @@ function renderOrderDetailCard(order) {
       }
     });
   }
+  const pickedUpButton = modal.querySelector('[data-order-picked-up]');
+  if (pickedUpButton) {
+    pickedUpButton.addEventListener('click', async () => {
+      pickedUpButton.disabled = true;
+      pickedUpButton.textContent = '更新中...';
+      try {
+        await markOrderPickedUp(order.id);
+      } catch (error) {
+        console.error(error);
+        pickedUpButton.disabled = false;
+        pickedUpButton.textContent = '標記為已取貨';
+      }
+    });
+  }
   document.body.appendChild(modal);
 }
 
 function renderRecentOrders(orders) {
   const list = document.querySelector('[data-admin-list="recent-orders"]');
   if (!list) return;
-  const rows = orders.slice(-5).reverse();
+  const rows = orders.filter(order => String(order.status || '').toLowerCase() !== 'picked_up').slice(-5).reverse();
   if (!rows.length) {
     list.innerHTML = '<li class="list-group-item text-secondary">No orders yet.</li>';
     return;
@@ -191,6 +236,172 @@ function renderRecentOrders(orders) {
   });
 }
 
+function renderAdminNotifications(notifications) {
+  const list = document.querySelector('[data-admin-notifications]');
+  const count = document.querySelector('[data-admin-notification-count]');
+  if (count) {
+    count.childNodes[0].nodeValue = String((notifications || []).length) + ' ';
+  }
+  if (!list) return;
+  const rows = (notifications || []).slice(0, 5);
+  if (!rows.length) {
+    list.innerHTML = '<li class="p-3 text-secondary small">No customer activity yet.</li>';
+    return;
+  }
+  list.innerHTML = rows.map(item => {
+    const icon = item.type === 'user' ? 'ti-user-check' : 'ti-receipt';
+    return '<li class="p-3 border-bottom">'
+      + '<div class="d-flex gap-3">'
+      + '<span class="avatar avatar-sm rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center"><i class="ti ' + icon + '"></i></span>'
+      + '<div class="flex-grow-1 small">'
+      + '<p class="mb-0">' + escapeHtml(item.title || 'Customer activity') + '</p>'
+      + '<p class="mb-1">' + escapeHtml(item.message || '') + '</p>'
+      + '<div class="text-secondary">' + formatOrderDate(item.time) + '</div>'
+      + '</div>'
+      + '</div>'
+      + '</li>';
+  }).join('') + '<li class="px-4 py-3 text-center"><a href="index.html#recent-orders" class="text-primary">View all notifications</a></li>';
+}
+
+function renderAdminSummary(summary) {
+  if (!summary) return;
+  setText('[data-admin-summary="completed-sales"]', money(summary.completedSales));
+  setText('[data-admin-summary="pending-sales"]', money(summary.pendingSales));
+  setText('[data-admin-summary="addresses"]', String(summary.customersWithAddresses || 0));
+  setText('[data-admin-summary="first-time"]', String(Math.max(0, Number(summary.customerCount || 0) - Number(summary.customersWithOrders || 0))));
+  setText('[data-admin-summary="returning"]', String(summary.customersWithOrders || 0));
+  setText('[data-admin-summary="completed-orders"]', String(summary.completedOrderCount || 0));
+  setText('[data-admin-summary="customers"]', String(summary.customerCount || 0));
+  setText('[data-admin-summary="orders"]', String(summary.orderCount || 0));
+}
+
+function productSalesFromOrders(orders) {
+  const sales = {};
+  (orders || []).forEach(order => {
+    (order.items || []).forEach(item => {
+      const id = item.id || item.title;
+      if (!id) return;
+      sales[id] ||= { ...item, qty: 0, revenue: 0 };
+      sales[id].qty += Number(item.qty || 0);
+      sales[id].revenue += Number(item.qty || 0) * Number(item.priceValue || 0);
+    });
+  });
+  return Object.values(sales).sort((a, b) => b.qty - a.qty);
+}
+
+function renderReportTopProducts(orders, products) {
+  const list = document.querySelector('[data-report-list="top-products"]');
+  if (!list) return;
+  const sold = productSalesFromOrders(orders);
+  const rows = sold.length ? sold.slice(0, 5) : (products || []).slice(0, 5).map(product => ({ ...product, qty: 0, revenue: 0 }));
+  if (!rows.length) {
+    list.innerHTML = '<div class="list-group-item p-3 text-secondary">No product data yet.</div>';
+    return;
+  }
+  list.innerHTML = rows.map(product => {
+    return '<div class="list-group-item p-3 d-flex align-items-center">'
+      + '<div class="me-3"><img src="' + productImage(product.img) + '" alt="' + escapeHtml(product.title || 'Product') + '" class="rounded object-fit-cover" style="width:48px; height:48px;"></div>'
+      + '<div class="flex-grow-1"><div class="d-flex justify-content-between align-items-center gap-3">'
+      + '<div><h6 class="mb-0">' + escapeHtml(product.title || 'Untitled product') + '</h6><small class="text-secondary">' + Number(product.qty || 0) + ' units sold</small></div>'
+      + '<div class="text-end"><strong>' + money(product.revenue || 0) + '</strong></div>'
+      + '</div></div>'
+      + '</div>';
+  }).join('');
+}
+
+function renderReportOrders(orders) {
+  const tbody = document.querySelector('[data-report-table="orders"]');
+  if (!tbody) return;
+  const rows = (orders || []).slice().sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="text-secondary">No customer orders yet.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(order => {
+    const qty = (order.items || []).reduce((sum, item) => sum + Number(item.qty || 0), 0);
+    const customer = order.customer || {};
+    const status = String(order.status || 'created');
+    return '<tr>'
+      + '<td>#' + escapeHtml(order.id) + '</td>'
+      + '<td><strong>' + escapeHtml(customer.name || 'Guest customer') + '</strong><br><small class="text-secondary">' + escapeHtml(customer.email || '') + '</small></td>'
+      + '<td>' + qty + '</td>'
+      + '<td>' + money(order.total) + '</td>'
+      + '<td><span class="badge ' + (status.toLowerCase() === 'completed' ? 'bg-success-subtle text-success' : 'bg-primary-subtle text-primary') + '">' + escapeHtml(status) + '</span></td>'
+      + '<td>' + formatOrderDate(order.createdAt) + '</td>'
+      + '</tr>';
+  }).join('');
+}
+
+function renderReportAddresses(customers) {
+  const tbody = document.querySelector('[data-report-table="addresses"]');
+  if (!tbody) return;
+  const rows = (customers || []).filter(customer => customer.address && customer.address.address);
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="text-secondary">No saved addresses yet.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(customer => {
+    const address = customer.address || {};
+    const parts = [address.address, address.city, address.postal].filter(Boolean).join(', ');
+    return '<tr>'
+      + '<td>' + escapeHtml(customer.name || 'Customer') + '</td>'
+      + '<td>' + escapeHtml(customer.email || '-') + '</td>'
+      + '<td>' + escapeHtml(customer.phone || '-') + '</td>'
+      + '<td>' + escapeHtml(parts || '-') + '</td>'
+      + '<td>' + Number(customer.orderCount || 0) + '</td>'
+      + '</tr>';
+  }).join('');
+}
+
+function renderEngagementTables(data) {
+  const reservations = document.querySelector('[data-engagement-table="reservations"]');
+  if (reservations) {
+    const rows = data.reservations || [];
+    reservations.innerHTML = rows.length ? rows.map(item => '<tr>'
+      + '<td>' + escapeHtml(item.name || '-') + '</td>'
+      + '<td>' + escapeHtml(item.phone || '-') + '</td>'
+      + '<td>' + escapeHtml(item.email || '-') + '</td>'
+      + '<td>' + escapeHtml(item.guests || '-') + '</td>'
+      + '<td>' + escapeHtml(item.date || '-') + '</td>'
+      + '<td>' + escapeHtml(item.time || '-') + '</td>'
+      + '<td>' + escapeHtml(item.requests || '-') + '</td>'
+      + '</tr>').join('') : '<tr><td colspan="7" class="text-secondary">No reservations yet.</td></tr>';
+  }
+
+  const messages = document.querySelector('[data-engagement-table="messages"]');
+  if (messages) {
+    const rows = data.messages || [];
+    messages.innerHTML = rows.length ? rows.map(item => '<tr>'
+      + '<td>' + escapeHtml(item.name || '-') + '</td>'
+      + '<td>' + escapeHtml(item.email || '-') + '</td>'
+      + '<td>' + escapeHtml(item.phone || '-') + '</td>'
+      + '<td>' + escapeHtml(item.subject || '-') + '</td>'
+      + '<td>' + escapeHtml(item.message || '-') + '</td>'
+      + '<td>' + formatOrderDate(item.createdAt) + '</td>'
+      + '</tr>').join('') : '<tr><td colspan="6" class="text-secondary">No messages yet.</td></tr>';
+  }
+
+  const subscribers = document.querySelector('[data-engagement-table="subscribers"]');
+  if (subscribers) {
+    const rows = data.subscribers || [];
+    subscribers.innerHTML = rows.length ? rows.map(item => '<tr>'
+      + '<td>' + escapeHtml(item.email || '-') + '</td>'
+      + '<td>' + escapeHtml(item.status || 'active') + '</td>'
+      + '<td>' + formatOrderDate(item.createdAt || item.updatedAt) + '</td>'
+      + '</tr>').join('') : '<tr><td colspan="3" class="text-secondary">No subscribers yet.</td></tr>';
+  }
+
+  const searches = document.querySelector('[data-engagement-table="searches"]');
+  if (searches) {
+    const rows = data.searches || [];
+    searches.innerHTML = rows.length ? rows.map(item => '<tr>'
+      + '<td>' + escapeHtml(item.query || '-') + '</td>'
+      + '<td>' + Number(item.resultCount || 0) + '</td>'
+      + '<td>' + formatOrderDate(item.createdAt) + '</td>'
+      + '</tr>').join('') : '<tr><td colspan="3" class="text-secondary">No searches yet.</td></tr>';
+  }
+}
+
 function renderInventory(products) {
   const tbody = document.querySelector('[data-admin-table="inventory"]');
   if (!tbody) return;
@@ -207,7 +418,7 @@ function renderInventory(products) {
       + '<span class="ms-3">' + escapeHtml(product.title) + '</span></a></td>'
       + '<td>PRD' + String(index + 1).padStart(3, '0') + '</td>'
       + '<td>' + escapeHtml(product.cat || 'Menu') + '</td>'
-      + '<td>Patria</td>'
+      + '<td>' + escapeHtml(product.day || '5') + '</td>'
       + '<td>' + escapeHtml(product.price) + '</td>'
       + '<td>dish</td>'
       + '<td>' + inventoryQuantity(product, index) + '</td>'
@@ -261,6 +472,151 @@ function renderInventoryPagination(total, pageCount) {
   });
 }
 
+function csvCell(value) {
+  const text = String(value ?? '');
+  return '"' + text.replace(/"/g, '""') + '"';
+}
+
+function parseCsv(text) {
+  const rows = [];
+  let row = [];
+  let cell = '';
+  let quoted = false;
+  for (let index = 0; index < text.length; index += 1) {
+    const char = text[index];
+    const next = text[index + 1];
+    if (quoted) {
+      if (char === '"' && next === '"') {
+        cell += '"';
+        index += 1;
+      } else if (char === '"') {
+        quoted = false;
+      } else {
+        cell += char;
+      }
+    } else if (char === '"') {
+      quoted = true;
+    } else if (char === ',') {
+      row.push(cell);
+      cell = '';
+    } else if (char === '\n') {
+      row.push(cell);
+      rows.push(row);
+      row = [];
+      cell = '';
+    } else if (char !== '\r') {
+      cell += char;
+    }
+  }
+  if (cell || row.length) {
+    row.push(cell);
+    rows.push(row);
+  }
+  return rows;
+}
+
+function productFromCsvRow(headers, row) {
+  const data = {};
+  headers.forEach((header, index) => {
+    data[String(header || '').trim().toLowerCase()] = row[index] || '';
+  });
+  return {
+    id: data.id || '',
+    title: data.title || data.name || '',
+    cat: data.category || data.cat || 'NOODLES',
+    day: data.day || '5',
+    priceValue: Number(String(data.price || data.pricevalue || '').replace(/[^0-9.]/g, '')),
+    quantity: Number(data.quantity || data.qty || 0),
+    img: data.image || data.img || '',
+    desc: data.description || data.desc || ''
+  };
+}
+
+function exportInventoryCsv() {
+  const headers = ['id', 'title', 'category', 'day', 'price', 'quantity', 'image', 'description'];
+  const rows = latestInventoryProducts.map((product, index) => [
+    product.id || '',
+    product.title || '',
+    product.cat || '',
+    product.day || '5',
+    Number(product.priceValue || String(product.price || '').replace(/[^0-9.]/g, '') || 0).toFixed(2),
+    inventoryQuantity(product, index),
+    product.img || '',
+    product.desc || ''
+  ]);
+  const csv = '\ufeff' + [headers, ...rows].map(row => row.map(csvCell).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'patria-inventory.csv';
+  document.body.appendChild(link);
+  link.click();
+  URL.revokeObjectURL(link.href);
+  link.remove();
+}
+
+async function importInventoryCsv(file) {
+  const status = document.querySelector('[data-inventory-excel-status]');
+  if (status) status.textContent = 'Importing products...';
+  const text = await file.text();
+  const rows = parseCsv(text).filter(row => row.some(cell => String(cell).trim()));
+  if (rows.length < 2) throw new Error('CSV needs a header row and at least one product row.');
+  const headers = rows[0];
+  const products = rows.slice(1).map(row => productFromCsvRow(headers, row)).filter(product => product.title);
+  if (!products.length) throw new Error('No valid products found in the CSV file.');
+
+  let created = 0;
+  let updated = 0;
+  for (const product of products) {
+    const existing = latestInventoryProducts.find(item => item.id === product.id || item.title === product.title);
+    if (existing) {
+      await api('/api/admin/products', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...product, id: existing.id })
+      });
+      updated += 1;
+    } else {
+      await api('/api/admin/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(product)
+      });
+      created += 1;
+    }
+  }
+  const data = await api('/api/products');
+  inventoryPage = 1;
+  renderInventory(data.products || []);
+  if (status) status.textContent = 'Imported ' + created + ' new and updated ' + updated + ' products.';
+}
+
+function bindInventoryExcelTools() {
+  const importButton = document.querySelector('[data-inventory-import]');
+  const exportButton = document.querySelector('[data-inventory-export]');
+  const fileInput = document.querySelector('[data-inventory-file]');
+  const status = document.querySelector('[data-inventory-excel-status]');
+  if (exportButton && exportButton.getAttribute('data-bound') !== 'true') {
+    exportButton.setAttribute('data-bound', 'true');
+    exportButton.addEventListener('click', exportInventoryCsv);
+  }
+  if (importButton && fileInput && importButton.getAttribute('data-bound') !== 'true') {
+    importButton.setAttribute('data-bound', 'true');
+    importButton.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files && fileInput.files[0];
+      if (!file) return;
+      try {
+        await importInventoryCsv(file);
+      } catch (error) {
+        if (status) status.textContent = error.message;
+      } finally {
+        fileInput.value = '';
+      }
+    });
+  }
+}
+
 async function deleteInventoryProduct(product) {
   if (!product) return;
   if (!window.confirm('Delete ' + product.title + ' from inventory?')) return;
@@ -288,6 +644,7 @@ function openProductEditor(product, index) {
     + '<label>Category<input name="cat" value="' + escapeHtml(product.cat || 'Menu') + '" required></label>'
     + '<label>Price<input name="priceValue" type="number" min="0" step="0.01" value="' + Number(product.priceValue || 0).toFixed(2) + '" required></label>'
     + '<label>Quantity<input name="quantity" type="number" min="0" step="1" value="' + inventoryQuantity(product, index) + '" required></label>'
+    + '<label>day<input name="day" value="' + escapeHtml(product.day || '5') + '"></label>'
     + '<label class="wide">Image Path<input name="img" value="' + escapeHtml(product.img || '') + '"></label>'
     + '<label class="wide">Description<textarea name="desc" rows="3">' + escapeHtml(product.desc || '') + '</textarea></label>'
     + '<p class="admin-product-error" data-product-error></p>'
@@ -316,6 +673,7 @@ function openProductEditor(product, index) {
           cat: formData.get('cat'),
           priceValue: Number(formData.get('priceValue')),
           quantity: Number(formData.get('quantity')),
+          day: formData.get('day'),
           img: formData.get('img'),
           desc: formData.get('desc')
         })
@@ -338,6 +696,8 @@ export async function loadAdminDashboard() {
     const productsData = await api('/api/products');
     const products = productsData.products || [];
     let orders = [];
+    let summary = null;
+    let notifications = [];
     try {
       const ordersData = await api('/api/admin/orders');
       orders = ordersData.orders || [];
@@ -345,16 +705,25 @@ export async function loadAdminDashboard() {
     } catch (ordersError) {
       console.warn('Admin orders API is not available yet. Restart sarab/sarab/server.js to enable it.', ordersError);
     }
+    try {
+      const summaryData = await api('/api/admin/summary');
+      summary = summaryData.summary || null;
+      notifications = summaryData.notifications || [];
+    } catch (summaryError) {
+      console.warn('Admin summary API is not available yet. Restart sarab/sarab/server.js to enable it.', summaryError);
+    }
     const totalSales = orders.reduce((sum, order) => sum + Number(order.total || 0), 0);
     const itemCount = orders.reduce((sum, order) => sum + (order.items || []).reduce((s, item) => s + Number(item.qty || 0), 0), 0);
     setText('[data-admin-stat="sales"]', money(totalSales));
     setText('[data-admin-stat="products"]', String(products.length));
     setText('[data-admin-stat="orders"]', String(orders.length));
     setText('[data-admin-stat="items"]', String(itemCount));
-    renderTopProducts(products);
+    renderTopProducts(products, orders);
     renderLowStockProducts(products);
     renderRecentOrders(orders);
-    setText('[data-admin-status]', orders.length ? 'Connected to Patria backend.' : 'Products connected. Restart Patria backend to load orders.');
+    renderAdminSummary(summary);
+    renderAdminNotifications(notifications);
+    setText('[data-admin-status]', orders.length ? 'Connected to Patria customer orders.' : 'Connected to Patria backend. Waiting for customer orders.');
   } catch (error) {
     console.error(error);
     setText('[data-admin-status]', 'Cannot connect to Patria backend.');
@@ -363,6 +732,7 @@ export async function loadAdminDashboard() {
 
 export async function loadInventory() {
   if (!document.querySelector('[data-admin-table="inventory"]')) return;
+  bindInventoryExcelTools();
   try {
     const data = await api('/api/products');
     renderInventory(data.products || []);
@@ -371,4 +741,113 @@ export async function loadInventory() {
     const tbody = document.querySelector('[data-admin-table="inventory"]');
     if (tbody) tbody.innerHTML = '<tr><td colspan="8" class="text-secondary">Cannot connect to Patria backend.</td></tr>';
   }
+}
+
+export async function loadAdminReports() {
+  if (!document.querySelector('[data-admin-page="reports"]')) return;
+  try {
+    const productsData = await api('/api/products');
+    const products = productsData.products || [];
+    const ordersData = await api('/api/admin/orders');
+    const orders = ordersData.orders || [];
+    let customers = [];
+    try {
+      const customersData = await api('/api/admin/customers');
+      customers = customersData.customers || [];
+    } catch (customersError) {
+      console.warn(customersError);
+    }
+    let engagement = { reservations: [], messages: [], subscribers: [], searches: [] };
+    try {
+      engagement = await api('/api/admin/engagement');
+    } catch (engagementError) {
+      console.warn(engagementError);
+    }
+    let summary = null;
+    let notifications = [];
+    try {
+      const summaryData = await api('/api/admin/summary');
+      summary = summaryData.summary || null;
+      notifications = summaryData.notifications || [];
+    } catch (summaryError) {
+      console.warn(summaryError);
+    }
+    const totalSales = orders.reduce((sum, order) => sum + Number(order.total || 0), 0);
+    const soldQty = orders.reduce((sum, order) => sum + (order.items || []).reduce((itemSum, item) => itemSum + Number(item.qty || 0), 0), 0);
+    const lowStock = products.filter(product => inventoryQuantity(product, 999) > 0 && inventoryQuantity(product, 999) < 10).length;
+    const outStock = products.filter(product => inventoryQuantity(product, 999) === 0).length;
+    setText('[data-report-stat="revenue"]', money(summary ? summary.totalSales : totalSales));
+    setText('[data-report-stat="sold"]', String(summary ? summary.itemCount : soldQty));
+    setText('[data-report-stat="low-stock"]', String(lowStock));
+    setText('[data-report-stat="out-stock"]', String(outStock));
+    renderReportTopProducts(orders, products);
+    renderReportOrders(orders);
+    renderReportAddresses(customers);
+    renderEngagementTables(engagement);
+    renderAdminNotifications(notifications);
+  } catch (error) {
+    console.error(error);
+    setText('[data-report-stat="revenue"]', 'Offline');
+    const tbody = document.querySelector('[data-report-table="orders"]');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="text-secondary">Cannot connect to Patria backend.</td></tr>';
+    const addressesTable = document.querySelector('[data-report-table="addresses"]');
+    if (addressesTable) addressesTable.innerHTML = '<tr><td colspan="5" class="text-secondary">Cannot connect to Patria backend.</td></tr>';
+    document.querySelectorAll('[data-engagement-table]').forEach(table => {
+      const cols = table.getAttribute('data-engagement-table') === 'reservations' ? 7 : (table.getAttribute('data-engagement-table') === 'messages' ? 6 : 3);
+      table.innerHTML = '<tr><td colspan="' + cols + '" class="text-secondary">Cannot connect to Patria backend.</td></tr>';
+    });
+  }
+}
+
+export function initCreateProduct() {
+  const form = document.getElementById('addProductForm');
+  if (!form) return;
+  const status = document.querySelector('[data-add-product-status]');
+  const submit = form.querySelector('[type="submit"]');
+
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+    const imageInput = document.getElementById('productImage');
+    const imageFile = imageInput && imageInput.files && imageInput.files[0] ? imageInput.files[0] : null;
+    const imagePath = imageFile ? 'img/menu/' + imageFile.name : '';
+    if (status) {
+      status.className = 'small mt-3 mb-0 text-secondary';
+      status.textContent = '';
+    }
+    if (submit) {
+      submit.disabled = true;
+      submit.textContent = 'Adding...';
+    }
+
+    try {
+      const data = await api('/api/admin/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: document.getElementById('productName').value,
+          sku: document.getElementById('productSKU').value,
+          priceValue: Number(document.getElementById('productPrice').value),
+          quantity: Number(document.getElementById('productStock').value),
+          cat: document.getElementById('productCategory').value,
+          img: imagePath,
+          desc: document.getElementById('productDescription').value
+        })
+      });
+      form.reset();
+      if (status) {
+        status.className = 'small mt-3 mb-0 text-success';
+        status.textContent = data.product.title + ' 已加入前台菜單與 Inventory。';
+      }
+    } catch (error) {
+      if (status) {
+        status.className = 'small mt-3 mb-0 text-danger';
+        status.textContent = error.message;
+      }
+    } finally {
+      if (submit) {
+        submit.disabled = false;
+        submit.textContent = 'Add Product';
+      }
+    }
+  });
 }

@@ -6,15 +6,92 @@ import ApexCharts from 'apexcharts';
 
 document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('salesPurchaseChart')) {
-         var options = {
+      const API_BASE = window.location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
+      const rangeSelect = document.querySelector('[data-sales-purchase-range]');
+      const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+      function moneyLabel(value) {
+        return '$' + Number(value || 0).toLocaleString(undefined, { maximumFractionDigits: 0 });
+      }
+
+      function orderDate(order) {
+        return order && order.createdAt ? new Date(order.createdAt) : new Date();
+      }
+
+      function emptyBuckets(range) {
+        if (range === 'week') {
+          return {
+            categories: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+            sales: Array(7).fill(0),
+            purchase: Array(7).fill(0)
+          };
+        }
+        if (range === 'month') {
+          return {
+            categories: Array.from({ length: 31 }, (_, index) => String(index + 1)),
+            sales: Array(31).fill(0),
+            purchase: Array(31).fill(0)
+          };
+        }
+        return {
+          categories: monthLabels,
+          sales: Array(12).fill(0),
+          purchase: Array(12).fill(0)
+        };
+      }
+
+      function reportSeries(orders, range) {
+        const buckets = emptyBuckets(range);
+        const now = new Date();
+        orders.forEach(order => {
+          const date = orderDate(order);
+          if (range === 'week') {
+            const start = new Date(now);
+            start.setDate(now.getDate() - 6);
+            start.setHours(0, 0, 0, 0);
+            if (date < start || date > now) return;
+            const index = date.getDay();
+            const value = Number(order.total || 0);
+            buckets.sales[index] += value;
+            buckets.purchase[index] += value * 0.62;
+            return;
+          }
+          if (range === 'month') {
+            if (date.getFullYear() !== now.getFullYear() || date.getMonth() !== now.getMonth()) return;
+            const index = date.getDate() - 1;
+            const value = Number(order.total || 0);
+            buckets.sales[index] += value;
+            buckets.purchase[index] += value * 0.62;
+            return;
+          }
+          if (date.getFullYear() !== now.getFullYear()) return;
+          const index = date.getMonth();
+          const value = Number(order.total || 0);
+          buckets.sales[index] += value;
+          buckets.purchase[index] += value * 0.62;
+        });
+        buckets.sales = buckets.sales.map(value => Number(value.toFixed(2)));
+        buckets.purchase = buckets.purchase.map(value => Number(value.toFixed(2)));
+        return buckets;
+      }
+
+      async function loadOrders() {
+        const response = await fetch(API_BASE + '/api/admin/orders');
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Cannot load customer orders.');
+        return data.orders || [];
+      }
+
+      function salesPurchaseOptions(data) {
+        return {
       series: [
         {
           name: 'Sales',
-          data: [44, 55, 57, 56, 61, 58, 63, 60, 66],
+          data: data.sales,
         },
         {
           name: 'Purchase',
-          data: [76, 85, 101, 98, 87, 105, 91, 114, 94],
+          data: data.purchase,
         },
 
       ],
@@ -65,7 +142,12 @@ document.addEventListener('DOMContentLoaded', () => {
         colors: ['transparent'],
       },
       xaxis: {
-        categories: ['28 Jan', '29 Jan', '30 Jan', '31 Jan', '1 Feb', '2 Feb', '3 Feb', '4 Feb', '5 Feb'],
+        categories: data.categories,
+        tickAmount: Math.min(data.categories.length - 1, 11),
+        labels: {
+          rotate: data.categories.length > 12 ? -45 : 0,
+          trim: true,
+        },
         axisBorder: {
           show: false,
           color: "#e2e8f0",
@@ -87,11 +169,11 @@ document.addEventListener('DOMContentLoaded', () => {
       yaxis: {
         labels: {
           formatter: function (e) {
-            return e + 'k';
+            return moneyLabel(e);
           },
         },
         title: {
-          text: '$ (thousands)' ,
+          text: '$' ,
         },
       },
       fill: {
@@ -100,19 +182,91 @@ document.addEventListener('DOMContentLoaded', () => {
      tooltip: {
     			y: {
     				formatter: function (val) {
-    					return "$ " + val + " thousands"
+    					return moneyLabel(val)
     				}
     			}
     		},
     };
+      }
 
-var chart = new ApexCharts(document.querySelector("#salesPurchaseChart"), options);
+      const chartEl = document.querySelector("#salesPurchaseChart");
+      let chart = null;
+      let salesPurchaseOrders = [];
 
-chart.render();
+      function updateSalesPurchase(range) {
+        const data = reportSeries(salesPurchaseOrders, range || 'year');
+        if (chart) chart.destroy();
+        chart = new ApexCharts(chartEl, salesPurchaseOptions(data));
+        chart.render();
+      }
+
+      updateSalesPurchase(rangeSelect ? rangeSelect.value : 'year');
+
+      if (rangeSelect) {
+        rangeSelect.addEventListener('change', () => {
+          updateSalesPurchase(rangeSelect.value);
+        });
+      }
+
+      loadOrders().then(orders => {
+        salesPurchaseOrders = orders;
+        updateSalesPurchase(rangeSelect ? rangeSelect.value : 'year');
+      }).catch(error => {
+        console.warn(error.message);
+        updateSalesPurchase(rangeSelect ? rangeSelect.value : 'year');
+      });
     }
       if (document.getElementById('customerChart')) {
+    const API_BASE = window.location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
+    const customerRange = document.querySelector('[data-customer-range]');
+
+    function customerCutoff(range) {
+      const now = new Date();
+      const start = new Date(now);
+      if (range === 'week') start.setDate(now.getDate() - 6);
+      else if (range === 'month') start.setDate(1);
+      else start.setMonth(now.getMonth() - 5, 1);
+      start.setHours(0, 0, 0, 0);
+      return start;
+    }
+
+    function customerBreakdown(orders, range) {
+      const cutoff = customerCutoff(range);
+      const counts = {};
+      (orders || []).forEach(order => {
+        const created = order.createdAt ? new Date(order.createdAt) : new Date();
+        if (created < cutoff) return;
+        const customer = order.userId || (order.customer && order.customer.email) || 'guest';
+        counts[customer] = (counts[customer] || 0) + 1;
+      });
+      const values = Object.values(counts);
+      const first = values.filter(count => count === 1).length;
+      const returning = values.filter(count => count > 1).length;
+      const total = first + returning;
+      return {
+        first,
+        returning,
+        series: total ? [
+          Math.round((first / total) * 100),
+          Math.round((returning / total) * 100)
+        ] : [0, 0]
+      };
+    }
+
+    function setCustomerText(selector, value) {
+      const el = document.querySelector(selector);
+      if (el) el.textContent = value;
+    }
+
+    async function loadCustomerOrders() {
+      const response = await fetch(API_BASE + '/api/admin/orders');
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Cannot load customer orders.');
+      return data.orders || [];
+    }
+
     var options = {
-      series: [44, 55],
+      series: [0, 0],
       chart: {
         height: 200,
         type: 'radialBar',
@@ -186,14 +340,61 @@ chart.render();
 
     var chart = new ApexCharts(document.querySelector('#customerChart'), options);
     chart.render();
+    let customerOrders = [];
+
+    function updateCustomerChart(range) {
+      const data = customerBreakdown(customerOrders, range || 'six-months');
+      chart.updateSeries(data.series);
+      setCustomerText('[data-admin-summary="first-time"]', String(data.first));
+      setCustomerText('[data-admin-summary="returning"]', String(data.returning));
+      setCustomerText('[data-customer-percent="first"]', data.series[0] + '%');
+      setCustomerText('[data-customer-percent="return"]', data.series[1] + '%');
+    }
+
+    if (customerRange) {
+      customerRange.addEventListener('change', () => {
+        updateCustomerChart(customerRange.value);
+      });
+    }
+    updateCustomerChart(customerRange ? customerRange.value : 'six-months');
+
+    loadCustomerOrders().then(orders => {
+      customerOrders = orders;
+      updateCustomerChart(customerRange ? customerRange.value : 'six-months');
+    }).catch(error => {
+      console.warn(error.message);
+      updateCustomerChart(customerRange ? customerRange.value : 'six-months');
+    });
   }
    if (document.getElementById('salesChart')) {
-   // --- Replace these arrays with your real monthly sales numbers (12 values each) ---
-    const salesThisYear = [42000, 53000, 48000, 61000, 72000, 69000, 74000, 82000, 78000, 86000, 91000, 97000];
-    const salesLastYear = [38000, 45000, 47000, 56000, 65000, 63000, 68000, 70000, 69000, 75000, 80000, 84000];
-
-    // Categories for x-axis (months)
+    const API_BASE = window.location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
     const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    let salesThisYear = Array(12).fill(0);
+    let salesLastYear = Array(12).fill(0);
+
+    function monthlySales(orders) {
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const previousYear = currentYear - 1;
+      const current = Array(12).fill(0);
+      const previous = Array(12).fill(0);
+      (orders || []).forEach(order => {
+        const date = order.createdAt ? new Date(order.createdAt) : null;
+        if (!date) return;
+        const total = Number(order.total || 0);
+        if (date.getFullYear() === currentYear) current[date.getMonth()] += total;
+        if (date.getFullYear() === previousYear) previous[date.getMonth()] += total;
+      });
+      salesThisYear = current.map(value => Number(value.toFixed(2)));
+      salesLastYear = previous.map(value => Number(value.toFixed(2)));
+    }
+
+    async function loadReportOrders() {
+      const response = await fetch(API_BASE + '/api/admin/orders');
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Cannot load customer orders.');
+      return data.orders || [];
+    }
 
     const options = {
       chart: {
@@ -224,7 +425,7 @@ chart.render();
       },
       yaxis: {
         labels: { formatter: function (val) { return formatCurrency(val); } },
-        title: { text: 'Sales (INR)' }
+        title: { text: 'Sales (USD)' }
       },
       xaxis: {
         categories: months,
@@ -258,20 +459,24 @@ chart.render();
     // helper: format currency with thousands separators (assumes INR — change locale/currency as needed)
     function formatCurrency(value) {
       if (value == null) return '-';
-      // ensure numeric
       const n = Number(value);
-      return '₹' + n.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+      return '$' + n.toLocaleString(undefined, { maximumFractionDigits: 0 });
     }
 
-    // Example control: Randomize data (for demo)
-    document.getElementById('btn-random').addEventListener('click', () => {
-      const rand = () => Math.round((Math.random() * 80 + 20) * 1000); // 20k - 100k
-      const newThisYear = Array.from({length: 12}, rand);
-      const newLastYear = Array.from({length: 12}, rand);
+    function updateSalesOverview() {
       chart.updateSeries([
-        { name: 'This Year', data: newThisYear },
-        { name: 'Last Year', data: newLastYear }
+        { name: 'This Year', data: salesThisYear },
+        { name: 'Last Year', data: salesLastYear }
       ]);
+    }
+
+    document.getElementById('btn-random').addEventListener('click', () => {
+      loadReportOrders().then(orders => {
+        monthlySales(orders);
+        updateSalesOverview();
+      }).catch(error => {
+        console.warn(error.message);
+      });
     });
 
     // Example control: Toggle to show only This Year
@@ -290,18 +495,11 @@ chart.render();
       showingBoth = !showingBoth;
     });
 
-    // Public function: update chart with new monthly sales data
-    // call updateMonthlySales([arrayOf12], optionalCompareArrayOf12)
-    function updateMonthlySales(currentYearArray, compareYearArray = null) {
-      if (!Array.isArray(currentYearArray) || currentYearArray.length !== 12) {
-        console.warn('updateMonthlySales expects an array of 12 numbers for currentYearArray');
-        return;
-      }
-      const series = [{ name: 'This Year', data: currentYearArray }];
-      if (Array.isArray(compareYearArray) && compareYearArray.length === 12) {
-        series.push({ name: 'Last Year', data: compareYearArray });
-      }
-      chart.updateSeries(series);
-    }
+    loadReportOrders().then(orders => {
+      monthlySales(orders);
+      updateSalesOverview();
+    }).catch(error => {
+      console.warn(error.message);
+    });
   }
 });

@@ -42,46 +42,14 @@
               <path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
               <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
             </svg>
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger mt-2 ms-n2">
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger mt-2 ms-n2" data-admin-notification-count>
               2
               <span class="visually-hidden">unread messages</span>
             </span>
           </a>
           <div class="dropdown-menu dropdown-menu-end dropdown-menu-md p-0">
-            <ul class="list-unstyled p-0 m-0">
-              <li class="p-3 border-bottom ">
-                <div class="d-flex gap-3">
-                  <img src="./assets/images/avatar/avatar-1.jpg" alt="" class="avatar avatar-sm rounded-circle" />
-                  <div class="flex-grow-1 small">
-                    <p class="mb-0">New order received</p>
-                    <p class="mb-1">Order #12345 has been placed</p>
-                    <div class="text-secondary">5 minutes ago</div>
-                  </div>
-                </div>
-              </li>
-              <li class="p-3 border-bottom ">
-                <div class="d-flex gap-3">
-                  <img src="./assets/images/avatar/avatar-4.jpg" alt="" class="avatar avatar-sm rounded-circle" />
-                  <div class="flex-grow-1 small">
-                    <p class="mb-0">New user registered</p>
-                    <p class="mb-1">User @john_doe has signed up</p>
-                    <div class="text-secondary">30 minutes ago</div>
-                  </div>
-              </li>
-
-              <li class="p-3 border-bottom">
-                <div class="d-flex gap-3">
-                  <img src="./assets/images/avatar/avatar-2.jpg" alt="" class="avatar avatar-sm rounded-circle" />
-                  <div class="flex-grow-1 small">
-                    <p class="mb-0">Payment confirmed</p>
-                    <p class="mb-1">Payment of $299 has been received</p>
-                    <div class="text-secondary">1 hour ago</div>
-                  </div>
-                </div>
-              </li>
-              <li class="px-4 py-3 text-center">
-                <a href="#" class="text-primary ">View all notifications</a>
-              </li>
+            <ul class="list-unstyled p-0 m-0" data-admin-notifications>
+              <li class="p-3 text-secondary small">Loading customer activity...</li>
             </ul>
           </div>
         </li>
@@ -95,30 +63,30 @@
               <div class="d-flex gap-3 align-items-center border-dashed border-bottom px-3 py-3">
                 <img src="./assets/images/avatar/avatar-1.jpg" alt="" class="avatar avatar-md rounded-circle" />
                 <div>
-                  <h4 class="mb-0 small">Shrina Tesla</h4>
-                  <p class="mb-0  small">@imshrina</p>
+                  <h4 class="mb-0 small">Patria Admin</h4>
+                  <p class="mb-0  small">@patria</p>
                 </div>
               </div>
               <div class="p-3 d-flex flex-column gap-1 small lh-lg">
-                <a href="#!" class="">
+                <a href="index.html" class="">
 
-                  <span>Home</span>
+                  <span>Dashboard</span>
                 </a>
-                <a href="#!" class="">
+                <a href="reports.html#customer-orders" class="">
 
-                  <span> Inbox</span>
+                  <span> Orders</span>
                 </a>
-                <a href="#!" class="">
+                <a href="inventory.html" class="">
 
-                  <span> Chat</span>
+                  <span> Inventory</span>
                 </a>
-                <a href="#!" class="">
+                <a href="create-product.html" class="">
 
-                  <span> Activity</span>
+                  <span> Add Product</span>
                 </a>
-                <a href="#!" class="">
+                <a href="../index.html" class="">
 
-                  <span> Account Settings</span>
+                  <span> Back to Patria</span>
                 </a>
               </div>
 
@@ -153,7 +121,7 @@
   </aside>
 
   <!-- MAIN CONTENT -->
-  <main id="content" class="content py-10">
+  <main id="content" class="content py-10" data-admin-page="reports">
     <div class="container-fluid">
       <div class="row">
         <div class="col-12">
@@ -173,8 +141,8 @@
           <div class="card h-100">
             <div class="card-body p-4">
               <h6 class="mb-4 ">Total Revenue</h6>
-              <h3 class="mb-1 fw-bold">$45,231</h3>
-              <p class="mb-0 text-success small"><i class="ti ti-arrow-up"> </i>12% from last month</p>
+              <h3 class="mb-1 fw-bold" data-report-stat="revenue">$0.00</h3>
+              <p class="mb-0 text-success small"><i class="ti ti-arrow-up"> </i>Synced from customer checkout</p>
             </div>
           </div>
         </div>
@@ -183,8 +151,8 @@
           <div class="card h-100">
             <div class="card-body p-4">
               <h6 class="mb-4 ">Products Sold</h6>
-              <h3 class="mb-1 fw-bold">1,234</h3>
-              <p class="mb-0 text-success small"><i class="ti ti-arrow-up"> </i> 8% from last month</p>
+              <h3 class="mb-1 fw-bold" data-report-stat="sold">0</h3>
+              <p class="mb-0 text-success small"><i class="ti ti-arrow-up"> </i>Items from paid orders</p>
             </div>
           </div>
         </div>
@@ -193,8 +161,8 @@
           <div class="card h-100">
             <div class="card-body p-4">
               <h6 class="mb-4 ">Low Stock Items</h6>
-              <h3 class="mb-1 fw-bold">23</h3>
-              <p class="mb-0 text-danger small"><i class="ti ti-arrow-down"> </i> 3% from last month</p>
+              <h3 class="mb-1 fw-bold" data-report-stat="low-stock">0</h3>
+              <p class="mb-0 text-danger small"><i class="ti ti-arrow-down"> </i>Inventory quantity under 10</p>
             </div>
           </div>
         </div>
@@ -203,8 +171,8 @@
           <div class="card h-100">
             <div class="card-body p-4">
               <h6 class="mb-4 ">Out of Stock</h6>
-              <h3 class="mb-1 fw-bold">5</h3>
-              <p class="mb-0 text-danger small"><i class="ti ti-arrow-down"> </i> 2% from last month</p>
+              <h3 class="mb-1 fw-bold" data-report-stat="out-stock">0</h3>
+              <p class="mb-0 text-danger small"><i class="ti ti-arrow-down"> </i>Inventory quantity is 0</p>
             </div>
           </div>
         </div>
@@ -221,7 +189,7 @@
 
                 </div>
                  <div class="controls">
-        <button id="btn-random" class="btn btn-light btn-sm">Randomize Data</button>
+        <button id="btn-random" class="btn btn-light btn-sm">Refresh Data</button>
         <button id="btn-update" class="btn btn-primary btn-sm">Show This Year Only</button>
       </div>
               </div>
@@ -252,59 +220,133 @@
               </div>
 
               <!-- Product rows -->
-              <div class="list-group list-group-flush">
-                <div class="list-group-item p-3 d-flex align-items-center">
-                  <div class="me-3">
-                    <img src="./assets/images/product-1.webp" alt="Product A" class="rounded" style="width:48px; height:48px; object-fit:cover;">
-                  </div>
-                  <div class="flex-grow-1">
-                    <div class="d-flex justify-content-between align-items-center">
-                      <div>
-                        <h6 class="mb-0">Gaming Joy Stick</h6>
-                        <small class="text-secondary">156 units sold</small>
-                      </div>
-                      <div class="text-end">
-                        <strong>$3,120</strong>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="list-group-item p-3 d-flex align-items-center">
-                  <div class="me-3">
-                    <img src="./assets/images/product-2.webp" alt="Product B" class="rounded" style="width:48px; height:48px; object-fit:cover;">
-                  </div>
-                  <div class="flex-grow-1">
-                    <div class="d-flex justify-content-between align-items-center">
-                      <div>
-                        <h6 class="mb-0">Wireless Headphones</h6>
-                        <small class="text-secondary">134 units sold</small>
-                      </div>
-                      <div class="text-end">
-                        <strong>$2,680</strong>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="list-group-item p-3 d-flex align-items-center">
-                  <div class="me-3">
-                    <img src="./assets/images/product-3.webp" alt="Product C" class="rounded" style="width:48px; height:48px; object-fit:cover;">
-                  </div>
-                  <div class="flex-grow-1">
-                    <div class="d-flex justify-content-between align-items-center">
-                      <div>
-                        <h6 class="mb-0">Smartwatch</h6>
-                        <small class="text-secondary">98 units sold</small>
-                      </div>
-                      <div class="text-end">
-                        <strong>$1,960</strong>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+              <div class="list-group list-group-flush" data-report-list="top-products">
+                <div class="list-group-item p-3 text-secondary">Loading top products...</div>
               </div>
 
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-3" id="customer-orders">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body p-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <h2 class="mb-0 fs-5">Customer Orders</h2>
+                  <p class="mb-0 text-secondary small">Orders created from Patria My Account and checkout.</p>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="table align-middle">
+                  <thead>
+                    <tr>
+                      <th>Order</th>
+                      <th>Customer</th>
+                      <th>Items</th>
+                      <th>Total</th>
+                      <th>Status</th>
+                      <th>Date</th>
+                    </tr>
+                  </thead>
+                  <tbody data-report-table="orders">
+                    <tr><td colspan="6" class="text-secondary">Loading customer orders...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-3" id="customer-addresses">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body p-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <h2 class="mb-0 fs-5">Saved Addresses</h2>
+                  <p class="mb-0 text-secondary small">Addresses saved from Patria customer accounts.</p>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="table align-middle">
+                  <thead>
+                    <tr>
+                      <th>Customer</th>
+                      <th>Email</th>
+                      <th>Phone</th>
+                      <th>Address</th>
+                      <th>Orders</th>
+                    </tr>
+                  </thead>
+                  <tbody data-report-table="addresses">
+                    <tr><td colspan="5" class="text-secondary">Loading saved addresses...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-3" id="reservations">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body p-4">
+              <h2 class="mb-1 fs-5">Reservations</h2>
+              <p class="mb-3 text-secondary small">Table reservations submitted from the Patria front page.</p>
+              <div class="table-responsive">
+                <table class="table align-middle">
+                  <thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>Guests</th><th>Date</th><th>Time</th><th>Requests</th></tr></thead>
+                  <tbody data-engagement-table="reservations"><tr><td colspan="7" class="text-secondary">Loading reservations...</td></tr></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-3" id="contact-messages">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body p-4">
+              <h2 class="mb-1 fs-5">Contact Messages</h2>
+              <p class="mb-3 text-secondary small">Messages submitted from the Patria contact form.</p>
+              <div class="table-responsive">
+                <table class="table align-middle">
+                  <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Subject</th><th>Message</th><th>Date</th></tr></thead>
+                  <tbody data-engagement-table="messages"><tr><td colspan="6" class="text-secondary">Loading messages...</td></tr></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-3" id="newsletter-subscribers">
+        <div class="col-12 col-lg-6">
+          <div class="card h-100">
+            <div class="card-body p-4">
+              <h2 class="mb-1 fs-5">Newsletter Subscribers</h2>
+              <p class="mb-3 text-secondary small">Emails collected from the subscription form.</p>
+              <div class="table-responsive">
+                <table class="table align-middle">
+                  <thead><tr><th>Email</th><th>Status</th><th>Date</th></tr></thead>
+                  <tbody data-engagement-table="subscribers"><tr><td colspan="3" class="text-secondary">Loading subscribers...</td></tr></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-lg-6" id="search-logs">
+          <div class="card h-100">
+            <div class="card-body p-4">
+              <h2 class="mb-1 fs-5">Search Logs</h2>
+              <p class="mb-3 text-secondary small">Searches submitted from the Patria front page.</p>
+              <div class="table-responsive">
+                <table class="table align-middle">
+                  <thead><tr><th>Keyword</th><th>Results</th><th>Date</th></tr></thead>
+                  <tbody data-engagement-table="searches"><tr><td colspan="3" class="text-secondary">Loading searches...</td></tr></tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>

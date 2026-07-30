@@ -3139,6 +3139,23 @@ footer {
 .order-summary span:last-child {
   color: var(--primary);
 }
+.order-date-field {
+  display: grid;
+  gap: 8px;
+  margin-top: 18px;
+  color: #3a1f14;
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+.order-date-field input {
+  width: 100%;
+  border: 1px solid #efd7bb;
+  border-radius: 9px;
+  background: #fffaf5;
+  color: #3a1f14;
+  font: inherit;
+  padding: 12px 14px;
+}
 .order-checkout {
   width: 100%;
   margin-top: 18px;

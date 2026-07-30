@@ -183,14 +183,19 @@
                 <button class="btn btn-outline-secondary">
                   <i class="ti ti-filter"></i> Filter
                 </button>
-                <button class="btn btn-outline-secondary">
-                  <i class="ti ti-file-excel"></i> Excel
+                <button class="btn btn-outline-secondary" type="button" data-inventory-import>
+                  <i class="ti ti-upload"></i> Import Excel
                 </button>
+                <button class="btn btn-outline-secondary" type="button" data-inventory-export>
+                  <i class="ti ti-file-excel"></i> Export Excel
+                </button>
+                <input type="file" class="d-none" accept=".csv,text/csv" data-inventory-file>
                 <button class="btn btn-outline-secondary">
                   <i class="ti ti-file-pdf"></i> PDF
                 </button>
               </div>
             </div>
+            <p class="small text-secondary mb-3" data-inventory-excel-status>CSV format: id, title, category, day, price, quantity, image, description</p>
           </div>
           <div class="card table-responsive ">
             <table class="table mb-0 text-nowrap table-hover">
@@ -200,7 +205,7 @@
 
                   <th>Code</th>
                   <th>Category</th>
-                  <th>Brand</th>
+                  <th>day</th>
                   <th>Price</th>
                   <th>Unit</th>
                   <th>Quantity</th>
@@ -214,7 +219,7 @@
 
                   <td>PRD001</td>
                   <td>Electronics</td>
-                  <td>Brand Name</td>
+                  <td>5</td>
                   <td>$99.99</td>
                   <td>pcs</td>
                   <td>150</td>
