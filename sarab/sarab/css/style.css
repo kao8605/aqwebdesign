@@ -452,6 +452,9 @@ section {
   object-fit: cover;
   border-radius: 50%;
 }
+.hero-mobile-art {
+  display: none;
+}
 .fcard {
   position: absolute;
   background: #fff;
@@ -3542,6 +3545,21 @@ footer {
   }
   #topbar .top-contact span:last-child {
     display: none;
+  }
+  #hero {
+    min-height: auto;
+    padding-top: 44px;
+  }
+  #hero .row > .col-lg-6:last-child {
+    display: none;
+  }
+  .hero-mobile-art {
+    display: flex;
+    justify-content: center;
+    margin: 12px 0 18px;
+  }
+  .hero-mobile-art .hcircle {
+    margin: 0 auto;
   }
   .hcircle {
     width: 260px;
