@@ -269,6 +269,8 @@ section {
   align-items: center;
   position: relative;
   overflow: hidden;
+  width: 100%;
+  max-width: 100%;
 }
 .hbgtxt {
   position: absolute;
@@ -455,9 +457,9 @@ section {
 .hero-mobile-art {
   position: absolute;
   top: 50%;
-  right: 12px;
+  right: clamp(56px, 6vw, 120px);
   z-index: 1;
-  width: 50%;
+  width: min(46%, 680px);
   transform: translateY(-50%);
   text-align: center;
 }
@@ -478,12 +480,12 @@ section {
 }
 .fcard.fc2 {
   bottom: 75px;
-  right: -25px;
+  right: 8px;
   animation: fltc 4s ease-in-out infinite 1.5s;
 }
 .fcard.fc3 {
   top: 38%;
-  right: -45px;
+  right: 20px;
   animation: fltc 4s ease-in-out infinite 0.8s;
 }
 @keyframes fltc {
