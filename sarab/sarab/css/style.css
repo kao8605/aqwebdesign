@@ -455,12 +455,10 @@ section {
   border-radius: 50%;
 }
 .hero-mobile-art {
-  position: absolute;
-  top: 50%;
-  right: clamp(56px, 6vw, 120px);
-  z-index: 1;
-  width: min(46%, 680px);
-  transform: translateY(-50%);
+  display: none;
+}
+.hero-art-wrap {
+  position: relative;
   text-align: center;
 }
 .fcard {
@@ -3571,6 +3569,9 @@ footer {
   #hero {
     min-height: auto;
     padding-top: 44px;
+  }
+  #hero .hero-desktop-art {
+    display: none !important;
   }
   .hero-mobile-art {
     display: flex;
