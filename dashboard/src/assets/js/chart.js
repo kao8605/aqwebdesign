@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
       ],
-      colors: ['#f7a085', '#E66239'],
+      colors: ['#E66239', '#4FAF7A'],
       chart: {
         type: 'bar',
         height: 350,
@@ -271,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
         height: 200,
         type: 'radialBar',
       },
-      colors: ['#5BE49B', '#E66239'],
+      colors: ['#E66239', '#F6B73C'],
       plotOptions: {
         radialBar: {
           dataLabels: {
@@ -325,10 +325,14 @@ document.addEventListener('DOMContentLoaded', () => {
       fill: {
         type: 'gradient',
         gradient: {
-          shade: 'dark',
-          type: 'vertical',
-          gradientToColors: ['#007867', '#FFD666', '#FFAC82'],
-          stops: [0, 100],
+          shade: 'light',
+          type: 'horizontal',
+          shadeIntensity: 0.35,
+          gradientToColors: ['#FFB088', '#FFE08A'],
+          inverseColors: false,
+          opacityFrom: 1,
+          opacityTo: 1,
+          stops: [0, 55, 100],
         },
       },
       stroke: {

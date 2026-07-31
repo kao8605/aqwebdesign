@@ -1194,6 +1194,10 @@ input[type="button"]:hover {
     display: block;
 }
 
+.portfolio-preview a:not([href]) {
+    cursor: default;
+}
+
 .portfolio-preview img {
     display: block;
     width: 100%;
@@ -1204,7 +1208,7 @@ input[type="button"]:hover {
     transition: transform 240ms ease, box-shadow 240ms ease;
 }
 
-.portfolio-preview a:hover img {
+.portfolio-preview a[href]:hover img {
     transform: translateY(-4px);
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
 }

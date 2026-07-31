@@ -121,7 +121,7 @@ function apiRequest(path, options) {
                 try {
                     data = JSON.parse(text);
                 } catch (err) {
-                    throw new Error("Backend API is not available. Please deploy sarab/sarab/server.js and connect /api routes.");
+                    throw new Error("Backend API is not available. Please deploy Patria/Patria/server.js and connect /api routes.");
                 }
             }
             if (!res.ok) throw new Error(data.error || "Request failed.");

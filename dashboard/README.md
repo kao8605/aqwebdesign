@@ -1,17 +1,17 @@
-# InApp Free Inventory Admin Dashboard Template
+# Dashboard Admin Frontend
 
 #### Preview
 
- - [Demo](https://themewagon.github.io/inapp/)
+ - [Demo](https://themewagon.github.io/dashboard/)
 
 #### Download
- - [Download from ThemeWagon](https://themewagon.com/themes/inapp/)
+ - [Download from ThemeWagon](https://themewagon.com/themes/dashboard/)
 
 ## Getting Started
 
 1. Clone Repository
 ```
-git clone https://github.com/themewagon/inapp.git
+git clone https://github.com/themewagon/dashboard.git
 ```
 2. Install Dependencies
 ```

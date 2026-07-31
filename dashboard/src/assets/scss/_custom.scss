@@ -1,4 +1,9 @@
 
+body,
+.content {
+	background-color: #fff;
+}
+
 .overlay {
 	position: fixed;
 	inset: 0;
@@ -9,6 +14,44 @@
 }
 .overlay.show {
 	display: block;
+}
+.admin-stat-card {
+	min-height: 146px;
+	height: 100%;
+	display: flex;
+	justify-content: center;
+}
+.admin-stat-card > .d-flex {
+	width: 100%;
+	align-items: center;
+}
+.admin-stat-card .icon-shape {
+	flex: 0 0 auto;
+}
+.admin-stat-card h2 {
+	min-height: 20px;
+	margin-bottom: 10px !important;
+}
+.admin-stat-card p {
+	min-height: 38px;
+	line-height: 1.35;
+}
+.admin-mini-stat {
+	gap: 16px;
+	align-items: flex-start;
+}
+.admin-mini-stat__copy {
+	min-width: 0;
+	flex: 1 1 auto;
+}
+.admin-mini-stat__copy span {
+	display: block;
+	white-space: normal;
+	line-height: 1.35;
+}
+.admin-mini-stat__icon {
+	flex: 0 0 auto;
+	line-height: 1;
 }
 .sidebar {
 	width: 240px;
@@ -114,19 +157,27 @@
 }
 .patria-auth-brand {
 	justify-content: center;
-	gap: 18px;
+	gap: 12px;
+	width: 100%;
+	flex-direction: column;
+	text-align: center;
 }
 .patria-auth-brand .patria-admin-icon {
-	width: 92px;
-	height: 92px;
-	font-size: 43px;
+	width: 78px;
+	height: 78px;
+	font-size: 36px;
 }
 .patria-auth-brand .patria-admin-copy strong {
-	font-size: 48px;
+	font-size: 42px;
 }
 .patria-auth-brand .patria-admin-copy em {
-	font-size: 15px;
-	letter-spacing: .24em;
+	display: block;
+	max-width: 100%;
+	font-size: 11px;
+	letter-spacing: .16em;
+	line-height: 1.4;
+	white-space: normal;
+	word-break: keep-all;
 }
 .sidebar.collapsed {
 	width: 60px;

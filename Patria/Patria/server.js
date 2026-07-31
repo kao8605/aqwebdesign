@@ -4,7 +4,7 @@ const path = require('path');
 const crypto = require('crypto');
 
 const ROOT = __dirname;
-const ADMIN_ROOT = path.resolve(ROOT, "../../inapp/dist");
+const ADMIN_ROOT = path.resolve(ROOT, "../../dashboard/dist");
 const DATA_DIR = path.join(ROOT, 'data');
 const DB_PATH = path.join(DATA_DIR, 'db.json');
 const PRODUCTS_PATH = path.join(DATA_DIR, 'products.json');

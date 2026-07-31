@@ -54,9 +54,9 @@
       "userId": "f5a7d19b30560cc00b6b635f7c9520b78a778c178399aa977b6d2e1635639bdf",
       "createdAt": "2026-07-29T10:33:51.992Z"
     },
-    "bfd40f1f8f38f003fd5e7ba4a1ae657d60b0df33832d3e7f698461e24958ab37": {
+    "b6e6043ead6af3e5603081d4a5e589c50c2c6f3be0574b066afac2c09a34a723": {
       "userId": "af6a671ffdc4474cdc7d8dfdc37ab0a4cdb76984440d7b5fe86c46c61588a907",
-      "createdAt": "2026-07-30T10:16:02.064Z"
+      "createdAt": "2026-07-31T18:30:21.935Z"
     }
   },
   "guestCarts": {
@@ -213,6 +213,36 @@
       "leadDays": 5,
       "status": "created",
       "createdAt": "2026-07-30T15:25:03.798Z"
+    },
+    {
+      "id": "aa56dd2709d3",
+      "userId": "af6a671ffdc4474cdc7d8dfdc37ab0a4cdb76984440d7b5fe86c46c61588a907",
+      "items": [
+        {
+          "id": "house-comfort-soup",
+          "source": "static",
+          "title": "House Comfort Soup",
+          "cat": "SOUP",
+          "price": "$12.99",
+          "old": "",
+          "priceValue": 12.99,
+          "img": "img/menu/64.webp",
+          "desc": "A cozy soup pot simmered slowly for deep, clean flavor.",
+          "rating": "4.9",
+          "reviews": "88",
+          "cal": "520",
+          "time": "15",
+          "tags": "SOUP,House Favorite,Shareable",
+          "quantity": 25,
+          "day": "5",
+          "qty": 1
+        }
+      ],
+      "total": 12.99,
+      "fulfillmentDate": "2026-08-14",
+      "leadDays": 5,
+      "status": "created",
+      "createdAt": "2026-07-31T18:30:21.948Z"
     }
   ],
   "productOverrides": {
@@ -226,6 +256,17 @@
       "priceValue": 13.99,
       "price": "$13.99",
       "updatedAt": "2026-07-30T15:11:49.588Z"
+    },
+    "chicken-fried-rice-set": {
+      "title": "Chicken Fried Rice Set",
+      "cat": "RICE",
+      "img": "img/QuickMeals/3.webp",
+      "desc": "A satisfying fried rice lunch set with egg, peas, carrots, scallions, chicken and broccoli.",
+      "quantity": 28,
+      "day": "5",
+      "priceValue": 12.99,
+      "price": "$12.99",
+      "updatedAt": "2026-07-31T18:29:30.827Z"
     }
   },
   "productAdditions": [
@@ -270,7 +311,8 @@
   ],
   "deletedProducts": [
     "123",
-    "codex-excel-test"
+    "codex-excel-test",
+    "chicken-herbal-soup"
   ],
   "reservations": [],
   "messages": [],

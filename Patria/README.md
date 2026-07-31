@@ -1,16 +1,16 @@
 # Patria – Free Fast Food & Restaurant HTML Template
 #### Preview
 
- - [Demo](https://themewagon.github.io/sarab/)
+ - [Demo](https://themewagon.github.io/Patria/)
 
 #### Download
- - [Download from ThemeWagon](https://themewagon.com/themes/sarab/)
+ - [Download from ThemeWagon](https://themewagon.com/themes/Patria/)
 
 ## Getting Started
 
 1. Clone Repository
 ```
-git clone https://github.com/themewagon/sarab.git
+git clone https://github.com/themewagon/Patria.git
 ```
 
 ## Author 

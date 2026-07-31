@@ -703,14 +703,14 @@ export async function loadAdminDashboard() {
       orders = ordersData.orders || [];
       latestAdminOrders = orders;
     } catch (ordersError) {
-      console.warn('Admin orders API is not available yet. Restart sarab/sarab/server.js to enable it.', ordersError);
+      console.warn('Admin orders API is not available yet. Restart Patria/Patria/server.js to enable it.', ordersError);
     }
     try {
       const summaryData = await api('/api/admin/summary');
       summary = summaryData.summary || null;
       notifications = summaryData.notifications || [];
     } catch (summaryError) {
-      console.warn('Admin summary API is not available yet. Restart sarab/sarab/server.js to enable it.', summaryError);
+      console.warn('Admin summary API is not available yet. Restart Patria/Patria/server.js to enable it.', summaryError);
     }
     const totalSales = orders.reduce((sum, order) => sum + Number(order.total || 0), 0);
     const itemCount = orders.reduce((sum, order) => sum + (order.items || []).reduce((s, item) => s + Number(item.qty || 0), 0), 0);
