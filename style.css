@@ -1198,6 +1198,12 @@ input[type="button"]:hover {
 
 .portfolio-preview a {
     display: block;
+    color: transparent;
+    font-size: 0;
+    line-height: 0;
+    text-decoration: none;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .portfolio-preview a:not([href]) {
@@ -1206,6 +1212,12 @@ input[type="button"]:hover {
 
 .portfolio-preview img {
     display: block;
+    color: transparent;
+    font-size: 0;
+    line-height: 0;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
     width: 100%;
     height: auto;
     object-fit: contain;

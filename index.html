@@ -167,8 +167,8 @@
                 <a href="./Everyfresh/dist/index.html" data-category="ecommerce" data-title="Every Fresh" data-type="購物平台" data-desc="生鮮雜貨購物網站，包含分類篩選、商品詳情、購物車、結帳流程，以及客戶與員工後台入口。" data-tags="Fresh Grocery,Cart,Filter,Dashboard" aria-label="查看 Every Fresh 作品集">
                     <img src="202608021137.png" alt="Every Fresh 作品集預覽">
                 </a>
-                <a href="./Everyfresh/dist/customer-dashboard.html" data-category="system" data-title="Every Fresh 客戶後台" data-type="系統" data-desc="客戶會員中心，包含訂單查看、再次訂購、取消訂單、地址管理、會員回饋與帳戶資料修改。" data-tags="Customer Portal,Orders,Address,Account" aria-label="查看 Every Fresh 客戶後台作品集">
-                    <img src="26080212858.png" alt="Every Fresh 客戶後台作品集預覽">
+                <a href="./Dashai/dist/index.html" data-category="system" data-title="DASHAI 管理後台" data-type="系統" data-desc="中文化管理後台範例，包含營收總覽、訂單表格、商品銷售、地區營收、熱銷商品與通知介面。" data-tags="Dashboard,Charts,Orders,Chinese UI" aria-label="查看 DASHAI 管理後台作品集">
+                    <img src="8220355.png" alt="DASHAI 管理後台作品集預覽">
                 </a>
                 <a href="./farcimensample/customer-dashboard.html" data-category="system" data-title="Farcimen 客戶後台" data-type="系統" data-desc="餐廳客戶後台範例，提供訂單紀錄、地址管理、帳戶資料與再次訂購流程，適合展示會員系統雛形。" data-tags="Customer Portal,Orders,Profile,Restaurant" aria-label="查看 Farcimen 客戶後台作品集">
                     <img src="202548.png" alt="Farcimen 客戶後台作品集預覽">
@@ -179,8 +179,8 @@
                 <a href="./farcimensample/staff-dashboard.html" data-category="system" data-title="Farcimen 員工後台" data-type="系統" data-desc="餐廳員工管理後台，整合訂單、庫存、銷售報表、訂位管理、商品新增編輯與狀態追蹤。" data-tags="Admin,Inventory,Orders,Reservations" aria-label="查看 Farcimen 員工後台作品集">
                     <img src="02608023844.png" alt="Farcimen 員工後台作品集預覽">
                 </a>
-                <a href="./Dashai/dist/index.html" data-category="system" data-title="DASHAI 管理後台" data-type="系統" data-desc="中文化管理後台範例，包含營收總覽、訂單表格、商品銷售、地區營收、熱銷商品與通知介面。" data-tags="Dashboard,Charts,Orders,Chinese UI" aria-label="查看 DASHAI 管理後台作品集">
-                    <img src="8220355.png" alt="DASHAI 管理後台作品集預覽">
+                <a href="./Everyfresh/dist/customer-dashboard.html" data-category="system" data-title="Every Fresh 客戶後台" data-type="系統" data-desc="客戶會員中心，包含訂單查看、再次訂購、取消訂單、地址管理、會員回饋與帳戶資料修改。" data-tags="Customer Portal,Orders,Address,Account" aria-label="查看 Every Fresh 客戶後台作品集">
+                    <img src="26080212858.png" alt="Every Fresh 客戶後台作品集預覽">
                 </a>
                 <a href="#" data-category="corporate" data-restricted-preview aria-label="第四個作品預覽">
                     <img src="Image20267011915.webp" alt="第四個作品預覽">
@@ -205,7 +205,7 @@
                         <div class="portfolio-modal__label">技術</div>
                         <div class="portfolio-modal__tags" id="portfolioModalTags"></div>
                         <div class="portfolio-modal__actions">
-                            <a id="portfolioModalLink" href="#" class="portfolio-modal__primary">前往專案 <span aria-hidden="true">↗</span></a>
+                            <a id="portfolioModalLink" href="#" class="portfolio-modal__primary">前往專案</a>
                         </div>
                     </div>
                 </article>
@@ -228,14 +228,14 @@
                     <span data-value="5">★</span>
                 </div>
                 <p class="rating-label" id="ratingLabel">請選擇評分</p>
-                <textarea id="reviewContent" placeholder="請分享您的經驗與感受…" rows="4" required></textarea>
+                <textarea id="reviewContent" placeholder="請分享您的經驗與感受..." rows="4" required></textarea>
                 <button type="submit">送出評論</button>
                 <p class="form-msg" id="formMsg"></p>
             </form>
         </div>
 
         <div class="reviews-list" id="reviewsList">
-            <p class="loading-msg">載入評論中…</p>
+            <p class="loading-msg">載入評論中...</p>
         </div>
     </section>
 
@@ -301,7 +301,7 @@
             if (!selectedRating) { msg.textContent = "請先選擇評分"; msg.className = "form-msg error"; return; }
             if (!content) { msg.textContent = "請填寫評論內容"; msg.className = "form-msg error"; return; }
 
-            msg.textContent = "送出中…"; msg.className = "form-msg";
+            msg.textContent = "送出中..."; msg.className = "form-msg";
             try {
                 const res = await fetch("/api/reviews", {
                     method: "POST",

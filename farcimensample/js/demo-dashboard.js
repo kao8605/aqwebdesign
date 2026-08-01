@@ -243,8 +243,9 @@
   }
 
   function setText(selector, text) {
-    var el = document.querySelector(selector);
-    if (el) el.textContent = text;
+    document.querySelectorAll(selector).forEach(function (el) {
+      el.textContent = text;
+    });
   }
 
   function setActive(sectionId) {
@@ -254,6 +255,18 @@
     document.querySelectorAll("[data-demo-tab]").forEach(function (tab) {
       tab.classList.toggle("active", tab.getAttribute("data-demo-tab") === sectionId);
     });
+  }
+
+  function setMobileMenu(open) {
+    var sidebar = document.querySelector(".demo-sidebar");
+    var toggle = document.querySelector("[data-demo-menu-toggle]");
+    var backdrop = document.querySelector("[data-demo-sidebar-close]");
+    if (!sidebar || !toggle || !backdrop) return;
+    sidebar.classList.toggle("is-open", open);
+    toggle.classList.toggle("is-open", open);
+    backdrop.classList.toggle("is-open", open);
+    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    document.body.classList.toggle("demo-menu-open", open);
   }
 
   function renderSummary() {
@@ -456,23 +469,24 @@
     var data = engagement();
     var notes = [];
     orderList.filter(function (order) { return order.status === "Processing"; }).slice(0, 4).forEach(function (order) {
-      notes.push({ icon: "fa-file-text-o", title: "處理中訂單 " + order.id, text: money(order.total) + " 等待員工處理。" });
+      notes.push({ icon: "fa-file-text-o", title: "處理中訂單 " + order.id, text: money(order.total) + " 等待員工處理。", detail: "顧客：" + customerName(order.customer) + "<br>合計：" + money(order.total) + "<br>狀態：" + statusLabel(order.status) });
     });
     productList.filter(function (product) { return product.stock <= 5; }).slice(0, 4).forEach(function (product) {
-      notes.push({ icon: "fa-exclamation-triangle", title: productTitle(product.title), text: product.stock <= 0 ? "已缺貨" : "庫存剩 " + product.stock + " 份。" });
+      notes.push({ icon: "fa-exclamation-triangle", title: productTitle(product.title), text: product.stock <= 0 ? "已缺貨" : "庫存剩 " + product.stock + " 份。", detail: "商品：" + productTitle(product.title) + "<br>分類：" + product.category + "<br>庫存：" + product.stock + " 份" });
     });
     bookings().slice(0, 2).forEach(function (booking) {
-      notes.push({ icon: "fa-calendar", title: "訂位", text: booking.name + " / " + booking.date });
+      notes.push({ icon: "fa-calendar", title: "訂位", text: booking.name + " / " + booking.date, detail: "姓名：" + booking.name + "<br>日期：" + booking.date + "<br>時間：" + (booking.time || "未填寫") + "<br>人數：" + (booking.people || "未填寫") });
     });
     (data.messages || []).slice(0, 2).forEach(function (message) {
-      notes.push({ icon: "fa-envelope-o", title: "新訊息", text: message.subject });
+      notes.push({ icon: "fa-envelope-o", title: "新訊息", text: message.subject, detail: "姓名：" + escapeHtml(message.name) + "<br>Email：" + escapeHtml(message.email) + "<br>主旨：" + escapeHtml(message.subject) + "<br>內容：" + escapeHtml(message.message) });
     });
     setText("[data-demo-notification-count]", notes.length);
-    var menu = document.querySelector("[data-demo-notifications]");
-    if (!menu) return;
-    menu.innerHTML = notes.map(function (note) {
-      return '<div class="demo-notification-item"><i class="fa ' + note.icon + '"></i><div><strong>' + escapeHtml(note.title) + '</strong><span>' + escapeHtml(note.text) + '</span></div></div>';
+    var notificationHtml = notes.map(function (note) {
+      return '<button type="button" class="demo-notification-item" data-demo-notification-item data-notification-title="' + escapeHtml(note.title) + '" data-notification-detail="' + escapeHtml(note.detail || note.text) + '"><i class="fa ' + note.icon + '"></i><div><strong>' + escapeHtml(note.title) + '</strong><span>' + escapeHtml(note.text) + '</span></div></button>';
     }).join("") || '<p class="demo-muted">目前沒有通知。</p>';
+    document.querySelectorAll("[data-demo-notifications]").forEach(function (menu) {
+      menu.innerHTML = notificationHtml;
+    });
   }
 
   function renderCharts() {
@@ -859,10 +873,22 @@
   }
 
   document.addEventListener("click", function (event) {
+    var menuToggle = event.target.closest("[data-demo-menu-toggle]");
+    if (menuToggle) {
+      event.preventDefault();
+      setMobileMenu(!menuToggle.classList.contains("is-open"));
+      return;
+    }
+    if (event.target.closest("[data-demo-sidebar-close]")) {
+      event.preventDefault();
+      setMobileMenu(false);
+      return;
+    }
     var tab = event.target.closest("[data-demo-tab]");
     if (tab) {
       event.preventDefault();
       setActive(tab.getAttribute("data-demo-tab"));
+      setMobileMenu(false);
       return;
     }
     var view = event.target.closest("[data-view-order]");
@@ -881,6 +907,7 @@
     if (logout) {
       event.preventDefault();
       setCustomerLoggedIn(false);
+      setMobileMenu(false);
       return;
     }
     var complete = event.target.closest("[data-complete-order]");
@@ -926,10 +953,21 @@
       renderProducts();
       return;
     }
+    var notificationItem = event.target.closest("[data-demo-notification-item]");
+    if (notificationItem) {
+      event.preventDefault();
+      document.querySelectorAll("[data-demo-notifications]").forEach(function (menu) { menu.classList.remove("show"); });
+      openModal(notificationItem.getAttribute("data-notification-title") || "通知", '<p>' + (notificationItem.getAttribute("data-notification-detail") || "") + '</p>');
+      return;
+    }
     var notifications = event.target.closest("[data-demo-notification-toggle]");
     if (notifications) {
       event.preventDefault();
-      var menu = document.querySelector("[data-demo-notifications]");
+      var notificationWrap = notifications.closest(".demo-notifications");
+      var menu = notificationWrap ? notificationWrap.querySelector("[data-demo-notifications]") : null;
+      document.querySelectorAll("[data-demo-notifications]").forEach(function (item) {
+        if (item !== menu) item.classList.remove("show");
+      });
       if (menu) menu.classList.toggle("show");
       return;
     }
@@ -977,6 +1015,14 @@
     if (event.target.closest(".demo-modal-close") || event.target.classList.contains("demo-modal")) {
       document.querySelector(".demo-modal").classList.remove("show");
     }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") setMobileMenu(false);
+  });
+
+  window.addEventListener("resize", function () {
+    if (window.innerWidth > 900) setMobileMenu(false);
   });
 
   document.addEventListener("submit", function (event) {

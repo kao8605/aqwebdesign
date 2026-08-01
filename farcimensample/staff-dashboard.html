@@ -10,7 +10,25 @@
   <link href="css/demo-dashboard.css" rel="stylesheet">
 </head>
 <body class="demo-dashboard" data-dashboard="staff">
+  <header class="demo-mobile-nav staff-mobile-nav">
+    <button class="demo-menu-toggle" type="button" data-demo-menu-toggle aria-label="開啟選單" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <a class="demo-brand staff-mobile-brand" href="index.html">
+      <strong>Farcimen</strong>
+    </a>
+    <div class="demo-notifications demo-mobile-notifications">
+      <button class="demo-icon-button" type="button" data-demo-notification-toggle aria-label="通知">
+        <i class="fa fa-bell-o"></i>
+        <span data-demo-notification-count>0</span>
+      </button>
+      <div class="demo-notification-menu" data-demo-notifications></div>
+    </div>
+  </header>
   <div class="demo-shell">
+    <div class="demo-sidebar-backdrop" data-demo-sidebar-close></div>
     <aside class="demo-sidebar">
       <a class="demo-brand" href="index.html">
         <span class="demo-brand-mark"><i class="fa fa-cutlery"></i></span>

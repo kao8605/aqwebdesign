@@ -8,9 +8,27 @@
   <link href="css/font-awesome.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link href="css/demo-dashboard.css" rel="stylesheet">
-</head>
+  </head>
 <body class="demo-dashboard customer-account" data-dashboard="customer">
+  <header class="demo-mobile-nav customer-mobile-nav">
+    <button class="demo-menu-toggle" type="button" data-demo-menu-toggle aria-label="開啟選單" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <a class="demo-brand staff-mobile-brand" href="index.html">
+      <strong>Farcimen</strong>
+    </a>
+    <div class="demo-notifications demo-mobile-notifications">
+      <button class="demo-icon-button" type="button" data-demo-notification-toggle aria-label="通知">
+        <i class="fa fa-bell-o"></i>
+        <span data-demo-notification-count>0</span>
+      </button>
+      <div class="demo-notification-menu" data-demo-notifications></div>
+    </div>
+  </header>
   <div class="demo-shell" data-customer-portal>
+    <div class="demo-sidebar-backdrop" data-demo-sidebar-close></div>
     <aside class="demo-sidebar">
       <a class="demo-brand" href="index.html">
         <span class="demo-brand-mark"><i class="fa fa-cutlery"></i></span>
@@ -31,7 +49,15 @@
           <h1>會員中心</h1>
           <p data-customer-greeting>您好，訪客顧客，您可以在這裡管理示範訂單與帳戶資料。</p>
         </div>
-        <span class="demo-chip">前端示範</span>
+        <div class="demo-topbar-actions">
+          <div class="demo-notifications">
+            <button class="demo-icon-button" type="button" data-demo-notification-toggle aria-label="通知">
+              <i class="fa fa-bell-o"></i>
+              <span data-demo-notification-count>0</span>
+            </button>
+            <div class="demo-notification-menu" data-demo-notifications></div>
+          </div>
+        </div>
       </header>
 
       <section class="demo-section active" id="overview" data-demo-panel>

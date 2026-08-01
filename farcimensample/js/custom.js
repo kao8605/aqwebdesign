@@ -80,6 +80,8 @@ if ($.fn.owlCarousel) {
     var CART_KEY = "farcimenDemoCart";
     var BOOKING_KEY = "farcimenDemoBookings";
     var ORDERS_KEY = "farcimenDemoOrders";
+    var PRODUCTS_KEY = "farcimenDemoProducts";
+    var CUSTOMER_KEY = "farcimenDemoCustomer";
 
     function getCart() {
         try {
@@ -118,6 +120,26 @@ if ($.fn.owlCarousel) {
         localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
     }
 
+    function getProducts() {
+        try {
+            return JSON.parse(localStorage.getItem(PRODUCTS_KEY)) || [];
+        } catch (error) {
+            return [];
+        }
+    }
+
+    function saveProducts(products) {
+        localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products));
+    }
+
+    function getCustomer() {
+        try {
+            return JSON.parse(localStorage.getItem(CUSTOMER_KEY)) || null;
+        } catch (error) {
+            return null;
+        }
+    }
+
     function money(value) {
         return "$" + Number(value || 0).toFixed(2);
     }
@@ -128,6 +150,10 @@ if ($.fn.owlCarousel) {
             pizza: "披薩",
             pasta: "義大利麵",
             fries: "薯條",
+            Burger: "漢堡",
+            Pizza: "披薩",
+            Pasta: "義大利麵",
+            Fries: "薯條",
             Menu: "菜單",
             Farcimen: "Farcimen"
         };
@@ -271,9 +297,71 @@ if ($.fn.owlCarousel) {
         modal.classList.add("show");
     }
 
+    function categoryClass(category) {
+        var value = String(category || "Menu").toLowerCase();
+        if (value.indexOf("burger") !== -1 || value.indexOf("漢堡") !== -1) return "burger";
+        if (value.indexOf("pizza") !== -1 || value.indexOf("披薩") !== -1) return "pizza";
+        if (value.indexOf("pasta") !== -1 || value.indexOf("義大利") !== -1 || value.indexOf("麵") !== -1) return "pasta";
+        if (value.indexOf("fries") !== -1 || value.indexOf("薯條") !== -1) return "fries";
+        return "burger";
+    }
+
+    function cartIconSvg() {
+        return '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 456.029 456.029" aria-hidden="true"><g><path d="M345.6,338.862c-29.184,0-53.248,23.552-53.248,53.248c0,29.184,23.552,53.248,53.248,53.248c29.184,0,53.248-23.552,53.248-53.248C398.336,362.926,374.784,338.862,345.6,338.862z"/></g><g><path d="M439.296,84.91c-1.024,0-2.56-0.512-4.096-0.512H112.64l-5.12-34.304C104.448,27.566,84.992,10.67,61.952,10.67H20.48C9.216,10.67,0,19.886,0,31.15c0,11.264,9.216,20.48,20.48,20.48h41.472c2.56,0,4.608,2.048,5.12,4.608l31.744,216.064c4.096,27.136,27.648,47.616,55.296,47.616h212.992c26.624,0,49.664-18.944,55.296-45.056l33.28-166.4C457.728,97.71,450.56,86.958,439.296,84.91z"/></g><g><path d="M215.04,389.55c-1.024-28.16-24.576-50.688-52.736-50.688c-29.696,1.536-52.224,26.112-51.2,55.296c1.024,28.16,24.064,50.688,52.224,50.688h1.024C193.536,443.31,216.576,418.734,215.04,389.55z"/></g></svg>';
+    }
+
+    function renderMenuFromProducts() {
+        var products = getProducts();
+        var grid = document.querySelector(".food_section .grid");
+        if (!grid) return;
+        if (!products.length) {
+            products = Array.prototype.slice.call(grid.querySelectorAll(".box")).map(function (box, index) {
+                var title = box.querySelector("h5") ? box.querySelector("h5").textContent.trim() : "菜單品項";
+                var priceText = box.querySelector(".options h6") ? box.querySelector(".options h6").textContent.trim() : "$0";
+                var item = box.closest(".food_section .all");
+                var category = item && item.classList.contains("pizza") ? "Pizza" : item && item.classList.contains("pasta") ? "Pasta" : item && item.classList.contains("fries") ? "Fries" : "Burger";
+                return {
+                    id: title.toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + priceText.replace(/[^0-9]/g, "") + "-" + index,
+                    sku: "FAR-FRONT-" + String(index + 1),
+                    title: title,
+                    category: category,
+                    price: Number(priceText.replace(/[^0-9.]/g, "")) || 0,
+                    unit: "份",
+                    stock: 10,
+                    day: 5,
+                    img: box.querySelector("img") ? box.querySelector("img").getAttribute("src") : "images/f1.png",
+                    description: box.querySelector("p") ? box.querySelector("p").textContent.replace(/\s+/g, " ").trim() : "現點現做，呈現 Farcimen 的招牌風味。"
+                };
+            });
+            if (products.length) saveProducts(products);
+        }
+        if (!products.length) return;
+        grid.innerHTML = products.map(function (product) {
+            var cls = categoryClass(product.category);
+            var title = product.title || "菜單品項";
+            var desc = product.description || "現點現做，呈現 Farcimen 的招牌風味。";
+            var stock = Number(product.stock || 0);
+            var stockText = stock > 0 ? "剩 " + stock + " 份" : "目前售完";
+            return "<div class=\"col-sm-6 col-lg-4 all " + cls + "\" data-staff-menu-product=\"" + product.id + "\"><div class=\"box\" data-product-id=\"" + product.id + "\"><div><div class=\"img-box\"><img src=\"" + (product.img || "images/f1.png") + "\" alt=\"" + title + "\"></div><div class=\"detail-box\"><h5>" + title + "</h5><p>" + desc + "</p><small class=\"farcimen-demo-muted\">" + stockText + "</small><div class=\"options\"><h6>" + money(product.price) + "</h6><a href=\"\" aria-label=\"加入購物車\">" + cartIconSvg() + "</a></div></div></div></div></div>";
+        }).join("");
+    }
+
     function getProductFromCard(card) {
         var box = card.closest(".food_section .box");
         if (!box) return null;
+        var dataId = box.getAttribute("data-product-id");
+        var savedProduct = dataId ? getProducts().find(function (product) { return product.id === dataId; }) : null;
+        if (savedProduct) {
+            return {
+                id: savedProduct.id,
+                title: savedProduct.title || "菜單品項",
+                price: Number(savedProduct.price || 0),
+                img: savedProduct.img || "images/f1.png",
+                category: savedProduct.category || "Menu",
+                desc: savedProduct.description || "現點現做，呈現 Farcimen 的招牌風味。",
+                qty: 1
+            };
+        }
         var title = box.querySelector("h5") ? box.querySelector("h5").textContent.trim() : "菜單品項";
         var priceText = box.querySelector(".options h6") ? box.querySelector(".options h6").textContent.trim() : "$0";
         var img = box.querySelector("img") ? box.querySelector("img").getAttribute("src") : "";
@@ -316,8 +404,24 @@ if ($.fn.owlCarousel) {
 
     function addToCart(product) {
         var cart = getCart();
+        var requestedQty = Number(product.qty || 1);
+        var inventoryProduct = getProducts().find(function (item) {
+            return item.id === product.id || item.title === product.title;
+        });
         var existing = cart.find(function (item) { return item.id === product.id; });
-        if (existing) existing.qty += product.qty || 1;
+        if (inventoryProduct) {
+            var alreadyInCart = existing ? Number(existing.qty || 0) : 0;
+            var available = Number(inventoryProduct.stock || 0);
+            if (available <= 0) {
+                toast(product.title + " 目前售完。");
+                return;
+            }
+            if (alreadyInCart + requestedQty > available) {
+                toast(product.title + " 目前庫存剩 " + available + " 份。");
+                return;
+            }
+        }
+        if (existing) existing.qty += requestedQty;
         else cart.push(product);
         saveCart(cart);
         toast(product.title + " 已加入購物車。");
@@ -348,13 +452,29 @@ if ($.fn.owlCarousel) {
         showCart();
     }
 
+    function syncInventoryAfterCheckout(cart) {
+        var products = getProducts();
+        if (!products.length) return;
+        var changed = false;
+        cart.forEach(function (cartItem) {
+            var product = products.find(function (item) {
+                return item.id === cartItem.id || item.title === cartItem.title;
+            });
+            if (!product) return;
+            product.stock = Math.max(0, Number(product.stock || 0) - Number(cartItem.qty || 0));
+            changed = true;
+        });
+        if (changed) saveProducts(products);
+    }
+
     function checkoutDemo() {
         var cart = getCart();
         if (!cart.length) return;
+        var customer = getCustomer() || {};
         var order = {
             id: "FC-" + Date.now().toString().slice(-6),
-            customer: "訪客顧客",
-            email: "guest@farcimen.demo",
+            customer: customer.displayName || [customer.firstName, customer.lastName].filter(Boolean).join(" ") || "訪客顧客",
+            email: customer.email || "guest@farcimen.demo",
             status: "Processing",
             items: cart,
             total: cart.reduce(function (sum, item) { return sum + item.price * item.qty; }, 0),
@@ -363,6 +483,7 @@ if ($.fn.owlCarousel) {
         var orders = getOrders();
         orders.unshift(order);
         saveOrders(orders);
+        syncInventoryAfterCheckout(cart);
         localStorage.setItem("farcimenDemoLastOrder", JSON.stringify(order));
         saveCart([]);
         openModal("訂單已建立", '<p class="farcimen-demo-muted">示範訂單 <strong>' + order.id + '</strong> 已儲存在此瀏覽器。</p><p class="farcimen-demo-muted">合計：<strong>' + money(order.total) + '</strong></p>');
@@ -370,9 +491,11 @@ if ($.fn.owlCarousel) {
 
     function showAccount() {
         var bookings = getBookings();
+        var customer = getCustomer() || { displayName: "訪客顧客", email: "guest@farcimen.demo", phone: "+1 300 659 4381" };
         var lastOrder = localStorage.getItem("farcimenDemoLastOrder");
         var orderText = lastOrder ? JSON.parse(lastOrder).id : "目前沒有示範訂單";
-        openModal("示範會員", '<p class="farcimen-demo-muted">示範帳號：訪客顧客</p><p><strong>最近訂單：</strong>' + orderText + '</p><p><strong>已儲存訂位：</strong>' + bookings.length + '</p><a class="farcimen-demo-btn" href="customer-dashboard.html" style="display:inline-block;margin-right:8px;">會員中心</a><button class="farcimen-demo-btn" data-demo-scroll-book>預約訂位</button>');
+        var name = customer.displayName || [customer.firstName, customer.lastName].filter(Boolean).join(" ") || "訪客顧客";
+        openModal("會員帳戶", '<p class="farcimen-demo-muted">示範帳號：' + name + '</p><p><strong>Email：</strong>' + (customer.email || "guest@farcimen.demo") + '</p><p><strong>電話：</strong>' + (customer.phone || "+1 300 659 4381") + '</p><p><strong>最近訂單：</strong>' + orderText + '</p><p><strong>已儲存訂位：</strong>' + bookings.length + '</p><a class="farcimen-demo-btn" href="customer-dashboard.html" style="display:inline-block;margin-right:8px;">會員中心</a><button class="farcimen-demo-btn" data-demo-scroll-book>預約訂位</button>');
     }
 
     function scrollToSection(selector) {
@@ -515,6 +638,7 @@ if ($.fn.owlCarousel) {
     document.addEventListener("DOMContentLoaded", function () {
         ensureDemoStyles();
         renderCartCount();
+        renderMenuFromProducts();
         connectPageAnchors();
         connectMenuFilters();
         connectContactLinks();

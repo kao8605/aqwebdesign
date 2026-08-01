@@ -1,6 +1,9 @@
 (function () {
   var CART_KEY = "foodmartDemoCart";
   var ACCOUNT_KEY = "foodmartDemoAccount";
+  var ORDERS_KEY = "foodmartDemoOrders";
+  var PRODUCTS_KEY = "foodmartDemoProducts";
+  var ADDRESSES_KEY = "foodmartDemoAddresses";
 
   function read(key, fallback) {
     try {
@@ -25,6 +28,22 @@
   function saveCart(items) {
     write(CART_KEY, items);
     renderCart();
+  }
+
+  function orders() {
+    return read(ORDERS_KEY, []);
+  }
+
+  function saveOrders(items) {
+    write(ORDERS_KEY, items);
+  }
+
+  function products() {
+    return read(PRODUCTS_KEY, []);
+  }
+
+  function saveProducts(items) {
+    write(PRODUCTS_KEY, items);
   }
 
   function account() {
@@ -133,6 +152,7 @@
   function showAccount() {
     var data = account();
     var lastOrder = read("foodmartDemoLastOrder", null);
+    var orderCount = orders().length;
     var modal = ensureAccountModal();
     modal.querySelector(".foodmart-demo-card").classList.remove("is-product");
     modal.querySelector(".foodmart-demo-head h3").textContent = "示範帳戶";
@@ -142,7 +162,8 @@
       '<div class="foodmart-account-item"><strong>電子信箱</strong><br><span>' + data.email + '</span></div>',
       '<div class="foodmart-account-item"><strong>電話</strong><br><span>' + data.phone + '</span></div>',
       '<div class="foodmart-account-item"><strong>最近訂單</strong><br><span>' + (lastOrder ? lastOrder.id : "目前尚無示範訂單") + '</span></div>',
-      '</div>'
+      '<div class="foodmart-account-item"><strong>訂單總數</strong><br><span>' + orderCount + '</span></div>',
+      '</div><div class="d-flex gap-2 mt-3 flex-wrap"><a class="btn btn-primary" href="customer-dashboard.html">客戶後台</a><a class="btn btn-dark" href="staff-dashboard.html">員工後台</a></div>'
     ].join("");
     modal.classList.add("show");
   }
@@ -180,6 +201,23 @@
   }
 
   function productFromCard(card) {
+    var storedId = card.getAttribute("data-foodmart-product-id");
+    if (storedId) {
+      var storedProduct = products().find(function (item) { return item.id === storedId; });
+      if (storedProduct) {
+        return {
+          id: storedProduct.id,
+          title: storedProduct.title,
+          price: Number(storedProduct.price || 0),
+          img: storedProduct.img || "images/thumb-bananas.webp",
+          unit: storedProduct.unit || "1 件",
+          rating: storedProduct.rating || "4.5",
+          desc: storedProduct.desc || storedProduct.description || "新鮮嚴選的日常商品，風味均衡、價格實惠。",
+          category: storedProduct.category || "produce",
+          qty: Math.max(1, Number(card.querySelector(".input-number") ? card.querySelector(".input-number").value : 1) || 1)
+        };
+      }
+    }
     var priceText = card.querySelector(".price") ? card.querySelector(".price").textContent.trim() : (card.getAttribute("data-price") || "$8.99");
     var img = card.querySelector("img") ? card.querySelector("img").getAttribute("src") : "";
     var copy = productCopyFromImage(img);
@@ -195,6 +233,8 @@
       unit: card.querySelector(".qty") ? card.querySelector(".qty").textContent.trim() : "1 件",
       rating: card.querySelector(".rating") ? card.querySelector(".rating").textContent.replace(/\s+/g, " ").trim() : "4.5",
       desc: copy.desc || "新鮮嚴選的日常商品，風味均衡、價格實惠，可快速完成示範結帳。",
+      category: cardCategory(card),
+      stock: Number(card.getAttribute("data-stock") || 20),
       qty: qty
     };
   }
@@ -204,6 +244,64 @@
       "Sunstar Fresh Melon Juice": "FoodMart 精選商品",
       "FoodMart Product": "FoodMart 商品"
     }[title] || title || "FoodMart 商品";
+  }
+
+  function seedProductsFromPage() {
+    if (products().length) return;
+    var seen = {};
+    var list = [];
+    document.querySelectorAll("#nav-all .product-item").forEach(function (card, index) {
+      var product = productFromCard(card);
+      if (!product.title || seen[product.title + product.img]) return;
+      seen[product.title + product.img] = true;
+      product.sku = "FD-" + String(1001 + index);
+      product.stock = Number(product.stock || 20);
+      product.category = product.category || cardCategory(card);
+      list.push(product);
+    });
+    if (list.length) saveProducts(list);
+  }
+
+  function productCardHtml(product) {
+    return [
+      '<div class="col" data-staff-product>',
+      '<div class="product-item" data-foodmart-product-id="' + product.id + '" data-stock="' + Number(product.stock || 0) + '">',
+      '<a href="#" class="btn-wishlist"><svg width="24" height="24"><use xlink:href="#heart"></use></svg></a>',
+      '<figure><a href="index.html" title="商品名稱"><img src="' + (product.img || "images/thumb-bananas.webp") + '" class="tab-image"></a></figure>',
+      '<h3>' + product.title + '</h3>',
+      '<span class="qty">' + (product.unit || "1 件") + '</span><span class="rating"><svg width="24" height="24" class="text-primary"><use xlink:href="#star-solid"></use></svg> ' + (product.rating || "4.5") + '</span>',
+      '<span class="price">' + money(product.price) + '</span>',
+      '<p class="text-body-secondary small mb-2">庫存 ' + Number(product.stock || 0) + ' 件</p>',
+      '<div class="d-flex align-items-center justify-content-between"><div class="input-group product-qty"><span class="input-group-btn"><button type="button" class="quantity-left-minus btn btn-danger btn-number" data-type="minus"><svg width="16" height="16"><use xlink:href="#minus"></use></svg></button></span><input type="text" class="form-control input-number" value="1"><span class="input-group-btn"><button type="button" class="quantity-right-plus btn btn-success btn-number" data-type="plus"><svg width="16" height="16"><use xlink:href="#plus"></use></svg></button></span></div><a href="#" class="nav-link">加入購物車 <iconify-icon icon="uil:shopping-cart"></iconify-icon></a></div>',
+      '</div></div>'
+    ].join("");
+  }
+
+  function renderStoredProducts() {
+    var grid = document.querySelector("#nav-all .product-grid");
+    if (!grid) return;
+    grid.querySelectorAll("[data-staff-product]").forEach(function (node) { node.remove(); });
+    var existing = {};
+    grid.querySelectorAll(".product-item").forEach(function (card) {
+      var product = productFromCard(card);
+      existing[product.title + product.img] = true;
+    });
+    products().forEach(function (product) {
+      if (existing[product.title + product.img]) return;
+      grid.insertAdjacentHTML("beforeend", productCardHtml(product));
+    });
+  }
+
+  function syncInventoryAfterCheckout(items) {
+    var list = products();
+    var changed = false;
+    items.forEach(function (cartItem) {
+      var product = list.find(function (item) { return item.id === cartItem.id || item.title === cartItem.title; });
+      if (!product) return;
+      product.stock = Math.max(0, Number(product.stock || 0) - Number(cartItem.qty || 0));
+      changed = true;
+    });
+    if (changed) saveProducts(list);
   }
 
   function showProductDetail(product) {
@@ -232,9 +330,23 @@
 
   function addToCart(product) {
     var items = cart();
+    var inventoryProduct = products().find(function (item) { return item.id === product.id || item.title === product.title; });
     var existing = items.find(function (item) {
       return item.id === product.id;
     });
+    if (inventoryProduct) {
+      var requested = Number(product.qty || 1);
+      var already = existing ? Number(existing.qty || 0) : 0;
+      var available = Number(inventoryProduct.stock || 0);
+      if (available <= 0) {
+        toast(titleLabel(product.title) + " 目前售完。");
+        return;
+      }
+      if (already + requested > available) {
+        toast(titleLabel(product.title) + " 目前庫存剩 " + available + " 件。");
+        return;
+      }
+    }
     if (existing) existing.qty += product.qty;
     else items.push(product);
     saveCart(items);
@@ -256,14 +368,24 @@
     var total = items.reduce(function (sum, item) {
       return sum + item.price * item.qty;
     }, 0);
+    var data = account();
     var order = {
       id: "FM-" + Date.now().toString().slice(-6),
+      customer: data.name || "示範顧客",
+      email: data.email || "customer@foodmart.demo",
+      phone: data.phone || "",
+      status: "Processing",
       total: total,
       items: items,
       time: new Date().toISOString()
     };
+    var list = orders();
+    list.unshift(order);
+    saveOrders(list);
     write("foodmartDemoLastOrder", order);
+    syncInventoryAfterCheckout(items);
     saveCart([]);
+    renderStoredProducts();
     toast("示範結帳完成： " + order.id);
   }
 
@@ -587,6 +709,8 @@
   document.addEventListener("DOMContentLoaded", function () {
     ensureStyles();
     enhanceBrandCards();
+    seedProductsFromPage();
+    renderStoredProducts();
     bindClicks();
     renderCart();
   });

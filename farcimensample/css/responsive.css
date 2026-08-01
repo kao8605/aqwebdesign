@@ -70,6 +70,11 @@ padding-left: 0;
 
 @media (max-width: 767px) {
 
+  .slider_section .detail-box {
+    padding-top: 42px;
+  }
+
+
   .about_section .detail-box,
   .book_section .form_container {
     margin-bottom: 45px;

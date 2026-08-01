@@ -57,22 +57,13 @@
     "b6e6043ead6af3e5603081d4a5e589c50c2c6f3be0574b066afac2c09a34a723": {
       "userId": "af6a671ffdc4474cdc7d8dfdc37ab0a4cdb76984440d7b5fe86c46c61588a907",
       "createdAt": "2026-07-31T18:30:21.935Z"
+    },
+    "0e94f4b9fbbf38c0a190580629a580e689892f9f08ffae171d454145eabb5d0f": {
+      "userId": "af6a671ffdc4474cdc7d8dfdc37ab0a4cdb76984440d7b5fe86c46c61588a907",
+      "createdAt": "2026-08-01T18:38:06.160Z"
     }
   },
-  "guestCarts": {
-    "ms5wjva64xyz8b8u8mj": [
-      {
-        "id": "chicken-noodle-lunch-set",
-        "title": "Chicken Noodle Lunch Set",
-        "cat": "NOODLES",
-        "price": "$11.99",
-        "priceValue": 11.99,
-        "img": "img/QuickMeals/2.webp",
-        "desc": "A fast lunch set with stir-fried noodles, chicken, broccoli, peppers, onions and shiitake mushrooms.",
-        "qty": 1
-      }
-    ]
-  },
+  "guestCarts": {},
   "userCarts": {
     "6e351042aab2f8387e5a72e9ca5e3ed8851c1f74f3dcc2f7d2ffe46c00c9cf4b": [],
     "af6a671ffdc4474cdc7d8dfdc37ab0a4cdb76984440d7b5fe86c46c61588a907": []
@@ -243,6 +234,36 @@
       "leadDays": 5,
       "status": "created",
       "createdAt": "2026-07-31T18:30:21.948Z"
+    },
+    {
+      "id": "fe48d1608758",
+      "userId": "af6a671ffdc4474cdc7d8dfdc37ab0a4cdb76984440d7b5fe86c46c61588a907",
+      "items": [
+        {
+          "id": "herbal-chicken-soup",
+          "source": "static",
+          "title": "Herbal Chicken Soup",
+          "cat": "SOUP",
+          "price": "$13.99",
+          "old": "",
+          "priceValue": 13.99,
+          "img": "img/menu/6.webp",
+          "desc": "Slow-simmered chicken soup with mushrooms, red dates and goji berries.",
+          "rating": "4.9",
+          "reviews": "88",
+          "cal": "560",
+          "time": "20",
+          "tags": "SOUP,Slow-Simmered,Comfort",
+          "quantity": 25,
+          "day": "5",
+          "qty": 1
+        }
+      ],
+      "total": 13.99,
+      "fulfillmentDate": "2026-08-20",
+      "leadDays": 5,
+      "status": "created",
+      "createdAt": "2026-08-01T18:38:06.213Z"
     }
   ],
   "productOverrides": {

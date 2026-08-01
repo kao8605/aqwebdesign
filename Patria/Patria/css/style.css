@@ -272,6 +272,23 @@ section {
   width: 100%;
   max-width: 100%;
 }
+#hero .col-lg-6:first-child {
+  position: relative;
+  z-index: 5;
+}
+#hero .hs,
+#hero .hbgtxt,
+#hero .hero-mobile-art,
+#hero .hero-desktop-art {
+  pointer-events: none;
+}
+.hero-actions {
+  position: relative;
+  z-index: 10;
+}
+.hero-actions a {
+  pointer-events: auto;
+}
 .hbgtxt {
   position: absolute;
   top: 50%;
@@ -318,14 +335,17 @@ section {
   }
 }
 .hbadge {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
+  width: fit-content;
+  max-width: 100%;
   background: #fff;
   border-radius: 30px;
   padding: 6px 16px 6px 6px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  margin-bottom: 22px;
+  margin: 0 auto 22px;
 }
 .hbadge .hbi {
   width: 30px;
@@ -346,13 +366,13 @@ section {
 .htitle {
   font-size: clamp(2.7rem, 6vw, 4.8rem);
   font-weight: 900;
-  line-height: 1.1;
+  line-height: 1.02;
   margin-bottom: 18px;
 }
 .htitle .hl {
   color: var(--primary);
   position: relative;
-  display: inline-block;
+  display: block;
 }
 .htitle .hl::before {
   content: "";
