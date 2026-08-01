@@ -28,6 +28,21 @@
 		white-space: nowrap;
 	}
 
+	.ef-account-link {
+		display: inline-flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.12rem;
+		white-space: nowrap;
+		line-height: 1;
+	}
+
+	.ef-account-link span {
+		font-size: 0.72rem;
+		font-weight: 600;
+	}
+
 	@media (max-width: 640px) {
 		.ef-logo-text {
 			font-size: 1.35rem;
@@ -284,9 +299,9 @@
 									<a class="nav-link" href="#service-highlights" role="button">配送服務</a>
 								</li>
 								<li class="nav-item w-full lg:w-auto">
-									<a class="nav-link" href="./customer-dashboard.html" aria-label="客戶後台" title="客戶後台">
+									<a class="nav-link ef-account-link" href="./customer-dashboard.html" aria-label="帳戶" title="帳戶">
 										<i class="ti ti-user-circle text-md" aria-hidden="true"></i>
-										<span class="invisible hidden">客戶後台</span>
+										<span>帳戶</span>
 									</a>
 								</li>
 								<li class="nav-item w-full lg:w-auto">
@@ -364,9 +379,9 @@
 			<div class="grid grid-cols-1 gap-3 mt-4">
 				<a href="./customer-dashboard.html"
 					class="btn inline-flex items-center gap-x-2 bg-green-600 text-white border-green-600 hover:text-white hover:bg-green-700 hover:border-green-700 justify-center"
-					aria-label="客戶後台" title="客戶後台">
+					aria-label="帳戶" title="帳戶">
 					<i class="ti ti-user-circle text-md" aria-hidden="true"></i>
-					<span class="invisible hidden">客戶後台</span>
+					<span>帳戶</span>
 				</a>
 				<a href="./staff-dashboard.html"
 					class="btn inline-flex items-center gap-x-2 bg-gray-800 text-white border-gray-800 hover:text-white hover:bg-gray-900 hover:border-gray-900 justify-center"

@@ -67,6 +67,9 @@
         <symbol xmlns="http://www.w3.org/2000/svg" id="user" viewBox="0 0 24 24">
           <path fill="currentColor" d="M15.71 12.71a6 6 0 1 0-7.42 0a10 10 0 0 0-6.22 8.18a1 1 0 0 0 2 .22a8 8 0 0 1 15.9 0a1 1 0 0 0 1 .89h.11a1 1 0 0 0 .88-1.1a10 10 0 0 0-6.25-8.19ZM12 12a4 4 0 1 1 4-4a4 4 0 0 1-4 4Z"/>
         </symbol>
+        <symbol xmlns="http://www.w3.org/2000/svg" id="dashboard" viewBox="0 0 24 24">
+          <path fill="currentColor" d="M4 3h6a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Zm9 0h7a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1ZM4 14h7a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1Zm10-3h6a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1Z"/>
+        </symbol>
         <symbol xmlns="http://www.w3.org/2000/svg" id="close" viewBox="0 0 15 15">
           <path fill="currentColor" d="M7.953 3.788a.5.5 0 0 0-.906 0L6.08 5.85l-2.154.33a.5.5 0 0 0-.283.843l1.574 1.613l-.373 2.284a.5.5 0 0 0 .736.518l1.92-1.063l1.921 1.063a.5.5 0 0 0 .736-.519l-.373-2.283l1.574-1.613a.5.5 0 0 0-.283-.844L8.921 5.85l-.968-2.062Z"/>
         </symbol>
@@ -173,12 +176,7 @@
           </div>
           
           <div class="col-sm-8 col-lg-4 d-flex justify-content-end gap-5 align-items-center mt-4 mt-sm-0 justify-content-center justify-content-sm-end">
-            <ul class="d-none d-lg-flex justify-content-end list-unstyled m-0">
-              <li>
-                <a href="#" class="rounded-circle bg-light p-2 mx-1 FoodMart-account-link">
-                  <svg width="24" height="24" viewBox="0 0 24 24"><use xlink:href="#user"></use></svg>
-                </a>
-              </li>
+            <ul class="foodie-header-icons d-none d-lg-flex justify-content-end list-unstyled m-0">
               <li>
                 <a href="#" class="rounded-circle bg-light p-2 mx-1">
                   <svg width="24" height="24" viewBox="0 0 24 24"><use xlink:href="#heart"></use></svg>
@@ -191,7 +189,7 @@
               </li>
               <li>
                 <a href="staff-dashboard.html" class="rounded-circle bg-light p-2 mx-1" aria-label="員工後台" title="員工後台">
-                  <svg width="24" height="24" viewBox="0 0 24 24"><use xlink:href="#search"></use></svg>
+                  <svg width="24" height="24" viewBox="0 0 24 24"><use xlink:href="#dashboard"></use></svg>
                 </a>
               </li>
               <li class="d-lg-none">
@@ -271,9 +269,6 @@
                     </li>
                   </ul>
                   <div class="mobile-menu-icons d-lg-none">
-                    <a href="#" class="rounded-circle bg-light p-2 FoodMart-account-link" aria-label="會員帳戶">
-                      <svg width="24" height="24" viewBox="0 0 24 24"><use xlink:href="#user"></use></svg>
-                    </a>
                     <a href="#" class="rounded-circle bg-light p-2" aria-label="收藏清單">
                       <svg width="24" height="24" viewBox="0 0 24 24"><use xlink:href="#heart"></use></svg>
                     </a>
@@ -281,8 +276,8 @@
                       <svg width="24" height="24" viewBox="0 0 24 24"><use xlink:href="#user"></use></svg>
                     </a>
                     <a href="staff-dashboard.html" class="rounded-circle bg-light p-2" aria-label="員工後台" title="員工後台">
-                      <svg width="24" height="24" viewBox="0 0 24 24"><use xlink:href="#search"></use></svg>
-                    </a>
+                  <svg width="24" height="24" viewBox="0 0 24 24"><use xlink:href="#dashboard"></use></svg>
+                </a>
                     <a href="#" class="rounded-circle bg-light p-2 FoodMart-cart-link" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCart" aria-controls="offcanvasCart" aria-label="購物車">
                       <svg width="24" height="24" viewBox="0 0 24 24"><use xlink:href="#cart"></use></svg>
                     </a>

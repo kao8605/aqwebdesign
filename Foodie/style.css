@@ -873,11 +873,19 @@ h1,h2,h3,h4,h5,h6 {
   align-items: center;
 }
 
+.foodie-header-icons {
+  gap: 18px;
+}
+
+.foodie-header-icons li {
+  display: inline-flex;
+}
+
 .mobile-menu-icons {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 14px;
+  gap: 20px;
   width: 100%;
   margin-top: 18px;
   padding-top: 16px;
@@ -992,4 +1000,19 @@ h1,h2,h3,h4,h5,h6 {
   .main-menu .menu-list {
     justify-content: center !important;
   }
+}
+
+/* Header icon alignment */
+header a.rounded-circle,
+header button .rounded-circle,
+.mobile-menu-icons a {
+  width: 42px;
+  height: 42px;
+}
+
+header a.rounded-circle svg,
+header button .rounded-circle svg,
+.mobile-menu-icons a svg {
+  display: block;
+  flex: 0 0 auto;
 }
