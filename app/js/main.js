@@ -128,6 +128,17 @@
 
             link.addEventListener("click", function(event) {
 
+                const href = link.getAttribute('href');
+                const target = href && href.charAt(0) === '#' ? document.querySelector(href) : null;
+
+                if (target) {
+                    event.preventDefault();
+                    closeMenu();
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    history.replaceState(null, '', href);
+                    return;
+                }
+
                 // at 900px and below
                 if (window.matchMedia('(max-width: 900px)').matches) {
                     closeMenu();
