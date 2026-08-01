@@ -898,6 +898,18 @@ h1,h2,h3,h4,h5,h6 {
   justify-content: center;
 }
 
+.foodie-account-link {
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1;
+}
+
+.foodie-account-link span {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
 .service-card {
   padding: 24px 20px;
   border: 1px solid rgba(0, 0, 0, 0.06) !important;
@@ -1008,6 +1020,14 @@ header button .rounded-circle,
 .mobile-menu-icons a {
   width: 42px;
   height: 42px;
+}
+
+header a.foodie-account-link,
+.mobile-menu-icons a.foodie-account-link {
+  height: auto;
+  min-height: 46px;
+  padding-top: 6px !important;
+  padding-bottom: 5px !important;
 }
 
 header a.rounded-circle svg,

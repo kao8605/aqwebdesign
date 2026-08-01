@@ -534,7 +534,7 @@ function renderAccountOrderRows(orders, compact) {
         var completed = status === "completed" || status === "picked_up";
         var statusNote = status === "picked_up" ? "Your order has been picked up." : "Your order is completed.";
         return "<article class=\"account-order-row" + (completed ? " completed" : "") + "\">" +
-            "<img src=\"" + escapeHtml(first.img || "images/menu/menu-1.png") + "\" alt=\"" + escapeHtml(first.title || "Order") + "\">" +
+            "<img src=\"" + escapeHtml(first.img || "images/menu/menu-1.webp") + "\" alt=\"" + escapeHtml(first.title || "Order") + "\">" +
             "<div class=\"account-order-copy\">" +
             "<strong>Order #" + escapeHtml(order.id) + "</strong>" +
             "<span>" + qty + " items · " + formatMoney(order.total) + " · Pickup " + escapeHtml(order.fulfillmentDate || "-") + " · " + formatOrderDate(order.createdAt) + "</span>" +
@@ -557,7 +557,7 @@ function renderAccountCartRows() {
         "<div class=\"account-cart-list\">" + cartItems.map(function(item, index) {
             var itemTotal = Number(item.priceValue || 0) * Number(item.qty || 0);
             return "<article class=\"account-cart-row\">" +
-                "<img src=\"" + escapeHtml(item.img || "images/menu/menu-1.png") + "\" alt=\"" + escapeHtml(item.title || "Cart item") + "\">" +
+                "<img src=\"" + escapeHtml(item.img || "images/menu/menu-1.webp") + "\" alt=\"" + escapeHtml(item.title || "Cart item") + "\">" +
                 "<div class=\"account-order-copy\">" +
                 "<strong>" + escapeHtml(item.title || "Untitled item") + "</strong>" +
                 "<span>" + escapeHtml(item.cat || "Menu") + " · " + escapeHtml(item.price || formatMoney(item.priceValue)) + "</span>" +

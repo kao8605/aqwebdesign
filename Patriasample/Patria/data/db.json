@@ -88,7 +88,7 @@
           "cat": "RICE",
           "price": "$13.99",
           "priceValue": 13.99,
-          "img": "img/QuickMeals/1.png",
+          "img": "img/QuickMeals/1.webp",
           "desc": "A quick lunch set with steamed rice, saucy chicken, broccoli, baby corn, mushrooms and cabbage.",
           "qty": 2
         }
@@ -107,7 +107,7 @@
           "cat": "NOODLES",
           "price": "$11.99",
           "priceValue": 11.99,
-          "img": "img/QuickMeals/2.png",
+          "img": "img/QuickMeals/2.webp",
           "desc": "A fast lunch set with stir-fried noodles, chicken, broccoli, peppers, onions and shiitake mushrooms.",
           "qty": 3
         },

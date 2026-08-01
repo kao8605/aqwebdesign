@@ -17,12 +17,12 @@
   var inventoryPageSize = 10;
 
   var defaultProducts = [
-    { id: "delicious-pizza-20", sku: "FAR-1001", title: "招牌披薩", category: "Pizza", price: 20, unit: "份", stock: 18, day: 5, img: "images/f1.png", description: "Cheese pizza with tomato sauce and fresh herbs." },
-    { id: "delicious-burger-15", sku: "FAR-1002", title: "經典漢堡", category: "Burger", price: 15, unit: "份", stock: 24, day: 5, img: "images/f2.png", description: "Juicy beef burger with lettuce, tomato and house sauce." },
-    { id: "delicious-pizza-17", sku: "FAR-1003", title: "薄脆披薩", category: "Pizza", price: 17, unit: "份", stock: 12, day: 5, img: "images/f3.png", description: "Crispy crust pizza prepared for sharing." },
-    { id: "delicious-pasta-18", sku: "FAR-1004", title: "奶油義大利麵", category: "Pasta", price: 18, unit: "份", stock: 15, day: 5, img: "images/f4.png", description: "Creamy pasta tossed with vegetables and parmesan." },
-    { id: "french-fries-10", sku: "FAR-1005", title: "黃金薯條", category: "Fries", price: 10, unit: "份", stock: 3, day: 5, img: "images/f5.png", description: "Golden fries served crisp with dipping sauce." },
-    { id: "tasty-burger-12", sku: "FAR-1006", title: "美味漢堡", category: "Burger", price: 12, unit: "份", stock: 0, day: 5, img: "images/f7.png", description: "Classic burger for quick lunches and takeaway orders." }
+    { id: "delicious-pizza-20", sku: "FAR-1001", title: "招牌披薩", category: "Pizza", price: 20, unit: "份", stock: 18, day: 5, img: "images/f1.webp", description: "Cheese pizza with tomato sauce and fresh herbs." },
+    { id: "delicious-burger-15", sku: "FAR-1002", title: "經典漢堡", category: "Burger", price: 15, unit: "份", stock: 24, day: 5, img: "images/f2.webp", description: "Juicy beef burger with lettuce, tomato and house sauce." },
+    { id: "delicious-pizza-17", sku: "FAR-1003", title: "薄脆披薩", category: "Pizza", price: 17, unit: "份", stock: 12, day: 5, img: "images/f3.webp", description: "Crispy crust pizza prepared for sharing." },
+    { id: "delicious-pasta-18", sku: "FAR-1004", title: "奶油義大利麵", category: "Pasta", price: 18, unit: "份", stock: 15, day: 5, img: "images/f4.webp", description: "Creamy pasta tossed with vegetables and parmesan." },
+    { id: "french-fries-10", sku: "FAR-1005", title: "黃金薯條", category: "Fries", price: 10, unit: "份", stock: 3, day: 5, img: "images/f5.webp", description: "Golden fries served crisp with dipping sauce." },
+    { id: "tasty-burger-12", sku: "FAR-1006", title: "美味漢堡", category: "Burger", price: 12, unit: "份", stock: 0, day: 5, img: "images/f7.webp", description: "Classic burger for quick lunches and takeaway orders." }
   ];
 
   function read(key, fallback) {
@@ -608,7 +608,7 @@
           price: Number(data.price || 0),
           unit: data.unit || "份",
           stock: Number(data.quantity || data.stock || 0),
-          img: data.image || data.img || "images/f1.png",
+          img: data.image || data.img || "images/f1.webp",
           description: data.description || title + " 由 CSV 匯入。"
         };
       }).filter(function (product) { return product.title; });
@@ -665,7 +665,7 @@
     (order.items || []).forEach(function (orderItem) {
       var existing = items.find(function (item) { return item.title === orderItem.title; });
       if (existing) existing.qty += Number(orderItem.qty || 1);
-      else items.push({ id: orderItem.title.toLowerCase().replace(/[^a-z0-9]+/g, "-"), title: orderItem.title, price: Number(orderItem.price || 0), qty: Number(orderItem.qty || 1), img: "images/f1.png" });
+      else items.push({ id: orderItem.title.toLowerCase().replace(/[^a-z0-9]+/g, "-"), title: orderItem.title, price: Number(orderItem.price || 0), qty: Number(orderItem.qty || 1), img: "images/f1.webp" });
     });
     write(CART_KEY, items);
     openModal("已加入購物車", "<p>訂單 " + id + " 的品項已加入示範購物車。</p><p><a class=\"demo-button\" href=\"index.html\">返回前台</a></p>");

@@ -20,7 +20,7 @@ function money(value) {
 }
 
 function productImage(src) {
-  if (!src) return './assets/images/product-1.png';
+  if (!src) return './assets/images/product-1.webp';
   if (/^https?:\/\//.test(src)) return src;
   return STATIC_BASE.replace(/\/$/, '') + '/' + String(src).replace(/^\.\//, '').replace(/^\//, '');
 }

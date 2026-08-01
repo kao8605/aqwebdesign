@@ -329,7 +329,7 @@ if ($.fn.owlCarousel) {
                     unit: "份",
                     stock: 10,
                     day: 5,
-                    img: box.querySelector("img") ? box.querySelector("img").getAttribute("src") : "images/f1.png",
+                    img: box.querySelector("img") ? box.querySelector("img").getAttribute("src") : "images/f1.webp",
                     description: box.querySelector("p") ? box.querySelector("p").textContent.replace(/\s+/g, " ").trim() : "現點現做，呈現 Farcimen 的招牌風味。"
                 };
             });
@@ -342,7 +342,7 @@ if ($.fn.owlCarousel) {
             var desc = product.description || "現點現做，呈現 Farcimen 的招牌風味。";
             var stock = Number(product.stock || 0);
             var stockText = stock > 0 ? "剩 " + stock + " 份" : "目前售完";
-            return "<div class=\"col-sm-6 col-lg-4 all " + cls + "\" data-staff-menu-product=\"" + product.id + "\"><div class=\"box\" data-product-id=\"" + product.id + "\"><div><div class=\"img-box\"><img src=\"" + (product.img || "images/f1.png") + "\" alt=\"" + title + "\"></div><div class=\"detail-box\"><h5>" + title + "</h5><p>" + desc + "</p><small class=\"farcimen-demo-muted\">" + stockText + "</small><div class=\"options\"><h6>" + money(product.price) + "</h6><a href=\"\" aria-label=\"加入購物車\">" + cartIconSvg() + "</a></div></div></div></div></div>";
+            return "<div class=\"col-sm-6 col-lg-4 all " + cls + "\" data-staff-menu-product=\"" + product.id + "\"><div class=\"box\" data-product-id=\"" + product.id + "\"><div><div class=\"img-box\"><img src=\"" + (product.img || "images/f1.webp") + "\" alt=\"" + title + "\"></div><div class=\"detail-box\"><h5>" + title + "</h5><p>" + desc + "</p><small class=\"farcimen-demo-muted\">" + stockText + "</small><div class=\"options\"><h6>" + money(product.price) + "</h6><a href=\"\" aria-label=\"加入購物車\">" + cartIconSvg() + "</a></div></div></div></div></div>";
         }).join("");
     }
 
@@ -356,7 +356,7 @@ if ($.fn.owlCarousel) {
                 id: savedProduct.id,
                 title: savedProduct.title || "菜單品項",
                 price: Number(savedProduct.price || 0),
-                img: savedProduct.img || "images/f1.png",
+                img: savedProduct.img || "images/f1.webp",
                 category: savedProduct.category || "Menu",
                 desc: savedProduct.description || "現點現做，呈現 Farcimen 的招牌風味。",
                 qty: 1
