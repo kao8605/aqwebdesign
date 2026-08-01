@@ -433,6 +433,14 @@ h1,h2,h3,h4,h5,h6 {
     width: 100%;
     max-width: 100%;
   }
+  .banner-ad.large .img-wrapper {
+    order: -1;
+    text-align: center;
+    margin-bottom: 1.25rem;
+  }
+  .banner-ad.large .img-wrapper img {
+    max-width: min(78vw, 320px);
+  }
   .banner-ad.large .banner-title,
   .banner-ad.large .display-4 {
     font-size: 40px;
@@ -825,6 +833,23 @@ h1,h2,h3,h4,h5,h6 {
 
 .text-center .foodie-logo {
   align-items: center;
+}
+
+.mobile-menu-icons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.mobile-menu-icons a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .foodie-logo__name {
