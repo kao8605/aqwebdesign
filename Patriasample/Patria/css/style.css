@@ -272,6 +272,10 @@ section {
   width: 100%;
   max-width: 100%;
 }
+#hero .container {
+  position: relative;
+  z-index: 2;
+}
 .hbgtxt {
   position: absolute;
   top: 50%;
@@ -287,6 +291,7 @@ section {
 .hs {
   position: absolute;
   border-radius: 50%;
+  pointer-events: none;
 }
 .hs1 {
   width: 480px;
@@ -447,19 +452,23 @@ section {
   margin: 0 auto;
   position: relative;
   box-shadow: 0 28px 76px rgba(232, 40, 26, 0.14);
+  pointer-events: none;
 }
 .hcircle img {
   width: 90%;
   height: 90%;
   object-fit: cover;
   border-radius: 50%;
+  pointer-events: none;
 }
 .hero-mobile-art {
   display: none;
+  pointer-events: none;
 }
 .hero-art-wrap {
   position: relative;
   text-align: center;
+  pointer-events: none;
 }
 .fcard {
   position: absolute;
@@ -3583,6 +3592,7 @@ footer {
     transform: none;
     justify-content: center;
     margin: 12px 0 18px;
+    pointer-events: none;
   }
   .hero-mobile-art .hcircle {
     margin: 0 auto;
@@ -3613,18 +3623,25 @@ footer {
     overflow-wrap: anywhere;
   }
   .hero-actions {
+    position: relative;
+    z-index: 10;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     width: 100%;
+    pointer-events: auto;
   }
   .hero-actions .btn-red,
   .hero-actions .btn-play {
+    position: relative;
+    z-index: 11;
     width: min(270px, 100%);
     min-height: 54px;
     justify-content: center;
     align-items: center;
     text-align: center;
+    pointer-events: auto;
+    touch-action: manipulation;
   }
   .hero-actions .btn-play {
     padding: 6px 16px;

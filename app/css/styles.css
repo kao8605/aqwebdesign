@@ -4222,9 +4222,9 @@ img.u-pull-left {
 
     .s-about__screens {
         display  : block;
-        height   : min(118vw, 560px);
+        height   : min(138vw, 640px);
         margin   : 0 auto;
-        overflow : hidden;
+        overflow : visible;
     }
 
     .s-about__screen,
@@ -4268,9 +4268,10 @@ img.u-pull-left {
 
     .s-about__howto-screens {
         width    : 100%;
-        height   : min(118vw, 560px);
+        height   : min(138vw, 640px);
         margin   : 0 auto;
-        overflow : hidden;
+        overflow : visible;
+        padding  : var(--vspace-0_5) 0 var(--vspace-0_75);
     }
 
     .s-about__howto-screens img {
