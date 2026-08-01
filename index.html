@@ -403,7 +403,8 @@
                 portfolioModalTitle.textContent = item.dataset.title || item.getAttribute('aria-label') || '作品集';
                 portfolioModalDesc.textContent = item.dataset.desc || '';
                 portfolioModalTags.innerHTML = (item.dataset.tags || 'Website,UI,Responsive').split(',').map(tag => `<span>${tag.trim()}</span>`).join('');
-                portfolioModalLink.href = item.getAttribute('href') || '#';
+                const projectHref = item.getAttribute('href') || '#';
+                portfolioModalLink.href = projectHref === '#' ? '#' : new URL(projectHref, window.location.href).href;
                 portfolioModal.classList.add('is-open');
                 portfolioModal.setAttribute('aria-hidden', 'false');
                 document.body.classList.add('portfolio-modal-open');
@@ -430,6 +431,17 @@
                     openPortfolioModal(item);
                 });
             });
+
+            if (portfolioModalLink) {
+                portfolioModalLink.addEventListener('click', function (event) {
+                    const href = portfolioModalLink.getAttribute('href');
+                    if (!href || href === '#') {
+                        event.preventDefault();
+                        return;
+                    }
+                    window.location.href = href;
+                });
+            }
 
             document.querySelectorAll('[data-portfolio-close]').forEach(item => {
                 item.addEventListener('click', closePortfolioModal);
