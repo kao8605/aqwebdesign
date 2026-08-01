@@ -479,6 +479,44 @@ h1,h2,h3,h4,h5,h6 {
   min-height: 630px;
   display: flex;
 }
+
+@media screen and (max-width: 767px) {
+  .sale-banner {
+    display: flex;
+    flex-direction: column;
+    background-image: none !important;
+  }
+
+  .sale-banner::before {
+    content: "";
+    display: block;
+    width: 100%;
+    min-height: 220px;
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    background-size: contain;
+  }
+
+  .sale-banner--chocolate::before {
+    background-image: url("images/ad-image-3.webp");
+  }
+
+  .sale-banner--muffin::before {
+    background-image: url("images/ad-image-4.webp");
+  }
+
+  .sale-banner .banner-content {
+    width: 100%;
+    padding: 1.75rem !important;
+    text-align: center;
+  }
+
+  .sale-banner .banner-title {
+    font-size: 34px;
+    line-height: 1.15;
+  }
+}
+
 /* .banner-ad .banner-content {
   padding: 52px;
 }
@@ -850,6 +888,68 @@ h1,h2,h3,h4,h5,h6 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+.service-card {
+  padding: 24px 20px;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.service-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.08);
+}
+
+.service-card > .row {
+  height: 100%;
+  align-items: flex-start;
+  row-gap: 14px;
+}
+
+.service-card .text-dark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
+  border-radius: 50%;
+  color: #ffc43f !important;
+  background: #fff7df;
+}
+
+.service-card .card-body {
+  height: 100%;
+}
+
+.service-card h5 {
+  margin-bottom: 8px;
+  color: #222;
+  font-weight: 800;
+}
+
+.service-card .card-text {
+  margin-bottom: 0;
+  color: #747474;
+  line-height: 1.65;
+}
+
+@media screen and (max-width: 575px) {
+  .service-card {
+    text-align: center;
+  }
+
+  .service-card > .row {
+    justify-content: center;
+  }
+
+  .service-card .text-dark {
+    margin: 0 auto;
+  }
 }
 
 .foodie-logo__name {

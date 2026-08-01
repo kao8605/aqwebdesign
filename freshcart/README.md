@@ -8,7 +8,7 @@
 
 [Download](https://codescandy.lemonsqueezy.com/buy/3097b72d-1d17-48e0-a3a8-55a983b4681c) Free Freshcart Tailwind Ecommerce HTML Template
 
-[FreshCart](https://freshcart-tailwind.codescandy.com/freshcart-tailwind-free/) is a beautifully designed, expertly crafted components UI kit for building a high-quality website and web apps using web technologies — HTML, TailwindCSS, and JavaScript — with integrations of
+[FreshCart](https://freshcart-tailwind.codescandy.com/freshcart/) is a beautifully designed, expertly crafted components UI kit for building a high-quality website and web apps using web technologies — HTML, TailwindCSS, and JavaScript — with integrations of
 the world’s most popular Bootstrap Javascript Plugins.
 
 ### Documentation

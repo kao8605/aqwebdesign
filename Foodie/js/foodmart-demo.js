@@ -60,10 +60,10 @@
       ".foodmart-cart-controls button{border:0;border-radius:999px;background:#f1f1f1;color:#222;min-width:34px;height:34px;font-weight:800;}",
       ".foodmart-cart-controls button[data-foodmart-remove]{background:#222;color:#fff;padding:0 12px;}",
       ".foodmart-cart-total-row{display:flex;align-items:center;justify-content:space-between;font-size:20px;font-weight:800;margin:18px 0;}",
-      ".foodmart-demo-modal{position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.5);padding:20px;}",
+      ".foodmart-demo-modal{position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.5);padding:20px;overflow:auto;}",
       ".foodmart-demo-modal.show{display:flex;}",
       ".foodmart-demo-card{width:min(520px,100%);background:#fff;border-radius:20px;padding:26px;box-shadow:0 24px 70px rgba(0,0,0,.25);}",
-      ".foodmart-demo-card.is-product{width:min(980px,calc(100vw - 40px));padding:0;overflow:hidden;}",
+      ".foodmart-demo-card.is-product{width:min(920px,calc(100vw - 40px));max-height:calc(100vh - 40px);padding:0;overflow:auto;}",
       ".foodmart-demo-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}",
       ".foodmart-demo-card.is-product .foodmart-demo-head{position:absolute;right:18px;top:18px;z-index:2;margin:0;}",
       ".foodmart-demo-card.is-product .foodmart-demo-head h3{display:none;}",
@@ -71,10 +71,10 @@
       ".foodmart-demo-close{border:0;background:#f1f1f1;border-radius:50%;width:36px;height:36px;font-size:20px;}",
       ".foodmart-account-grid{display:grid;gap:12px;}",
       ".foodmart-account-item{background:#f8f8f8;border-radius:14px;padding:14px;}",
-      ".foodmart-product-modal{display:grid;grid-template-columns:.95fr 1.05fr;min-height:500px;}",
-      ".foodmart-product-image{background:#f8f8f8;display:grid;place-items:center;padding:34px;}",
-      ".foodmart-product-image img{width:100%;height:100%;max-height:430px;object-fit:contain;}",
-      ".foodmart-product-detail{padding:42px 44px 36px;display:flex;flex-direction:column;justify-content:center;}",
+      ".foodmart-product-modal{display:grid;grid-template-columns:.9fr 1.1fr;min-height:460px;}",
+      ".foodmart-product-image{background:#f8f8f8;display:grid;place-items:center;padding:30px;}",
+      ".foodmart-product-image img{width:100%;height:100%;max-height:380px;object-fit:contain;}",
+      ".foodmart-product-detail{padding:34px 38px 30px;display:flex;flex-direction:column;justify-content:center;}",
       ".foodmart-product-kicker{color:#ffc43f;font-size:13px;font-weight:900;letter-spacing:2px;margin-bottom:10px;text-transform:uppercase;}",
       ".foodmart-product-detail h4{font-size:42px;font-weight:900;line-height:1.05;margin:0 0 12px;color:#222;}",
       ".foodmart-product-rating{color:#ffc43f;font-weight:800;margin-bottom:16px;}",
@@ -89,8 +89,11 @@
       ".foodmart-product-qty button{width:38px;height:38px;border:0;border-radius:50%;background:#f1f1f1;color:#222;font-size:22px;font-weight:900;}",
       ".foodmart-product-qty strong{min-width:28px;text-align:center;font-size:22px;}",
       ".foodmart-product-add{border:0;border-radius:999px;background:#ffc43f;color:#222;font-size:18px;font-weight:900;padding:15px 24px;width:100%;}",
+      ".brand-product-card{cursor:pointer;}",
+      ".brand-product-card .brand-add-link{display:inline-flex;align-items:center;gap:6px;margin-top:10px;color:#222;font-weight:800;text-decoration:none;}",
+      ".brand-product-card .brand-add-link:hover{color:#ffc43f;}",
       ".product-item{cursor:pointer;}",
-      "@media (max-width: 767px){.foodmart-demo-card.is-product{width:100%;}.foodmart-product-modal{grid-template-columns:1fr;}.foodmart-product-image{min-height:240px;padding:24px;}.foodmart-product-detail{padding:28px 24px;}.foodmart-product-detail h4{font-size:32px;}.foodmart-product-price strong{font-size:34px;}}",
+      "@media (max-width: 767px){.foodmart-demo-modal{align-items:flex-start;padding:12px;}.foodmart-demo-card.is-product{width:100%;max-height:calc(100vh - 24px);border-radius:16px;}.foodmart-product-modal{grid-template-columns:1fr;min-height:auto;}.foodmart-product-image{min-height:170px;padding:18px;}.foodmart-product-image img{max-height:180px;}.foodmart-product-detail{padding:20px 18px 18px;}.foodmart-product-detail h4{font-size:25px;line-height:1.15;}.foodmart-product-rating{margin-bottom:10px;}.foodmart-product-desc{font-size:14px;line-height:1.5;margin-bottom:14px;}.foodmart-product-price{margin-bottom:14px;}.foodmart-product-price strong{font-size:28px;}.foodmart-product-price del{font-size:16px;}.foodmart-product-meta{gap:6px;margin-bottom:14px;}.foodmart-product-meta span{font-size:12px;padding:6px 10px;}.foodmart-product-qty{margin-bottom:16px;}.foodmart-product-add{padding:13px 18px;font-size:16px;}}",
       ".foodmart-toast{position:fixed;left:50%;bottom:26px;z-index:2100;transform:translate(-50%,18px);opacity:0;background:#222;color:#fff;border-radius:999px;padding:12px 18px;box-shadow:0 14px 40px rgba(0,0,0,.25);transition:.2s ease;}",
       ".foodmart-toast.show{opacity:1;transform:translate(-50%,0);}"
     ].join("");
@@ -168,15 +171,20 @@
       "thumb-honey.jpg": { title: "蜂蜜罐", desc: "香氣溫潤的蜂蜜，適合搭配吐司、茶飲、優格與日常甜味調整。" },
       "thumb-herb.jpg": { title: "花草茶包", desc: "清香乾燥花草茶包，適合午後沖泡、放鬆休息或搭配甜點。" },
       "thumb-junk.jpg": { title: "調理食品包", desc: "方便保存的調理食品包，適合快速備餐、露營或忙碌時簡單上桌。" },
-      "thumb-tuna.jpg": { title: "鮪魚罐頭", desc: "方便保存的鮪魚罐頭，適合沙拉、三明治、義大利麵與快速料理。" }
+      "thumb-tuna.jpg": { title: "鮪魚罐頭", desc: "方便保存的鮪魚罐頭，適合沙拉、三明治、義大利麵與快速料理。" },
+      "product-thumb-11.jpg": { title: "蜂蜜罐", desc: "香氣溫潤的蜂蜜，適合搭配吐司、茶飲、優格與日常甜味調整。" },
+      "product-thumb-12.jpg": { title: "花草茶包", desc: "清香乾燥花草茶包，適合午後沖泡、放鬆休息或搭配甜點。" },
+      "product-thumb-13.jpg": { title: "鮪魚罐頭", desc: "方便保存的鮪魚罐頭，適合沙拉、三明治、義大利麵與快速料理。" },
+      "product-thumb-14.jpg": { title: "調理食品包", desc: "方便保存的調理食品包，適合快速備餐、露營或忙碌時簡單上桌。" }
     }[file] || {};
   }
 
   function productFromCard(card) {
-    var priceText = card.querySelector(".price") ? card.querySelector(".price").textContent.trim() : "$0";
+    var priceText = card.querySelector(".price") ? card.querySelector(".price").textContent.trim() : (card.getAttribute("data-price") || "$8.99");
     var img = card.querySelector("img") ? card.querySelector("img").getAttribute("src") : "";
     var copy = productCopyFromImage(img);
-    var title = copy.title || (card.querySelector("h3") ? card.querySelector("h3").textContent.trim() : "FoodMart 商品");
+    var titleEl = card.querySelector("h3") || card.querySelector("h5") || card.querySelector(".card-title");
+    var title = copy.title || (titleEl ? titleEl.textContent.trim() : "FoodMart 商品");
     var qtyInput = card.querySelector(".input-number");
     var qty = Math.max(1, Number(qtyInput ? qtyInput.value : 1) || 1);
     return {
@@ -375,6 +383,13 @@
         return;
       }
 
+      var brandCard = event.target.closest(".brand-product-card");
+      if (brandCard) {
+        event.preventDefault();
+        showProductDetail(productFromCard(brandCard));
+        return;
+      }
+
       var inc = event.target.closest("[data-foodmart-inc]");
       if (inc) {
         event.preventDefault();
@@ -474,6 +489,22 @@
     if (instance) instance.hide();
   }
 
+  function enhanceBrandCards() {
+    document.querySelectorAll(".brand-carousel .card").forEach(function (card, index) {
+      var prices = ["$8.99", "$6.99", "$5.99", "$10.99"];
+      card.classList.add("brand-product-card");
+      if (!card.getAttribute("data-price")) card.setAttribute("data-price", prices[index % prices.length]);
+      if (card.querySelector(".brand-add-link")) return;
+      var body = card.querySelector(".card-body");
+      if (!body) return;
+      var link = document.createElement("a");
+      link.href = "#";
+      link.className = "brand-add-link";
+      link.innerHTML = '加入購物車 <iconify-icon icon="uil:shopping-cart"></iconify-icon>';
+      body.appendChild(link);
+    });
+  }
+
   function categoryFromText(label) {
     var text = String(label || "").toLowerCase();
     if (text.indexOf("全部") !== -1 || text.indexOf("all") !== -1) return "all";
@@ -555,6 +586,7 @@
 
   document.addEventListener("DOMContentLoaded", function () {
     ensureStyles();
+    enhanceBrandCards();
     bindClicks();
     renderCart();
   });
