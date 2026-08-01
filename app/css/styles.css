@@ -3364,7 +3364,7 @@ img.u-pull-left {
     height              : 100%;
     background-image    : url(../images/hero-bg-3000change.webp);
     background-repeat   : no-repeat;
-    background-position : center;
+    background-position : 52% center;
     background-size     : cover;
 }
 
@@ -3679,7 +3679,7 @@ img.u-pull-left {
     }
 
     .s-intro__bg {
-        background-position : 42% center;
+        background-position : 48% center;
     }
 
     .s-intro__content {
@@ -3921,6 +3921,9 @@ img.u-pull-left {
 .s-about__screen img {
     box-shadow    : 0 40px 24px -40px rgba(0, 0, 0, 0.1);
     border-radius : 16px;
+    width         : 100%;
+    height        : auto;
+    object-fit    : contain;
 }
 
 .s-about__screen:nth-child(1) {
@@ -4026,6 +4029,7 @@ img.u-pull-left {
 .s-about__howto-screens img {
     width         : var(--screen-width);
     height        : var(--screen-height);
+    object-fit    : contain;
     border-radius : 16px;
     opacity       : 0;
     position      : absolute;

@@ -17,12 +17,12 @@
   var inventoryPageSize = 10;
 
   var defaultProducts = [
-    { id: "delicious-pizza-20", sku: "FAR-1001", title: "Delicious Pizza", category: "Pizza", price: 20, unit: "item", stock: 18, day: 5, img: "images/f1.png", description: "Cheese pizza with tomato sauce and fresh herbs." },
-    { id: "delicious-burger-15", sku: "FAR-1002", title: "Delicious Burger", category: "Burger", price: 15, unit: "item", stock: 24, day: 5, img: "images/f2.png", description: "Juicy beef burger with lettuce, tomato and house sauce." },
-    { id: "delicious-pizza-17", sku: "FAR-1003", title: "Delicious Pizza", category: "Pizza", price: 17, unit: "item", stock: 12, day: 5, img: "images/f3.png", description: "Crispy crust pizza prepared for sharing." },
-    { id: "delicious-pasta-18", sku: "FAR-1004", title: "Delicious Pasta", category: "Pasta", price: 18, unit: "item", stock: 15, day: 5, img: "images/f4.png", description: "Creamy pasta tossed with vegetables and parmesan." },
-    { id: "french-fries-10", sku: "FAR-1005", title: "French Fries", category: "Fries", price: 10, unit: "item", stock: 3, day: 5, img: "images/f5.png", description: "Golden fries served crisp with dipping sauce." },
-    { id: "tasty-burger-12", sku: "FAR-1006", title: "Tasty Burger", category: "Burger", price: 12, unit: "item", stock: 0, day: 5, img: "images/f7.png", description: "Classic burger for quick lunches and takeaway orders." }
+    { id: "delicious-pizza-20", sku: "FAR-1001", title: "招牌披薩", category: "Pizza", price: 20, unit: "份", stock: 18, day: 5, img: "images/f1.png", description: "Cheese pizza with tomato sauce and fresh herbs." },
+    { id: "delicious-burger-15", sku: "FAR-1002", title: "經典漢堡", category: "Burger", price: 15, unit: "份", stock: 24, day: 5, img: "images/f2.png", description: "Juicy beef burger with lettuce, tomato and house sauce." },
+    { id: "delicious-pizza-17", sku: "FAR-1003", title: "薄脆披薩", category: "Pizza", price: 17, unit: "份", stock: 12, day: 5, img: "images/f3.png", description: "Crispy crust pizza prepared for sharing." },
+    { id: "delicious-pasta-18", sku: "FAR-1004", title: "奶油義大利麵", category: "Pasta", price: 18, unit: "份", stock: 15, day: 5, img: "images/f4.png", description: "Creamy pasta tossed with vegetables and parmesan." },
+    { id: "french-fries-10", sku: "FAR-1005", title: "黃金薯條", category: "Fries", price: 10, unit: "份", stock: 3, day: 5, img: "images/f5.png", description: "Golden fries served crisp with dipping sauce." },
+    { id: "tasty-burger-12", sku: "FAR-1006", title: "美味漢堡", category: "Burger", price: 12, unit: "份", stock: 0, day: 5, img: "images/f7.png", description: "Classic burger for quick lunches and takeaway orders." }
   ];
 
   function read(key, fallback) {
@@ -69,7 +69,7 @@
           changed = true;
         }
         if (!product.unit) {
-          product.unit = "item";
+          product.unit = "份";
           changed = true;
         }
         if (product.stock == null && product.quantity != null) {
@@ -112,15 +112,15 @@
     var seed = [
       {
         id: "FC-1026",
-        customer: "Guest Customer",
+        customer: "訪客顧客",
         email: "guest@farcimen.demo",
         status: "Processing",
         total: 45,
         time: new Date().toISOString(),
         items: [
-          { title: "Delicious Burger", price: 15, qty: 1 },
-          { title: "Delicious Pizza", price: 20, qty: 1 },
-          { title: "French Fries", price: 10, qty: 1 }
+          { title: "經典漢堡", price: 15, qty: 1 },
+          { title: "招牌披薩", price: 20, qty: 1 },
+          { title: "黃金薯條", price: 10, qty: 1 }
         ]
       },
       {
@@ -131,8 +131,8 @@
         total: 38,
         time: new Date(Date.now() - 86400000).toISOString(),
         items: [
-          { title: "Delicious Pasta", price: 18, qty: 1 },
-          { title: "Delicious Pizza", price: 20, qty: 1 }
+          { title: "奶油義大利麵", price: 18, qty: 1 },
+          { title: "招牌披薩", price: 20, qty: 1 }
         ]
       }
     ];
@@ -143,7 +143,7 @@
   function addresses() {
     var saved = read(ADDRESSES_KEY, []);
     if (saved.length) return saved;
-    var seed = [{ name: "Guest Customer", phone: "+1 300 659 4381", address: "52 Teka Street, LA" }];
+    var seed = [{ name: "訪客顧客", phone: "+1 300 659 4381", address: "52 Teka Street, LA" }];
     write(ADDRESSES_KEY, seed);
     return seed;
   }
@@ -158,11 +158,27 @@
 
   function customer() {
     var saved = read(CUSTOMER_KEY, null);
-    if (saved) return saved;
+    if (saved) {
+      var changed = false;
+      if (saved.firstName === "Guest") {
+        saved.firstName = "訪客";
+        changed = true;
+      }
+      if (saved.lastName === "Customer") {
+        saved.lastName = "顧客";
+        changed = true;
+      }
+      if (saved.displayName === "Guest Customer") {
+        saved.displayName = "訪客顧客";
+        changed = true;
+      }
+      if (changed) write(CUSTOMER_KEY, saved);
+      return saved;
+    }
     saved = {
-      firstName: "Guest",
-      lastName: "Customer",
-      displayName: "Guest Customer",
+      firstName: "訪客",
+      lastName: "顧客",
+      displayName: "訪客顧客",
       email: "guest@farcimen.demo",
       phone: "+1 300 659 4381",
       password: "demo1234"
@@ -186,6 +202,44 @@
 
   function statusClass(status) {
     return String(status || "Processing").toLowerCase().replace(/\s+/g, "-");
+  }
+
+  function statusLabel(status) {
+    return {
+      Processing: "處理中",
+      Completed: "已完成",
+      "Picked Up": "已取貨",
+      Cancelled: "已取消",
+      Active: "啟用中"
+    }[status] || status || "處理中";
+  }
+
+  function categoryLabel(category) {
+    return {
+      Burger: "漢堡",
+      Pizza: "披薩",
+      Pasta: "義大利麵",
+      Fries: "薯條",
+      Dessert: "甜點"
+    }[category] || category || "未分類";
+  }
+
+  function unitLabel(unit) {
+    return { item: "份" }[unit] || unit || "份";
+  }
+
+  function productTitle(title) {
+    return {
+      "Delicious Pizza": "招牌披薩",
+      "Delicious Burger": "經典漢堡",
+      "Delicious Pasta": "奶油義大利麵",
+      "French Fries": "黃金薯條",
+      "Tasty Burger": "美味漢堡"
+    }[title] || title || "示範商品";
+  }
+
+  function customerName(name) {
+    return name === "Guest Customer" ? "訪客顧客" : name || "訪客顧客";
   }
 
   function setText(selector, text) {
@@ -240,21 +294,21 @@
       return currentOrderFilter === "all" || order.status === currentOrderFilter;
     });
     tbody.innerHTML = list.map(function (order) {
-      return '<tr><td><strong>' + order.id + '</strong><br><span class="demo-muted">' + new Date(order.time).toLocaleString() + '</span></td><td>' + (order.customer || "Guest Customer") + '<br><span class="demo-muted">' + (order.email || "") + '</span></td><td>' + itemCount(order) + '</td><td>' + money(order.total) + '</td><td><span class="demo-status ' + statusClass(order.status) + '">' + order.status + '</span></td><td><button class="demo-button" data-view-order="' + order.id + '">View</button></td></tr>';
-    }).join("") || '<tr><td colspan="6" class="demo-muted">No orders match this filter.</td></tr>';
+      return '<tr><td><strong>' + order.id + '</strong><br><span class="demo-muted">' + new Date(order.time).toLocaleString() + '</span></td><td>' + customerName(order.customer) + '<br><span class="demo-muted">' + (order.email || "") + '</span></td><td>' + itemCount(order) + '</td><td>' + money(order.total) + '</td><td><span class="demo-status ' + statusClass(order.status) + '">' + statusLabel(order.status) + '</span></td><td><button class="demo-button" data-view-order="' + order.id + '">查看</button></td></tr>';
+    }).join("") || '<tr><td colspan="6" class="demo-muted">沒有符合此篩選條件的訂單。</td></tr>';
   }
 
   function renderRecentOrders() {
     var tbody = document.querySelector("[data-demo-recent-orders]");
     if (!tbody) return;
     tbody.innerHTML = orders().slice(0, 5).map(function (order) {
-      return '<tr><td><strong>' + order.id + '</strong></td><td>' + (order.customer || "Guest Customer") + '</td><td>' + money(order.total) + '</td><td><span class="demo-status ' + statusClass(order.status) + '">' + order.status + '</span></td><td><button class="demo-button" data-view-order="' + order.id + '">View</button></td></tr>';
+      return '<tr><td><strong>' + order.id + '</strong></td><td>' + customerName(order.customer) + '</td><td>' + money(order.total) + '</td><td><span class="demo-status ' + statusClass(order.status) + '">' + statusLabel(order.status) + '</span></td><td><button class="demo-button" data-view-order="' + order.id + '">查看</button></td></tr>';
     }).join("");
   }
 
   function renderCustomerOrders() {
     var rows = orders().map(function (order) {
-      return '<tr><td><strong>' + order.id + '</strong></td><td>' + new Date(order.time).toLocaleDateString() + '</td><td>' + money(order.total) + '</td><td><span class="demo-status ' + statusClass(order.status) + '">' + order.status + '</span></td><td><button class="demo-button" data-view-order="' + order.id + '">View</button> <button class="demo-button dark" data-reorder="' + order.id + '">Reorder</button></td></tr>';
+      return '<tr><td><strong>' + order.id + '</strong></td><td>' + new Date(order.time).toLocaleDateString() + '</td><td>' + money(order.total) + '</td><td><span class="demo-status ' + statusClass(order.status) + '">' + statusLabel(order.status) + '</span></td><td><button class="demo-button" data-view-order="' + order.id + '">查看</button></td></tr>';
     }).join("");
     document.querySelectorAll("[data-demo-customer-orders]").forEach(function (tbody) {
       tbody.innerHTML = rows;
@@ -266,7 +320,7 @@
     orders().forEach(function (order) {
       (order.items || []).forEach(function (item) {
         var key = item.id || productId(item.title);
-        if (!map[key]) map[key] = { title: item.title, qty: 0, revenue: 0 };
+        if (!map[key]) map[key] = { title: productTitle(item.title), qty: 0, revenue: 0 };
         map[key].qty += Number(item.qty || 0);
         map[key].revenue += Number(item.price || 0) * Number(item.qty || 0);
       });
@@ -289,15 +343,15 @@
     inventoryPage = Math.min(inventoryPage, pages);
     var start = total ? (inventoryPage - 1) * inventoryPageSize + 1 : 0;
     var end = Math.min(total, inventoryPage * inventoryPageSize);
-    if (showing) showing.textContent = "Showing " + start + "-" + end + " of " + total;
+    if (showing) showing.textContent = "顯示 " + start + "-" + end + "，共 " + total + " 筆";
     var pager = document.querySelector("[data-inventory-pagination]");
     if (!pager) return;
     var buttons = [];
-    buttons.push('<button type="button" data-inventory-page="' + Math.max(1, inventoryPage - 1) + '"' + (inventoryPage === 1 ? " disabled" : "") + '>Prev</button>');
+    buttons.push('<button type="button" data-inventory-page="' + Math.max(1, inventoryPage - 1) + '"' + (inventoryPage === 1 ? " disabled" : "") + '>上一頁</button>');
     for (var i = 1; i <= pages; i += 1) {
       buttons.push('<button type="button" data-inventory-page="' + i + '"' + (i === inventoryPage ? ' class="active"' : "") + '>' + i + '</button>');
     }
-    buttons.push('<button type="button" data-inventory-page="' + Math.min(pages, inventoryPage + 1) + '"' + (inventoryPage === pages ? " disabled" : "") + '>Next</button>');
+    buttons.push('<button type="button" data-inventory-page="' + Math.min(pages, inventoryPage + 1) + '"' + (inventoryPage === pages ? " disabled" : "") + '>下一頁</button>');
     pager.innerHTML = buttons.join("");
   }
 
@@ -308,25 +362,25 @@
     renderInventoryPagination(list.length);
     var pageItems = list.slice((inventoryPage - 1) * inventoryPageSize, inventoryPage * inventoryPageSize);
     if (!pageItems.length) {
-      wrap.innerHTML = '<p class="demo-muted">No products match the current search or filter.</p>';
+      wrap.innerHTML = '<p class="demo-muted">沒有符合目前搜尋或篩選條件的商品。</p>';
       return;
     }
-    wrap.innerHTML = '<div class="demo-product-row demo-product-head"><span>Code</span><span>Category</span><span>day</span><span>Price</span><span>Unit</span><span>Quantity</span><span>Action</span></div>' + pageItems.map(function (product) {
-      return '<div class="demo-product-row"><div class="demo-product-code"><img src="' + escapeHtml(product.img) + '" alt=""><div><strong>' + escapeHtml(product.sku) + '</strong><small>' + escapeHtml(product.title) + '</small></div></div><span>' + escapeHtml(product.category) + '</span><span>' + (product.day || 5) + '</span><strong>' + money(product.price) + '</strong><span>' + escapeHtml(product.unit || "item") + '</span><input type="number" min="0" value="' + product.stock + '" data-stock="' + escapeHtml(product.id) + '"><div class="demo-product-actions"><button class="demo-button dark" data-save-stock="' + escapeHtml(product.id) + '">Save</button><button class="demo-icon-button" data-edit-product="' + escapeHtml(product.id) + '"><i class="fa fa-pencil"></i></button><button class="demo-icon-button danger" data-delete-product="' + escapeHtml(product.id) + '"><i class="fa fa-trash"></i></button></div></div>';
+    wrap.innerHTML = '<div class="demo-product-row demo-product-head"><span>代碼</span><span>分類</span><span>天數</span><span>價格</span><span>單位</span><span>數量</span><span>操作</span></div>' + pageItems.map(function (product) {
+      return '<div class="demo-product-row"><div class="demo-product-code"><img src="' + escapeHtml(product.img) + '" alt=""><div><strong>' + escapeHtml(product.sku) + '</strong><small>' + escapeHtml(productTitle(product.title)) + '</small></div></div><span>' + escapeHtml(categoryLabel(product.category)) + '</span><span>' + (product.day || 5) + '</span><strong>' + money(product.price) + '</strong><span>' + escapeHtml(unitLabel(product.unit)) + '</span><input type="number" min="0" value="' + product.stock + '" data-stock="' + escapeHtml(product.id) + '"><div class="demo-product-actions"><button class="demo-button dark" data-save-stock="' + escapeHtml(product.id) + '">儲存</button><button class="demo-icon-button" data-edit-product="' + escapeHtml(product.id) + '"><i class="fa fa-pencil"></i></button><button class="demo-icon-button danger" data-delete-product="' + escapeHtml(product.id) + '"><i class="fa fa-trash"></i></button></div></div>';
     }).join("");
   }
 
   function renderTopProducts() {
     var rows = productSales().slice(0, 5);
     var html = rows.map(function (item, index) {
-      return '<div class="demo-list-row"><span>' + (index + 1) + '</span><div><strong>' + escapeHtml(item.title) + '</strong><small>' + item.qty + ' sold</small></div><b>' + money(item.revenue) + '</b></div>';
-    }).join("") || '<p class="demo-muted">No product sales yet.</p>';
+      return '<div class="demo-list-row"><span>' + (index + 1) + '</span><div><strong>' + escapeHtml(item.title) + '</strong><small>已售出 ' + item.qty + ' 份</small></div><b>' + money(item.revenue) + '</b></div>';
+    }).join("") || '<p class="demo-muted">目前尚無商品銷售資料。</p>';
     document.querySelectorAll("[data-demo-top-products]").forEach(function (wrap) { wrap.innerHTML = html; });
     var revenueWrap = document.querySelector("[data-demo-product-revenue]");
     if (revenueWrap) {
       revenueWrap.innerHTML = rows.slice(0, 4).map(function (item) {
         return '<div class="demo-info-item"><span>' + escapeHtml(item.title) + '</span><strong>' + item.qty + ' / ' + money(item.revenue) + '</strong></div>';
-      }).join("") || '<p class="demo-muted">No revenue data yet.</p>';
+      }).join("") || '<p class="demo-muted">目前尚無營收資料。</p>';
     }
   }
 
@@ -334,7 +388,7 @@
     var wrap = document.querySelector("[data-demo-addresses]");
     if (!wrap) return;
     wrap.innerHTML = addresses().map(function (address, index) {
-      return '<div class="demo-card"><strong>' + address.name + '</strong><p class="demo-muted">' + address.phone + '</p><p>' + address.address + '</p><button class="demo-button red" data-delete-address="' + index + '">Delete</button></div>';
+      return '<div class="demo-card"><strong>' + customerName(address.name) + '</strong><p class="demo-muted">' + address.phone + '</p><p>' + address.address + '</p><button class="demo-button red" data-delete-address="' + index + '">刪除</button></div>';
     }).join("");
   }
 
@@ -363,7 +417,7 @@
     form.elements.email.value = data.email || "";
     form.elements.phone.value = data.phone || "";
     var greeting = document.querySelector("[data-customer-greeting]");
-    if (greeting) greeting.textContent = "Hello " + (data.displayName || data.firstName || "customer") + ", manage your sample orders and account here.";
+    if (greeting) greeting.textContent = "您好，" + (data.displayName || data.firstName || "顧客") + "，您可以在這裡管理示範訂單與帳戶資料。";
   }
 
   function renderBookings() {
@@ -371,7 +425,7 @@
     if (!tbody) return;
     tbody.innerHTML = bookings().map(function (booking) {
       return '<tr><td>' + booking.name + '</td><td>' + booking.phone + '</td><td>' + booking.persons + '</td><td>' + booking.date + '</td></tr>';
-    }).join("") || '<tr><td colspan="4" class="demo-muted">No bookings yet.</td></tr>';
+    }).join("") || '<tr><td colspan="4" class="demo-muted">目前尚無訂位資料。</td></tr>';
   }
 
   function renderEngagement() {
@@ -380,19 +434,19 @@
     if (messages) {
       messages.innerHTML = data.messages.map(function (item) {
         return '<div class="demo-mini-row"><strong>' + escapeHtml(item.name) + '</strong><span>' + escapeHtml(item.subject) + '</span><small>' + escapeHtml(item.message) + '</small></div>';
-      }).join("") || '<p class="demo-muted">No messages yet.</p>';
+      }).join("") || '<p class="demo-muted">目前尚無聯絡訊息。</p>';
     }
     var subscribers = document.querySelector('[data-engagement-table="subscribers"]');
     if (subscribers) {
       subscribers.innerHTML = data.subscribers.map(function (item) {
-        return '<div class="demo-mini-row"><strong>' + escapeHtml(item.email) + '</strong><span>' + escapeHtml(item.status) + '</span><small>' + new Date(item.date).toLocaleDateString() + '</small></div>';
-      }).join("") || '<p class="demo-muted">No subscribers yet.</p>';
+        return '<div class="demo-mini-row"><strong>' + escapeHtml(item.email) + '</strong><span>' + escapeHtml(statusLabel(item.status)) + '</span><small>' + new Date(item.date).toLocaleDateString() + '</small></div>';
+      }).join("") || '<p class="demo-muted">目前尚無訂閱者。</p>';
     }
     var searches = document.querySelector('[data-engagement-table="searches"]');
     if (searches) {
       searches.innerHTML = data.searches.map(function (item) {
-        return '<div class="demo-mini-row"><strong>' + escapeHtml(item.keyword) + '</strong><span>' + item.results + ' results</span><small>' + new Date(item.date).toLocaleString() + '</small></div>';
-      }).join("") || '<p class="demo-muted">No search logs yet.</p>';
+        return '<div class="demo-mini-row"><strong>' + escapeHtml(item.keyword) + '</strong><span>' + item.results + ' 筆結果</span><small>' + new Date(item.date).toLocaleString() + '</small></div>';
+      }).join("") || '<p class="demo-muted">目前尚無搜尋紀錄。</p>';
     }
   }
 
@@ -402,23 +456,23 @@
     var data = engagement();
     var notes = [];
     orderList.filter(function (order) { return order.status === "Processing"; }).slice(0, 4).forEach(function (order) {
-      notes.push({ icon: "fa-file-text-o", title: "Processing order " + order.id, text: money(order.total) + " waiting for staff action." });
+      notes.push({ icon: "fa-file-text-o", title: "處理中訂單 " + order.id, text: money(order.total) + " 等待員工處理。" });
     });
     productList.filter(function (product) { return product.stock <= 5; }).slice(0, 4).forEach(function (product) {
-      notes.push({ icon: "fa-exclamation-triangle", title: product.title, text: product.stock <= 0 ? "Out of stock" : product.stock + " left in inventory." });
+      notes.push({ icon: "fa-exclamation-triangle", title: productTitle(product.title), text: product.stock <= 0 ? "已缺貨" : "庫存剩 " + product.stock + " 份。" });
     });
     bookings().slice(0, 2).forEach(function (booking) {
-      notes.push({ icon: "fa-calendar", title: "Reservation", text: booking.name + " / " + booking.date });
+      notes.push({ icon: "fa-calendar", title: "訂位", text: booking.name + " / " + booking.date });
     });
     (data.messages || []).slice(0, 2).forEach(function (message) {
-      notes.push({ icon: "fa-envelope-o", title: "New message", text: message.subject });
+      notes.push({ icon: "fa-envelope-o", title: "新訊息", text: message.subject });
     });
     setText("[data-demo-notification-count]", notes.length);
     var menu = document.querySelector("[data-demo-notifications]");
     if (!menu) return;
     menu.innerHTML = notes.map(function (note) {
       return '<div class="demo-notification-item"><i class="fa ' + note.icon + '"></i><div><strong>' + escapeHtml(note.title) + '</strong><span>' + escapeHtml(note.text) + '</span></div></div>';
-    }).join("") || '<p class="demo-muted">No notifications.</p>';
+    }).join("") || '<p class="demo-muted">目前沒有通知。</p>';
   }
 
   function renderCharts() {
@@ -437,10 +491,10 @@
     if (overall) {
       var multiplier = overallRange === "year" ? 12 : overallRange === "month" ? 4 : 1;
       overall.innerHTML = [
-        ["Revenue", money(83 * multiplier)],
-        ["Average Order", money(27.6 + multiplier)],
-        ["Returning Customers", 18 * multiplier + "%"],
-        ["Pickup Rate", 72 + multiplier + "%"]
+        ["營收", money(83 * multiplier)],
+        ["平均訂單金額", money(27.6 + multiplier)],
+        ["回訪顧客", 18 * multiplier + "%"],
+        ["取貨率", 72 + multiplier + "%"]
       ].map(function (item) {
         return '<div class="demo-info-item"><span>' + item[0] + '</span><strong>' + item[1] + '</strong></div>';
       }).join("");
@@ -448,7 +502,7 @@
     var customer = document.querySelector("[data-demo-customer-chart]");
     if (customer) {
       var percent = customerRange === "year" ? 78 : customerRange === "month" ? 63 : 52;
-      customer.innerHTML = '<div class="demo-donut-ring" style="--value:' + percent + '%"><strong>' + percent + '%</strong><span>Returning</span></div>';
+      customer.innerHTML = '<div class="demo-donut-ring" style="--value:' + percent + '%"><strong>' + percent + '%</strong><span>回訪</span></div>';
     }
     renderStockReports();
   }
@@ -458,15 +512,15 @@
     var out = document.querySelector("[data-demo-out-stock]");
     var list = products();
     if (low) {
-      low.innerHTML = list.filter(function (product) { return product.stock > 0 && product.stock <= 5; }).map(stockRow).join("") || '<p class="demo-muted">No low stock items.</p>';
+      low.innerHTML = list.filter(function (product) { return product.stock > 0 && product.stock <= 5; }).map(stockRow).join("") || '<p class="demo-muted">目前沒有低庫存品項。</p>';
     }
     if (out) {
-      out.innerHTML = list.filter(function (product) { return product.stock <= 0; }).map(stockRow).join("") || '<p class="demo-muted">No out of stock items.</p>';
+      out.innerHTML = list.filter(function (product) { return product.stock <= 0; }).map(stockRow).join("") || '<p class="demo-muted">目前沒有缺貨品項。</p>';
     }
   }
 
   function stockRow(product) {
-    return '<div class="demo-stock-row"><img src="' + product.img + '" alt=""><div><strong>' + product.title + '</strong><span>' + product.stock + ' left</span></div></div>';
+    return '<div class="demo-stock-row"><img src="' + product.img + '" alt=""><div><strong>' + productTitle(product.title) + '</strong><span>剩 ' + product.stock + ' 份</span></div></div>';
   }
 
   function csvCell(value) {
@@ -477,7 +531,7 @@
   function exportInventoryCsv() {
     var header = ["id", "title", "category", "day", "price", "unit", "quantity", "image", "description", "sku"];
     var rows = products().map(function (product) {
-      return [product.id, product.title, product.category, product.day || 5, product.price, product.unit || "item", product.stock, product.img, product.description, product.sku].map(csvCell).join(",");
+      return [product.id, productTitle(product.title), product.category, product.day || 5, product.price, unitLabel(product.unit), product.stock, product.img, product.description, product.sku].map(csvCell).join(",");
     });
     var blob = new Blob([header.join(",") + "\n" + rows.join("\n")], { type: "text/csv;charset=utf-8" });
     var link = document.createElement("a");
@@ -485,7 +539,7 @@
     link.download = "farcimen-inventory.csv";
     link.click();
     URL.revokeObjectURL(link.href);
-    setText("[data-inventory-excel-status]", "Exported " + rows.length + " products to CSV.");
+    setText("[data-inventory-excel-status]", "已匯出 " + rows.length + " 筆商品資料為 CSV。");
   }
 
   function parseCsv(text) {
@@ -530,7 +584,7 @@
       var imported = rows.map(function (row, index) {
         var data = {};
         headers.forEach(function (header, i) { data[header] = row[i]; });
-        var title = data.title || "Imported Product " + (index + 1);
+        var title = data.title || "匯入商品 " + (index + 1);
         return {
           id: data.id || productId(title) + "-" + Date.now().toString().slice(-5) + index,
           sku: data.sku || "FAR-CSV-" + (index + 1),
@@ -538,14 +592,14 @@
           category: data.category || "Burger",
           day: Number(data.day || 5),
           price: Number(data.price || 0),
-          unit: data.unit || "item",
+          unit: data.unit || "份",
           stock: Number(data.quantity || data.stock || 0),
           img: data.image || data.img || "images/f1.png",
-          description: data.description || title + " imported from CSV."
+          description: data.description || title + " 由 CSV 匯入。"
         };
       }).filter(function (product) { return product.title; });
       if (!imported.length) {
-        setText("[data-inventory-excel-status]", "No valid product rows found in this CSV.");
+        setText("[data-inventory-excel-status]", "這份 CSV 沒有可匯入的商品資料。");
         return;
       }
       var existing = products();
@@ -556,7 +610,7 @@
       });
       write(PRODUCTS_KEY, existing);
       inventoryPage = 1;
-      setText("[data-inventory-excel-status]", "Imported " + imported.length + " products from CSV.");
+      setText("[data-inventory-excel-status]", "已從 CSV 匯入 " + imported.length + " 筆商品資料。");
       renderAll();
     };
     reader.readAsText(file);
@@ -574,10 +628,10 @@
     var order = orders().find(function (item) { return item.id === id; });
     if (!order) return;
     var items = (order.items || []).map(function (item) {
-      return '<tr><td>' + item.title + '</td><td>' + item.qty + '</td><td>' + money(item.price * item.qty) + '</td></tr>';
+      return '<tr><td>' + productTitle(item.title) + '</td><td>' + item.qty + '</td><td>' + money(item.price * item.qty) + '</td></tr>';
     }).join("");
-    var actions = document.body.getAttribute("data-dashboard") === "staff" ? '<div class="demo-modal-actions"><button class="demo-button" data-complete-order="' + id + '">Completed</button><button class="demo-button dark" data-pickup-order="' + id + '">Picked Up</button><button class="demo-button red" data-cancel-order="' + id + '">Cancel</button></div>' : "";
-    openModal("Order Detail", '<p><strong>' + order.id + '</strong> - ' + (order.customer || "Guest Customer") + '</p><table class="demo-table"><tbody>' + items + '</tbody></table><p><strong>Total:</strong> ' + money(order.total) + '</p><p><strong>Status:</strong> <span class="demo-status ' + statusClass(order.status) + '">' + order.status + '</span></p>' + actions);
+    var actions = document.body.getAttribute("data-dashboard") === "staff" ? '<div class="demo-modal-actions"><button class="demo-button" data-complete-order="' + id + '">標記完成</button><button class="demo-button dark" data-pickup-order="' + id + '">標記已取貨</button><button class="demo-button red" data-cancel-order="' + id + '">取消訂單</button></div>' : "";
+    openModal("訂單明細", '<p><strong>' + order.id + '</strong> - ' + customerName(order.customer) + '</p><table class="demo-table"><tbody>' + items + '</tbody></table><p><strong>合計：</strong> ' + money(order.total) + '</p><p><strong>狀態：</strong> <span class="demo-status ' + statusClass(order.status) + '">' + statusLabel(order.status) + '</span></p>' + actions);
   }
 
   function updateOrder(id, status) {
@@ -587,7 +641,7 @@
     });
     write(ORDERS_KEY, list);
     renderAll();
-    openModal("Order Updated", "<p>Order " + id + " is now " + status + ".</p>");
+    openModal("訂單已更新", "<p>訂單 " + id + " 的狀態已更新為「" + statusLabel(status) + "」。</p>");
   }
 
   function reorder(id) {
@@ -600,7 +654,7 @@
       else items.push({ id: orderItem.title.toLowerCase().replace(/[^a-z0-9]+/g, "-"), title: orderItem.title, price: Number(orderItem.price || 0), qty: Number(orderItem.qty || 1), img: "images/f1.png" });
     });
     write(CART_KEY, items);
-    openModal("Reorder Added", "<p>Items from " + id + " were added to your demo cart.</p><p><a class=\"demo-button\" href=\"index.html\">Back to Store</a></p>");
+    openModal("已加入購物車", "<p>訂單 " + id + " 的品項已加入示範購物車。</p><p><a class=\"demo-button\" href=\"index.html\">返回前台</a></p>");
   }
 
   function saveStock(id) {
@@ -616,7 +670,7 @@
   function editProduct(id) {
     var product = products().find(function (item) { return item.id === id; });
     if (!product) return;
-    openModal("Edit Product", '<form class="demo-form" data-demo-edit-product="' + escapeHtml(id) + '"><label>Name<input name="title" value="' + escapeHtml(product.title) + '"></label><label>SKU<input name="sku" value="' + escapeHtml(product.sku || "") + '"></label><label>Category<input name="category" value="' + escapeHtml(product.category) + '"></label><label>Price<input name="price" type="number" step="0.01" value="' + product.price + '"></label><label>Unit<input name="unit" value="' + escapeHtml(product.unit || "item") + '"></label><label>Stock<input name="stock" type="number" value="' + product.stock + '"></label><label>Day<input name="day" type="number" value="' + (product.day || 5) + '"></label><label>Image URL<input name="img" value="' + escapeHtml(product.img) + '"></label><label>Description<textarea name="description" rows="4">' + escapeHtml(product.description || "") + '</textarea></label><button class="demo-button" type="submit">Save Product</button></form>');
+    openModal("編輯商品", '<form class="demo-form" data-demo-edit-product="' + escapeHtml(id) + '"><label>商品名稱<input name="title" value="' + escapeHtml(productTitle(product.title)) + '"></label><label>SKU<input name="sku" value="' + escapeHtml(product.sku || "") + '"></label><label>分類<input name="category" value="' + escapeHtml(product.category) + '"></label><label>價格<input name="price" type="number" step="0.01" value="' + product.price + '"></label><label>單位<input name="unit" value="' + escapeHtml(unitLabel(product.unit)) + '"></label><label>庫存<input name="stock" type="number" value="' + product.stock + '"></label><label>備貨天數<input name="day" type="number" value="' + (product.day || 5) + '"></label><label>圖片路徑<input name="img" value="' + escapeHtml(product.img) + '"></label><label>描述<textarea name="description" rows="4">' + escapeHtml(product.description || "") + '</textarea></label><button class="demo-button" type="submit">儲存商品</button></form>');
   }
 
   function deleteProduct(id) {
@@ -655,7 +709,7 @@
     var pdfButton = document.querySelector("[data-inventory-pdf]");
     if (pdfButton) {
       pdfButton.addEventListener("click", function () {
-        setText("[data-inventory-excel-status]", "Opening browser print dialog for PDF export.");
+        setText("[data-inventory-excel-status]", "正在開啟瀏覽器列印視窗，可另存為 PDF。");
         window.print();
       });
     }
@@ -707,14 +761,14 @@
       productForm.addEventListener("submit", function (event) {
         event.preventDefault();
         var form = new FormData(productForm);
-        var title = String(form.get("title") || "New Product");
+        var title = String(form.get("title") || "新商品");
         var item = {
           id: productId(title) + "-" + Date.now().toString().slice(-5),
           sku: form.get("sku") || "FAR-" + Date.now().toString().slice(-6),
           title: title,
           category: form.get("category"),
           price: Number(form.get("price") || 0),
-          unit: form.get("unit") || "item",
+          unit: form.get("unit") || "份",
           stock: Number(form.get("stock") || 0),
           day: Number(form.get("day") || 5),
           img: productForm._imageData || form.get("img"),
@@ -728,7 +782,7 @@
         inventorySearch = "";
         inventoryFilter = "all";
         inventoryPage = 1;
-        setText("[data-add-product-status]", "Product added and synced to Inventory.");
+        setText("[data-add-product-status]", "商品已新增，並同步到庫存管理。");
         window.setTimeout(function () { productForm._addingProduct = false; }, 0);
         setActive("inventory");
         renderAll();
@@ -755,10 +809,10 @@
       registerForm.addEventListener("submit", function (event) {
         event.preventDefault();
         var form = new FormData(registerForm);
-        var name = String(form.get("name") || "Guest Customer").trim();
+        var name = String(form.get("name") || "訪客顧客").trim();
         var parts = name.split(/\s+/);
         write(CUSTOMER_KEY, {
-          firstName: parts[0] || "Guest",
+          firstName: parts[0] || "訪客",
           lastName: parts.slice(1).join(" "),
           displayName: name,
           email: form.get("email"),
@@ -784,7 +838,7 @@
         if (form.get("newPassword")) data.password = form.get("newPassword");
         write(CUSTOMER_KEY, data);
         renderProfileForm();
-        openModal("Account Updated", "<p>Your demo account details were saved in this browser.</p>");
+        openModal("帳戶已更新", "<p>示範帳戶資料已儲存在此瀏覽器。</p>");
       });
     }
   }
@@ -937,7 +991,7 @@
         product.sku = form.get("sku");
         product.category = form.get("category");
         product.price = Number(form.get("price") || 0);
-        product.unit = form.get("unit") || "item";
+        product.unit = form.get("unit") || "份";
         product.stock = Number(form.get("stock") || 0);
         product.day = Number(form.get("day") || 5);
         product.img = form.get("img") || product.img;

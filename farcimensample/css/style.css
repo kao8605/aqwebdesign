@@ -1,6 +1,6 @@
-@import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Open+Sans:wght@400;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Noto+Serif+TC:wght@400;500;600;700;900&family=Open+Sans:wght@400;600;700&display=swap");
 body {
-  font-family: "Open Sans", sans-serif;
+  font-family: "Open Sans", "Noto Serif TC", sans-serif;
   color: #0c0c0c;
   background-color: #ffffff;
   overflow-x: hidden;
@@ -32,7 +32,7 @@ body {
 
 h1,
 h2 {
-  font-family: 'Dancing Script', cursive;
+  font-family: "Dancing Script", "Noto Serif TC", cursive;
 }
 
 .heading_container {

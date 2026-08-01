@@ -55,8 +55,8 @@ var adminOpen = document.getElementById("adminOpen");
 if (adminOpen) {
     adminOpen.addEventListener("click", function(e) {
         e.preventDefault();
-        var target = adminOpen.getAttribute("data-admin-url") || adminOpen.getAttribute("href");
-        if (target) window.location.href = target;
+        var target = adminOpen.getAttribute("data-admin-url") || adminOpen.getAttribute("href") || "../../dashboard/dist/signin.html";
+        window.location.href = new URL(target, window.location.href).href;
     });
 }
 

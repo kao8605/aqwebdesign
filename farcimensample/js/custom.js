@@ -122,6 +122,18 @@ if ($.fn.owlCarousel) {
         return "$" + Number(value || 0).toFixed(2);
     }
 
+    function categoryLabel(category) {
+        var labels = {
+            burger: "漢堡",
+            pizza: "披薩",
+            pasta: "義大利麵",
+            fries: "薯條",
+            Menu: "菜單",
+            Farcimen: "Farcimen"
+        };
+        return labels[category] || category || "菜單";
+    }
+
     function toast(message) {
         var el = document.querySelector(".farcimen-toast");
         if (!el) {
@@ -216,7 +228,7 @@ if ($.fn.owlCarousel) {
         if (modal) return modal;
         modal = document.createElement("div");
         modal.className = "farcimen-modal";
-        modal.innerHTML = '<div class="farcimen-modal-card"><div class="farcimen-modal-head"><h3></h3><button class="farcimen-modal-close" type="button" aria-label="Close">&times;</button></div><div class="farcimen-modal-body"></div></div>';
+        modal.innerHTML = '<div class="farcimen-modal-card"><div class="farcimen-modal-head"><h3></h3><button class="farcimen-modal-close" type="button" aria-label="關閉">&times;</button></div><div class="farcimen-modal-body"></div></div>';
         modal.addEventListener("click", function (event) {
             if (event.target === modal || event.target.closest(".farcimen-modal-close")) {
                 modal.classList.remove("show");
@@ -243,15 +255,15 @@ if ($.fn.owlCarousel) {
             '<div class="farcimen-product-modal">',
             '<div class="farcimen-product-image"><img src="' + product.img + '" alt="' + product.title + '"></div>',
             '<div class="farcimen-product-detail">',
-            '<div class="farcimen-product-kicker">' + product.category + '</div>',
+            '<div class="farcimen-product-kicker">' + categoryLabel(product.category) + '</div>',
             '<h4>' + product.title + '</h4>',
-            '<div class="farcimen-product-rating">★★★★★ <span>4.9 (128 reviews)</span></div>',
+            '<div class="farcimen-product-rating">★★★★★ <span>4.9（128 則評論）</span></div>',
             '<p class="farcimen-product-desc">' + product.desc + '</p>',
             '<div class="farcimen-product-price"><strong>' + money(product.price) + '</strong><del>' + money(product.price + 4) + '</del></div>',
-            '<div class="farcimen-product-stats"><div class="farcimen-product-stat"><strong>620 kcal</strong><span>Calories</span></div><div class="farcimen-product-stat"><strong>12 min</strong><span>Prep Time</span></div><div class="farcimen-product-stat"><strong>4.9/5</strong><span>Rating</span></div></div>',
-            '<div class="farcimen-product-qty"><button type="button" data-demo-product-dec>-</button><strong data-demo-product-qty>1</strong><button type="button" data-demo-product-inc>+</button><span>portion</span></div>',
-            '<div class="farcimen-product-tags"><span>' + product.category + '</span><span>Local Favourite</span><span>Farcimen</span></div>',
-            '<button class="farcimen-product-add" type="button" data-demo-product-add>Add to Cart</button>',
+            '<div class="farcimen-product-stats"><div class="farcimen-product-stat"><strong>620 kcal</strong><span>熱量</span></div><div class="farcimen-product-stat"><strong>12 分鐘</strong><span>準備時間</span></div><div class="farcimen-product-stat"><strong>4.9/5</strong><span>評分</span></div></div>',
+            '<div class="farcimen-product-qty"><button type="button" data-demo-product-dec>-</button><strong data-demo-product-qty>1</strong><button type="button" data-demo-product-inc>+</button><span>份</span></div>',
+            '<div class="farcimen-product-tags"><span>' + categoryLabel(product.category) + '</span><span>人氣推薦</span><span>Farcimen</span></div>',
+            '<button class="farcimen-product-add" type="button" data-demo-product-add>加入購物車</button>',
             '</div>',
             '</div>'
         ].join("");
@@ -262,7 +274,7 @@ if ($.fn.owlCarousel) {
     function getProductFromCard(card) {
         var box = card.closest(".food_section .box");
         if (!box) return null;
-        var title = box.querySelector("h5") ? box.querySelector("h5").textContent.trim() : "Menu Item";
+        var title = box.querySelector("h5") ? box.querySelector("h5").textContent.trim() : "菜單品項";
         var priceText = box.querySelector(".options h6") ? box.querySelector(".options h6").textContent.trim() : "$0";
         var img = box.querySelector("img") ? box.querySelector("img").getAttribute("src") : "";
         var category = "Menu";
@@ -282,7 +294,7 @@ if ($.fn.owlCarousel) {
             price: Number(priceText.replace(/[^0-9.]/g, "")) || 0,
             img: img,
             category: category,
-            desc: box.querySelector("p") ? box.querySelector("p").textContent.replace(/\s+/g, " ").trim() : "Freshly prepared with signature Farcimen flavours.",
+            desc: box.querySelector("p") ? box.querySelector("p").textContent.replace(/\s+/g, " ").trim() : "現點現做，呈現 Farcimen 的招牌風味。",
             qty: 1
         };
     }
@@ -290,7 +302,7 @@ if ($.fn.owlCarousel) {
     function getOfferProductFromButton(link) {
         var box = link.closest(".offer_section .box");
         if (!box) return null;
-        var title = box.querySelector("h5") ? box.querySelector("h5").textContent.trim() : "Special Deal";
+        var title = box.querySelector("h5") ? box.querySelector("h5").textContent.trim() : "今日優惠";
         var discount = box.querySelector("h6") ? box.querySelector("h6").textContent.replace(/\s+/g, " ").trim() : "";
         var img = box.querySelector("img") ? box.querySelector("img").getAttribute("src") : "";
         return {
@@ -308,22 +320,22 @@ if ($.fn.owlCarousel) {
         if (existing) existing.qty += product.qty || 1;
         else cart.push(product);
         saveCart(cart);
-        toast(product.title + " added to cart.");
+        toast(product.title + " 已加入購物車。");
     }
 
     function showCart() {
         var cart = getCart();
         if (!cart.length) {
-            openModal("Your Cart", '<p class="farcimen-demo-muted">Your cart is empty. Add menu items to preview checkout.</p><button class="farcimen-demo-btn" data-demo-scroll-menu>Browse Menu</button>');
+            openModal("購物車", '<p class="farcimen-demo-muted">購物車目前是空的，先到菜單挑選餐點吧。</p><button class="farcimen-demo-btn" data-demo-scroll-menu>瀏覽菜單</button>');
             return;
         }
         var total = cart.reduce(function (sum, item) {
             return sum + item.price * item.qty;
         }, 0);
         var rows = cart.map(function (item, index) {
-            return '<div class="farcimen-cart-row"><div><strong>' + item.title + '</strong><small>' + money(item.price) + ' x ' + item.qty + '</small></div><b>' + money(item.price * item.qty) + '</b><div class="farcimen-cart-actions"><button type="button" data-demo-cart-dec="' + index + '">-</button><span>' + item.qty + '</span><button type="button" data-demo-cart-inc="' + index + '">+</button><button type="button" data-demo-cart-remove="' + index + '">Remove</button></div></div>';
+            return '<div class="farcimen-cart-row"><div><strong>' + item.title + '</strong><small>' + money(item.price) + ' x ' + item.qty + '</small></div><b>' + money(item.price * item.qty) + '</b><div class="farcimen-cart-actions"><button type="button" data-demo-cart-dec="' + index + '">-</button><span>' + item.qty + '</span><button type="button" data-demo-cart-inc="' + index + '">+</button><button type="button" data-demo-cart-remove="' + index + '">刪除</button></div></div>';
         }).join("");
-        openModal("Your Cart", rows + '<div class="farcimen-cart-total"><span>Total</span><strong>' + money(total) + '</strong></div><button class="farcimen-demo-btn" type="button" data-demo-checkout style="margin-top:16px;">Checkout Demo</button>');
+        openModal("購物車", rows + '<div class="farcimen-cart-total"><span>合計</span><strong>' + money(total) + '</strong></div><button class="farcimen-demo-btn" type="button" data-demo-checkout style="margin-top:16px;">送出示範訂單</button>');
     }
 
     function changeCart(index, mode) {
@@ -341,7 +353,7 @@ if ($.fn.owlCarousel) {
         if (!cart.length) return;
         var order = {
             id: "FC-" + Date.now().toString().slice(-6),
-            customer: "Guest Customer",
+            customer: "訪客顧客",
             email: "guest@farcimen.demo",
             status: "Processing",
             items: cart,
@@ -353,34 +365,73 @@ if ($.fn.owlCarousel) {
         saveOrders(orders);
         localStorage.setItem("farcimenDemoLastOrder", JSON.stringify(order));
         saveCart([]);
-        openModal("Order Placed", '<p class="farcimen-demo-muted">Demo order <strong>' + order.id + '</strong> has been created locally.</p><p class="farcimen-demo-muted">Total: <strong>' + money(order.total) + '</strong></p>');
+        openModal("訂單已建立", '<p class="farcimen-demo-muted">示範訂單 <strong>' + order.id + '</strong> 已儲存在此瀏覽器。</p><p class="farcimen-demo-muted">合計：<strong>' + money(order.total) + '</strong></p>');
     }
 
     function showAccount() {
         var bookings = getBookings();
         var lastOrder = localStorage.getItem("farcimenDemoLastOrder");
-        var orderText = lastOrder ? JSON.parse(lastOrder).id : "No demo order yet";
-        openModal("Demo Account", '<p class="farcimen-demo-muted">Demo account: Guest Customer</p><p><strong>Last order:</strong> ' + orderText + '</p><p><strong>Saved bookings:</strong> ' + bookings.length + '</p><a class="farcimen-demo-btn" href="customer-dashboard.html" style="display:inline-block;margin-right:8px;">Customer Dashboard</a><button class="farcimen-demo-btn" data-demo-scroll-book>Book a Table</button>');
+        var orderText = lastOrder ? JSON.parse(lastOrder).id : "目前沒有示範訂單";
+        openModal("示範會員", '<p class="farcimen-demo-muted">示範帳號：訪客顧客</p><p><strong>最近訂單：</strong>' + orderText + '</p><p><strong>已儲存訂位：</strong>' + bookings.length + '</p><a class="farcimen-demo-btn" href="customer-dashboard.html" style="display:inline-block;margin-right:8px;">會員中心</a><button class="farcimen-demo-btn" data-demo-scroll-book>預約訂位</button>');
     }
 
     function scrollToSection(selector) {
         var section = document.querySelector(selector);
-        if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
+        if (!section) return;
+        if (selector === "#home" || section.id === "home") {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            return;
+        }
+        var header = document.querySelector(".header_section");
+        var headerHeight = header ? header.getBoundingClientRect().height : 0;
+        var extraGap = window.innerWidth < 768 ? 12 : 18;
+        var targetTop = section.getBoundingClientRect().top + window.pageYOffset - headerHeight - extraGap;
+        window.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
+    }
+
+    function connectPageAnchors() {
+        document.querySelectorAll('.custom_nav-container .nav-link[href^="#"]').forEach(function (link) {
+            link.addEventListener("click", function (event) {
+                var href = link.getAttribute("href");
+                var target = href ? document.querySelector(href) : null;
+                if (!target) return;
+                event.preventDefault();
+                document.querySelectorAll(".custom_nav-container .nav-item").forEach(function (item) {
+                    item.classList.remove("active");
+                });
+                var navItem = link.closest(".nav-item");
+                if (navItem) navItem.classList.add("active");
+                var navCollapse = document.getElementById("navbarSupportedContent");
+                if (navCollapse && navCollapse.classList.contains("show") && window.jQuery) {
+                    $(navCollapse).collapse("hide");
+                    window.setTimeout(function () {
+                        scrollToSection(href);
+                    }, 240);
+                } else {
+                    scrollToSection(href);
+                }
+            });
+        });
+        if (window.location.hash && document.querySelector(window.location.hash)) {
+            window.setTimeout(function () {
+                scrollToSection(window.location.hash);
+            }, 120);
+        }
     }
 
     function searchMenu() {
-        var query = window.prompt("Search menu items");
+        var query = window.prompt("搜尋菜單品項");
         if (query === null) return;
         query = query.trim().toLowerCase();
         var items = Array.prototype.slice.call(document.querySelectorAll(".food_section .grid .all"));
         if (!items.length) {
-            toast("Search is available on the menu page.");
+            toast("請到菜單頁使用搜尋功能。");
             return;
         }
         if (!query) {
             items.forEach(function (item) { item.style.display = ""; });
             if (window.jQuery && $(".grid").data("isotope")) $(".grid").isotope("layout");
-            toast("Showing all menu items.");
+            toast("已顯示全部菜單品項。");
             return;
         }
         var matches = 0;
@@ -390,7 +441,7 @@ if ($.fn.owlCarousel) {
             if (matched) matches += 1;
         });
         scrollToSection(".food_section");
-        toast(matches + " item(s) found.");
+        toast("找到 " + matches + " 個品項。");
     }
 
     function filterMenuItems(filter) {
@@ -443,7 +494,7 @@ if ($.fn.owlCarousel) {
                 createdAt: new Date().toISOString()
             };
             if (!booking.name || !booking.phone || !booking.email || !booking.date) {
-                toast("Please complete the booking form.");
+                toast("請完整填寫訂位資料。");
                 return;
             }
             var bookings = getBookings();
@@ -455,7 +506,7 @@ if ($.fn.owlCarousel) {
                 message.className = "farcimen-form-message";
                 form.appendChild(message);
             }
-            message.textContent = "Booking saved locally. We will contact you soon.";
+            message.textContent = "訂位資料已儲存在此瀏覽器，我們會盡快與您聯繫。";
             form.reset();
             if ($.fn.niceSelect) $("select").niceSelect("update");
         });
@@ -464,6 +515,7 @@ if ($.fn.owlCarousel) {
     document.addEventListener("DOMContentLoaded", function () {
         ensureDemoStyles();
         renderCartCount();
+        connectPageAnchors();
         connectMenuFilters();
         connectContactLinks();
         handleBookingForm();
@@ -520,29 +572,29 @@ if ($.fn.owlCarousel) {
                 return;
             }
 
-            if (link && link.textContent.trim().toLowerCase() === "view more") {
+            if (link && (link.textContent.trim().toLowerCase() === "view more" || link.textContent.trim() === "查看更多")) {
                 event.preventDefault();
                 scrollToSection(".food_section");
-                toast("All menu items are shown in this demo.");
+                toast("此示範頁已顯示全部菜單品項。");
                 return;
             }
 
-            if (link && link.textContent.trim().toLowerCase() === "read more") {
+            if (link && (link.textContent.trim().toLowerCase() === "read more" || link.textContent.trim() === "了解更多")) {
                 event.preventDefault();
                 scrollToSection(".about_section");
-                toast("This demo keeps the full story on the same page.");
+                toast("完整介紹已放在同一頁。");
                 return;
             }
 
             if (link && link.getAttribute("href") === "#social-demo") {
                 event.preventDefault();
-                toast("Social link placeholder for demo.");
+                toast("這是社群連結的示範占位。");
                 return;
             }
 
             if (link && link.getAttribute("href") === "") {
                 event.preventDefault();
-                toast("Demo link connected.");
+                toast("此連結為示範互動。");
                 return;
             }
 
