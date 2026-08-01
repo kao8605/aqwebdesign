@@ -5319,6 +5319,10 @@ img.u-pull-left {
 
 /* Mobile full-width corrections */
 @media screen and (max-width: 600px) {
+    :root {
+        --mobile-edge-space: 1.6rem;
+    }
+
     html,
     body {
         width: 100%;
@@ -5337,8 +5341,8 @@ img.u-pull-left {
     }
 
     .row {
-        width: calc(100% - (var(--gutter) * 2));
-        max-width: calc(100% - (var(--gutter) * 2));
+        width: calc(100% - (var(--mobile-edge-space) * 2));
+        max-width: calc(100% - (var(--mobile-edge-space) * 2));
         margin-left: auto;
         margin-right: auto;
         padding-left: 0;
@@ -5347,8 +5351,8 @@ img.u-pull-left {
     }
 
     .s-intro__content {
-        width: calc(100% - (var(--gutter) * 2));
-        max-width: calc(100% - (var(--gutter) * 2));
+        width: calc(100% - (var(--mobile-edge-space) * 2));
+        max-width: calc(100% - (var(--mobile-edge-space) * 2));
         padding-left: 0;
         padding-right: 0;
     }
