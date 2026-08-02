@@ -15,6 +15,36 @@
     };
 
 
+
+   /* reset scroll position on refresh
+    * -------------------------------------------------- */
+    const ssResetScrollPosition = function() {
+
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+
+        const resetToHero = function() {
+            if (window.location.hash) {
+                history.replaceState(null, '', window.location.pathname + window.location.search);
+            }
+            window.scrollTo(0, 0);
+        };
+
+        resetToHero();
+        window.addEventListener('pageshow', function() {
+            resetToHero();
+            setTimeout(resetToHero, 50);
+            setTimeout(resetToHero, 250);
+        });
+        window.addEventListener('load', function() {
+            resetToHero();
+            setTimeout(resetToHero, 50);
+            setTimeout(resetToHero, 250);
+        });
+
+    };
+
    /* preloader
     * -------------------------------------------------- */
     const ssPreloader = function() {
@@ -70,11 +100,9 @@
         setTimeout(function(){
             triggerHeight = hero.offsetHeight - 170;
         }, 300);
-
         window.addEventListener('scroll', function () {
 
             let loc = window.scrollY;
-
             if (loc > triggerHeight) {
                 hdr.classList.add('sticky');
             } else {
@@ -606,6 +634,7 @@
     * ------------------------------------------------------ */
     (function ssInit() {
 
+        ssResetScrollPosition();
         ssPreloader();
         ssMoveHeader();
         ssMobileMenu();

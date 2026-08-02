@@ -3203,6 +3203,18 @@ img.u-pull-left {
         top          : var(--vspace-0_5);
     }
 
+    .s-header.sticky,
+    .s-header.sticky.offset,
+    .s-header.sticky.scrolling {
+        opacity          : 1;
+        visibility       : visible;
+        transform        : translateY(0);
+        background-color : var(--color-gray-19);
+        position         : fixed;
+        top              : 0;
+        left             : 0;
+    }
+
     .s-header__inner {
         max-width : none;
         width     : 100%;
