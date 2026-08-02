@@ -2497,7 +2497,7 @@ footer {
 }
 .account-dashboard {
   display: none;
-  padding: 26px 0 82px;
+  padding: 0 0 82px;
 }
 .account-dashboard .container {
   max-width: 1360px;
@@ -2844,6 +2844,7 @@ footer {
 }
 .account-main {
   min-width: 0;
+  padding-top: 0;
 }
 .account-page.active {
   animation: accountPageIn 0.24s ease both;
@@ -3118,7 +3119,7 @@ footer {
     min-height: 46px;
   }
   .account-dashboard {
-    padding: 14px 0 64px;
+    padding: 0 0 64px;
   }
   .account-dashboard .container {
     position: relative;
