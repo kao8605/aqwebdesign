@@ -3028,10 +3028,11 @@ footer {
   .account-nav {
     width: 100%;
     min-height: 78px;
-    padding-top: 12px;
-    padding-bottom: 12px;
+    padding: 12px 18px;
     align-items: center;
     justify-content: space-between;
+    flex-direction: row;
+    gap: 16px;
   }
   .account-nav-brand {
     align-items: center;
