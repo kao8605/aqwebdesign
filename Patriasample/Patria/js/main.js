@@ -792,6 +792,18 @@ function setAccountMenuOpen(open) {
     if (accountSide) accountSide.classList.toggle("open", open);
 }
 
+function setAccountHash() {
+    if (window.location.hash !== "#account") {
+        window.history.replaceState(null, "", "#account");
+    }
+}
+
+function clearAccountHash() {
+    if (window.location.hash === "#account") {
+        window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    }
+}
+
 if (accountOv && accountOpen && accountClose) {
     accountOpen.addEventListener("click", function(e) {
         e.preventDefault();
@@ -802,6 +814,7 @@ if (accountOv && accountOpen && accountClose) {
         }
         accountOv.classList.add("open");
         document.body.style.overflow = "hidden";
+        setAccountHash();
     });
 
     accountClose.addEventListener("click", closeAccount);
@@ -862,6 +875,7 @@ function setAccountPage(page) {
 
 function showAccountDashboard(page) {
     isLoggedIn = true;
+    setAccountHash();
     accountOv.classList.add("dashboard-mode");
     var hero = accountOv.querySelector(".account-hero");
     var panel = accountOv.querySelector(".account-panel");
@@ -878,7 +892,14 @@ function closeAccount() {
     accountOv.classList.remove("open");
     document.body.style.overflow = "";
     setAccountMenuOpen(false);
+    clearAccountHash();
     stopAccountOrdersPolling();
+}
+
+if (accountOv && window.location.hash === "#account") {
+    accountOv.classList.add("open");
+    document.body.style.overflow = "hidden";
+    showAccountDashboard();
 }
 
 if (accountOv) {
