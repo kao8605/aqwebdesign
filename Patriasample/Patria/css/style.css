@@ -297,7 +297,43 @@ img {
     line-height: 1;
     text-align: center;
     vertical-align: middle;
-    position: static;
+    position: relative;
+  }
+
+  #navmenu #navSearchBtn::before,
+  #navmenu #adminOpen::before,
+  #navmenu #accountOpen::before,
+  #navmenu #orderOpen::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 8px);
+    z-index: 5;
+    min-width: max-content;
+    padding: 5px 9px;
+    border-radius: 7px;
+    background: rgba(27, 13, 5, 0.92);
+    color: #fff;
+    font-size: 0.74rem;
+    font-weight: 800;
+    line-height: 1.2;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-50%) translateY(4px);
+    transition: opacity 0.16s ease, transform 0.16s ease;
+    white-space: nowrap;
+  }
+
+  #navmenu #navSearchBtn:hover::before,
+  #navmenu #navSearchBtn:focus-visible::before,
+  #navmenu #adminOpen:hover::before,
+  #navmenu #adminOpen:focus-visible::before,
+  #navmenu #accountOpen:hover::before,
+  #navmenu #accountOpen:focus-visible::before,
+  #navmenu #orderOpen:hover::before,
+  #navmenu #orderOpen:focus-visible::before {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
   }
 
   #navmenu #adminOpen::after,
