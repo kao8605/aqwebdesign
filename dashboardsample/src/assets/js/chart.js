@@ -6,7 +6,6 @@ import ApexCharts from 'apexcharts';
 
 document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('salesPurchaseChart')) {
-      const API_BASE = window.location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const rangeSelect = document.querySelector('[data-sales-purchase-range]');
       const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -76,10 +75,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       async function loadOrders() {
-        const response = await fetch(API_BASE + '/api/admin/orders');
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Cannot load customer orders.');
-        return data.orders || [];
+        try {
+          return JSON.parse(localStorage.getItem('patriaSampleOrders')) || [];
+        } catch (error) {
+          return [];
+        }
       }
 
       function salesPurchaseOptions(data) {
@@ -217,7 +217,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
       if (document.getElementById('customerChart')) {
-    const API_BASE = window.location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
     const customerRange = document.querySelector('[data-customer-range]');
 
     function customerCutoff(range) {
@@ -259,10 +258,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function loadCustomerOrders() {
-      const response = await fetch(API_BASE + '/api/admin/orders');
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Cannot load customer orders.');
-      return data.orders || [];
+      try {
+        return JSON.parse(localStorage.getItem('patriaSampleOrders')) || [];
+      } catch (error) {
+        return [];
+      }
     }
 
     var options = {
@@ -371,7 +371,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
    if (document.getElementById('salesChart')) {
-    const API_BASE = window.location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
     const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     let salesThisYear = Array(12).fill(0);
     let salesLastYear = Array(12).fill(0);
@@ -394,10 +393,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function loadReportOrders() {
-      const response = await fetch(API_BASE + '/api/admin/orders');
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Cannot load customer orders.');
-      return data.orders || [];
+      try {
+        return JSON.parse(localStorage.getItem('patriaSampleOrders')) || [];
+      } catch (error) {
+        return [];
+      }
     }
 
     const options = {

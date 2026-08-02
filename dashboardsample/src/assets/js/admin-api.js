@@ -1,18 +1,187 @@
-const API_BASE = import.meta.env.VITE_PATRIA_API_BASE || (window.location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
-const STATIC_BASE = import.meta.env.VITE_PATRIA_STATIC_BASE || 'http://127.0.0.1:8080';
+const STATIC_BASE = '../../Patriasample/Patria';
+const SAMPLE_PRODUCTS_KEY = 'patriaSampleProducts';
+const SAMPLE_ORDERS_KEY = 'patriaSampleOrders';
+const SAMPLE_USERS_KEY = 'patriaSampleUsers';
+const SAMPLE_ENGAGEMENT_KEY = 'patriaSampleEngagement';
 let latestAdminOrders = [];
 let latestInventoryProducts = [];
 let inventoryPage = 1;
 const INVENTORY_PAGE_SIZE = 10;
 
+const SAMPLE_DEFAULT_PRODUCTS = [
+  { id: 'chicken-rice-lunch-set', title: 'Chicken Rice Lunch Set', cat: 'RICE', day: '5', price: '$13.99', priceValue: 13.99, quantity: 24, img: 'img/QuickMeals/1.webp', desc: 'A quick lunch set with steamed rice, saucy chicken, broccoli, baby corn, mushrooms and cabbage.' },
+  { id: 'chicken-noodle-lunch-set', title: 'Chicken Noodle Lunch Set', cat: 'NOODLES', day: '5', price: '$11.99', priceValue: 11.99, quantity: 28, img: 'img/QuickMeals/2.webp', desc: 'A fast lunch set with stir-fried noodles, chicken, broccoli, peppers, onions and shiitake mushrooms.' },
+  { id: 'chicken-fried-rice-set', title: 'Chicken Fried Rice Set', cat: 'RICE', day: '5', price: '$12.99', priceValue: 12.99, quantity: 22, img: 'img/QuickMeals/3.webp', desc: 'A satisfying fried rice lunch set with egg, peas, carrots, scallions, chicken and broccoli.' },
+  { id: 'seafood-fried-noodles', title: 'Seafood Fried Noodles', cat: 'NOODLES', day: '5', price: '$14.99', priceValue: 14.99, quantity: 18, img: 'img/menu/1.webp', desc: 'Wok-tossed noodles with shrimp, char siu, greens and house soy sauce.' },
+  { id: 'crispy-spring-rolls', title: 'Crispy Spring Rolls', cat: 'DIM SUM', day: '5', price: '$9.99', priceValue: 9.99, quantity: 8, img: 'img/menu/2.webp', desc: 'Golden rolls filled with vegetables, glass noodles and sweet chili sauce.' },
+  { id: 'steamed-pork-dumplings', title: 'Steamed Pork Dumplings', cat: 'DIM SUM', day: '5', price: '$12.99', priceValue: 12.99, quantity: 16, img: 'img/menu/3.webp', desc: 'Handmade dumplings with pork, scallions and chili soy dipping sauce.' },
+  { id: 'bbq-pork-dim-sum-platter', title: 'BBQ Pork Dim Sum Platter', cat: 'DIM SUM', day: '5', price: '$16.99', priceValue: 16.99, quantity: 13, img: 'img/menu/4.webp', desc: 'Glazed barbecue pork, braised pork belly, ribs and Cantonese aromatics.' },
+  { id: 'house-egg-fried-rice', title: 'House Egg Fried Rice', cat: 'RICE', day: '5', price: '$11.99', priceValue: 11.99, quantity: 20, img: 'img/menu/5.webp', desc: 'Wok-fried rice with egg, vegetables, scallions and roast pork.' },
+  { id: 'herbal-chicken-soup', title: 'Herbal Chicken Soup', cat: 'SOUP', day: '5', price: '$13.99', priceValue: 13.99, quantity: 9, img: 'img/menu/6.webp', desc: 'Slow-simmered chicken soup with mushrooms, red dates and goji berries.' },
+  { id: 'pork-dumpling-basket', title: 'Pork Dumpling Basket', cat: 'DIM SUM', day: '5', price: '$10.99', priceValue: 10.99, quantity: 15, img: 'img/menu/31.webp', desc: 'A bamboo basket of juicy pork dumplings made for sharing.' },
+  { id: 'yangzhou-fried-rice', title: 'Yangzhou Fried Rice', cat: 'RICE', day: '5', price: '$12.99', priceValue: 12.99, quantity: 19, img: 'img/menu/51.webp', desc: 'Classic fried rice with egg, roast pork, shrimp and scallions.' },
+  { id: 'wonton-noodle-soup', title: 'Wonton Noodle Soup', cat: 'SOUP', day: '5', price: '$12.99', priceValue: 12.99, quantity: 12, img: 'img/menu/61.webp', desc: 'Springy noodles, wontons and clear broth for a comforting bowl.' }
+];
+
+function sampleRead(key, fallback) {
+  try {
+    const value = JSON.parse(localStorage.getItem(key));
+    return value || fallback;
+  } catch (error) {
+    return fallback;
+  }
+}
+
+function sampleWrite(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+
+function sampleSlug(text) {
+  return String(text || 'product').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'product';
+}
+
+function normalizeProduct(product, index = 0) {
+  const priceValue = Number(product.priceValue || String(product.price || '').replace(/[^0-9.]/g, '') || 0);
+  return {
+    ...product,
+    id: product.id || sampleSlug(product.title || 'product-' + (index + 1)),
+    title: product.title || 'Untitled product',
+    cat: product.cat || product.category || 'NOODLES',
+    day: product.day || '5',
+    price: product.price || money(priceValue),
+    priceValue,
+    quantity: Number.isFinite(Number(product.quantity)) ? Number(product.quantity) : 10,
+    img: product.img || product.image || 'img/menu/1.webp',
+    desc: product.desc || product.description || ''
+  };
+}
+
+function sampleProducts() {
+  const stored = sampleRead(SAMPLE_PRODUCTS_KEY, null);
+  if (Array.isArray(stored) && stored.length) return stored.map(normalizeProduct);
+  const seeded = SAMPLE_DEFAULT_PRODUCTS.map(normalizeProduct);
+  sampleWrite(SAMPLE_PRODUCTS_KEY, seeded);
+  return seeded;
+}
+
+function saveSampleProducts(products) {
+  const normalized = products.map(normalizeProduct);
+  sampleWrite(SAMPLE_PRODUCTS_KEY, normalized);
+  return normalized;
+}
+
+function sampleOrders() {
+  return sampleRead(SAMPLE_ORDERS_KEY, []);
+}
+
+function saveSampleOrders(orders) {
+  sampleWrite(SAMPLE_ORDERS_KEY, orders);
+}
+
+function sampleUsers() {
+  return sampleRead(SAMPLE_USERS_KEY, []);
+}
+
+function sampleEngagement() {
+  return sampleRead(SAMPLE_ENGAGEMENT_KEY, { reservations: [], messages: [], subscribers: [], searches: [] });
+}
+
+function sampleCustomers() {
+  const orders = sampleOrders();
+  return sampleUsers().map(user => ({
+    ...user,
+    orderCount: orders.filter(order => order.userId === user.id).length
+  }));
+}
+
+function sampleSummary() {
+  const orders = sampleOrders();
+  const users = sampleCustomers();
+  const completed = orders.filter(order => ['completed', 'picked_up'].includes(String(order.status || '').toLowerCase()));
+  const pending = orders.filter(order => !['completed', 'picked_up', 'cancelled'].includes(String(order.status || '').toLowerCase()));
+  const totalSales = orders.reduce((sum, order) => sum + Number(order.total || 0), 0);
+  return {
+    totalSales,
+    completedSales: completed.reduce((sum, order) => sum + Number(order.total || 0), 0),
+    pendingSales: pending.reduce((sum, order) => sum + Number(order.total || 0), 0),
+    itemCount: orders.reduce((sum, order) => sum + (order.items || []).reduce((itemSum, item) => itemSum + Number(item.qty || 0), 0), 0),
+    orderCount: orders.length,
+    completedOrderCount: completed.length,
+    customerCount: users.length,
+    customersWithOrders: users.filter(user => user.orderCount > 0).length,
+    customersWithAddresses: users.filter(user => user.address && user.address.address).length
+  };
+}
+
+function sampleNotifications() {
+  const orderNotes = sampleOrders().slice(-5).reverse().map(order => ({
+    type: 'order',
+    title: 'New order #' + order.id,
+    message: (order.customer && order.customer.name ? order.customer.name : 'Guest customer') + ' placed an order for ' + money(order.total) + '.',
+    time: order.createdAt
+  }));
+  const userNotes = sampleUsers().slice(-3).reverse().map(user => ({
+    type: 'user',
+    title: 'Customer account',
+    message: (user.name || 'Customer') + ' updated account data.',
+    time: user.updatedAt || user.createdAt || new Date().toISOString()
+  }));
+  return [...orderNotes, ...userNotes].slice(0, 6);
+}
+
+function sampleBody(options) {
+  if (!options || !options.body) return {};
+  if (typeof options.body !== 'string') return options.body;
+  try {
+    return JSON.parse(options.body);
+  } catch (error) {
+    return {};
+  }
+}
+
 async function api(path, options = {}) {
-  const headers = { ...(options.headers || {}) };
-  const token = localStorage.getItem('patriaAuthToken');
-  if (token) headers.Authorization = 'Bearer ' + token;
-  const response = await fetch(API_BASE + path, { ...options, headers });
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error || 'API request failed.');
-  return data;
+  const method = String(options.method || 'GET').toUpperCase();
+  const body = sampleBody(options);
+
+  if (method === 'GET' && path === '/api/products') return { products: sampleProducts() };
+  if (method === 'GET' && path === '/api/admin/orders') return { orders: sampleOrders() };
+  if (method === 'GET' && path === '/api/admin/customers') return { customers: sampleCustomers() };
+  if (method === 'GET' && path === '/api/admin/engagement') return sampleEngagement();
+  if (method === 'GET' && path === '/api/admin/summary') return { summary: sampleSummary(), notifications: sampleNotifications() };
+
+  if (method === 'PATCH' && path === '/api/admin/orders/status') {
+    const orders = sampleOrders();
+    const updated = orders.map(order => order.id === body.orderId ? { ...order, status: body.status, updatedAt: new Date().toISOString() } : order);
+    saveSampleOrders(updated);
+    return { order: updated.find(order => order.id === body.orderId) };
+  }
+
+  if (method === 'POST' && path === '/api/admin/products') {
+    const products = sampleProducts();
+    const product = normalizeProduct({
+      ...body,
+      id: body.id || sampleSlug(body.title) + '-' + Date.now().toString(36),
+      price: body.price || money(body.priceValue),
+      source: 'admin'
+    }, products.length);
+    const saved = saveSampleProducts([...products, product]);
+    return { product: saved[saved.length - 1], products: saved };
+  }
+
+  if (method === 'PATCH' && path === '/api/admin/products') {
+    const products = sampleProducts();
+    const updated = products.map(product => product.id === body.id ? normalizeProduct({ ...product, ...body, price: body.price || money(body.priceValue) }) : product);
+    saveSampleProducts(updated);
+    return { product: updated.find(product => product.id === body.id), products: updated };
+  }
+
+  if (method === 'DELETE' && path === '/api/admin/products') {
+    const products = sampleProducts().filter(product => product.id !== body.id);
+    saveSampleProducts(products);
+    return { ok: true, products };
+  }
+
+  return { ok: true };
 }
 
 function money(value) {
@@ -22,7 +191,10 @@ function money(value) {
 function productImage(src) {
   if (!src) return './assets/images/product-1.webp';
   if (/^https?:\/\//.test(src)) return src;
-  return STATIC_BASE.replace(/\/$/, '') + '/' + String(src).replace(/^\.\//, '').replace(/^\//, '');
+  const clean = String(src).replace(/^\.\//, '').replace(/^\//, '');
+  if (clean.startsWith('assets/')) return './' + clean;
+  if (clean.startsWith('img/')) return STATIC_BASE.replace(/\/$/, '') + '/' + clean;
+  return clean;
 }
 
 function setText(selector, value) {
@@ -723,10 +895,10 @@ export async function loadAdminDashboard() {
     renderRecentOrders(orders);
     renderAdminSummary(summary);
     renderAdminNotifications(notifications);
-    setText('[data-admin-status]', orders.length ? 'Connected to Patria customer orders.' : 'Connected to Patria backend. Waiting for customer orders.');
+    setText('[data-admin-status]', orders.length ? '已連接 Patria sample 訂單。' : '純前端 sample 後台已就緒，等待前台訂單。');
   } catch (error) {
     console.error(error);
-    setText('[data-admin-status]', 'Cannot connect to Patria backend.');
+    setText('[data-admin-status]', '純前端 sample 資料讀取失敗。');
   }
 }
 
@@ -739,7 +911,7 @@ export async function loadInventory() {
   } catch (error) {
     console.error(error);
     const tbody = document.querySelector('[data-admin-table="inventory"]');
-    if (tbody) tbody.innerHTML = '<tr><td colspan="8" class="text-secondary">Cannot connect to Patria backend.</td></tr>';
+    if (tbody) tbody.innerHTML = '<tr><td colspan="8" class="text-secondary">純前端 sample 資料讀取失敗。</td></tr>';
   }
 }
 
@@ -789,12 +961,12 @@ export async function loadAdminReports() {
     console.error(error);
     setText('[data-report-stat="revenue"]', 'Offline');
     const tbody = document.querySelector('[data-report-table="orders"]');
-    if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="text-secondary">Cannot connect to Patria backend.</td></tr>';
+    if (tbody) tbody.innerHTML = '<tr><td colspan="6" class="text-secondary">純前端 sample 資料讀取失敗。</td></tr>';
     const addressesTable = document.querySelector('[data-report-table="addresses"]');
-    if (addressesTable) addressesTable.innerHTML = '<tr><td colspan="5" class="text-secondary">Cannot connect to Patria backend.</td></tr>';
+    if (addressesTable) addressesTable.innerHTML = '<tr><td colspan="5" class="text-secondary">純前端 sample 資料讀取失敗。</td></tr>';
     document.querySelectorAll('[data-engagement-table]').forEach(table => {
       const cols = table.getAttribute('data-engagement-table') === 'reservations' ? 7 : (table.getAttribute('data-engagement-table') === 'messages' ? 6 : 3);
-      table.innerHTML = '<tr><td colspan="' + cols + '" class="text-secondary">Cannot connect to Patria backend.</td></tr>';
+      table.innerHTML = '<tr><td colspan="' + cols + '" class="text-secondary">純前端 sample 資料讀取失敗。</td></tr>';
     });
   }
 }

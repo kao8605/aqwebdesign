@@ -55,7 +55,7 @@ var adminOpen = document.getElementById("adminOpen");
 if (adminOpen) {
     adminOpen.addEventListener("click", function(e) {
         e.preventDefault();
-        var target = adminOpen.getAttribute("data-admin-url") || adminOpen.getAttribute("href") || "../../dashboard/src/signin.html";
+        var target = adminOpen.getAttribute("data-admin-url") || adminOpen.getAttribute("href") || "../../dashboardsample/dist/signin.html";
         window.location.href = new URL(target, window.location.href).href;
     });
 }
@@ -102,6 +102,7 @@ var DEMO_TOKENS_KEY = "patriaSampleTokens";
 var DEMO_CARTS_KEY = "patriaSampleCarts";
 var DEMO_ORDERS_KEY = "patriaSampleOrders";
 var DEMO_ENGAGEMENT_KEY = "patriaSampleEngagement";
+var DEMO_PRODUCTS_KEY = "patriaSampleProducts";
 
 function demoRead(key, fallback) {
     try {
@@ -160,6 +161,19 @@ function demoProductsFromPage() {
             day: "5"
         });
     });
+    var storedProducts = demoRead(DEMO_PRODUCTS_KEY, []);
+    if (storedProducts.length) {
+        var seen = {};
+        storedProducts.forEach(function(product) {
+            if (product.id) seen[product.id] = true;
+        });
+        products.forEach(function(product) {
+            if (!seen[product.id]) storedProducts.push(product);
+        });
+        demoWrite(DEMO_PRODUCTS_KEY, storedProducts);
+        return storedProducts;
+    }
+    demoWrite(DEMO_PRODUCTS_KEY, products);
     return products;
 }
 
