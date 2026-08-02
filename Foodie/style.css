@@ -882,12 +882,14 @@ h1,h2,h3,h4,h5,h6 {
 }
 
 .foodie-header-icons a[data-tooltip],
-.cart button[data-tooltip] {
+.cart button[data-tooltip],
+.mobile-menu-icons a[data-tooltip] {
   position: relative;
 }
 
 .foodie-header-icons a[data-tooltip]::before,
-.cart button[data-tooltip]::before {
+.cart button[data-tooltip]::before,
+.mobile-menu-icons a[data-tooltip]::before {
   content: attr(data-tooltip);
   position: absolute;
   left: 50%;
@@ -911,7 +913,9 @@ h1,h2,h3,h4,h5,h6 {
 .foodie-header-icons a[data-tooltip]:hover::before,
 .foodie-header-icons a[data-tooltip]:focus-visible::before,
 .cart button[data-tooltip]:hover::before,
-.cart button[data-tooltip]:focus-visible::before {
+.cart button[data-tooltip]:focus-visible::before,
+.mobile-menu-icons a[data-tooltip]:hover::before,
+.mobile-menu-icons a[data-tooltip]:focus-visible::before {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
