@@ -3025,6 +3025,21 @@ footer {
   padding-inline: 28px;
 }
 @media (max-width: 991px) {
+  .account-nav {
+    min-height: 78px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    align-items: center;
+  }
+  .account-nav-brand {
+    align-items: center;
+    line-height: 1;
+  }
+  .account-nav-brand > span:last-child {
+    display: inline-flex;
+    align-items: center;
+    min-height: 46px;
+  }
   .account-dashboard {
     padding: 34px 0 70px;
   }
