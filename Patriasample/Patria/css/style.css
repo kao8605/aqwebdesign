@@ -165,6 +165,7 @@ img {
 #adminOpen,
 #accountOpen,
 #orderOpen {
+  position: relative;
   background: none;
   border: none;
   cursor: pointer;
@@ -182,9 +183,45 @@ img {
   justify-content: center;
 }
 #navSearchBtn:hover,
-#adminOpen:hover {
+#adminOpen:hover,
+#accountOpen:hover,
+#orderOpen:hover {
   background: rgba(232, 40, 26, 0.08);
   color: var(--primary);
+}
+#navSearchBtn::before,
+#adminOpen::before,
+#accountOpen::before,
+#orderOpen::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 10px);
+  z-index: 20;
+  min-width: max-content;
+  padding: 5px 9px;
+  border-radius: 7px;
+  background: rgba(27, 13, 5, 0.92);
+  color: #fff;
+  font-size: 0.74rem;
+  font-weight: 800;
+  line-height: 1.2;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(4px);
+  transition: opacity 0.16s ease, transform 0.16s ease;
+  white-space: nowrap;
+}
+#navSearchBtn:hover::before,
+#navSearchBtn:focus-visible::before,
+#adminOpen:hover::before,
+#adminOpen:focus-visible::before,
+#accountOpen:hover::before,
+#accountOpen:focus-visible::before,
+#orderOpen:hover::before,
+#orderOpen:focus-visible::before {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
 .nav-cta {
   background: linear-gradient(135deg, var(--primary), #c01e12);
