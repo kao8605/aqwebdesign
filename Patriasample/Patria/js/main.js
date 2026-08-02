@@ -55,7 +55,7 @@ var adminOpen = document.getElementById("adminOpen");
 if (adminOpen) {
     adminOpen.addEventListener("click", function(e) {
         e.preventDefault();
-        var target = adminOpen.getAttribute("data-admin-url") || adminOpen.getAttribute("href") || "../../dashboard/dist/signin.html";
+        var target = adminOpen.getAttribute("data-admin-url") || adminOpen.getAttribute("href") || "../../dashboard/src/signin.html";
         window.location.href = new URL(target, window.location.href).href;
     });
 }
