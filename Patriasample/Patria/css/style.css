@@ -2445,6 +2445,9 @@ footer {
   background: #fffdfa;
   box-shadow: 0 18px 40px rgba(58, 31, 20, 0.06);
 }
+.account-site-links {
+  display: none;
+}
 .account-side button {
   width: 100%;
   border: none;
@@ -3032,6 +3035,27 @@ footer {
   }
   .account-side.open {
     display: block;
+  }
+  .account-site-links {
+    display: grid;
+    gap: 6px;
+    padding: 0 0 14px;
+    margin: 0 0 12px;
+    border-bottom: 1px solid #efd7bb;
+  }
+  .account-site-links a {
+    display: flex;
+    align-items: center;
+    min-height: 46px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    color: #3a1f14;
+    font-weight: 800;
+    text-decoration: none;
+  }
+  .account-site-links a:hover {
+    background: #fff7ec;
+    color: var(--primary);
   }
   .account-side button {
     min-height: 50px;

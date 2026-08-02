@@ -818,6 +818,12 @@ if (accountOv && accountOpen && accountClose) {
         });
     });
 
+    accountOv.querySelectorAll(".account-site-links a").forEach(function(link) {
+        link.addEventListener("click", function() {
+            closeAccount();
+        });
+    });
+
     accountOv.addEventListener("click", function(e) {
         if (e.target === accountOv) closeAccount();
     });
