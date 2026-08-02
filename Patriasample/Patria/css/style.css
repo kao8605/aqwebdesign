@@ -3031,7 +3031,7 @@ footer {
   .account-dashboard .container {
     position: relative;
   }
-  .account-menu-toggle {
+  #accountOv.dashboard-mode .account-menu-toggle {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -3039,7 +3039,7 @@ footer {
     gap: 5px;
     width: 46px;
     height: 46px;
-    margin: 0 0 18px auto;
+    margin: 0 0 0 auto;
     border: 1px solid #efd7bb;
     border-radius: 12px;
     background: #fffdfa;
@@ -3062,13 +3062,15 @@ footer {
     transform: translateY(-7px) rotate(-45deg);
   }
   .account-side {
-    position: absolute;
-    top: 64px;
+    position: fixed;
+    top: 86px;
     right: 15px;
     left: 15px;
     z-index: 6;
     display: none;
     max-width: none;
+    max-height: calc(100vh - 108px);
+    overflow-y: auto;
     padding: 14px;
     box-shadow: 0 26px 80px rgba(58, 31, 20, 0.18);
   }
