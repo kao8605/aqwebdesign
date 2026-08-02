@@ -2514,7 +2514,7 @@ footer {
 }
 .account-site-links button {
   border: 1px solid #efd7bb;
-  justify-content: center;
+  justify-content: flex-start;
   color: var(--primary);
 }
 .account-side button {
@@ -3157,7 +3157,7 @@ footer {
   .account-site-links button {
     margin-top: 6px;
     border: 1px solid #efd7bb;
-    justify-content: center;
+    justify-content: flex-start;
     color: var(--primary);
   }
   .account-side button {
