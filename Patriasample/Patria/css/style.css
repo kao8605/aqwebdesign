@@ -2460,7 +2460,7 @@ footer {
 }
 .account-dashboard {
   display: none;
-  padding: 58px 0 92px;
+  padding: 26px 0 82px;
 }
 .account-dashboard .container {
   max-width: 1360px;
@@ -3041,7 +3041,7 @@ footer {
     min-height: 46px;
   }
   .account-dashboard {
-    padding: 34px 0 70px;
+    padding: 14px 0 64px;
   }
   .account-dashboard .container {
     position: relative;
