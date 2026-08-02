@@ -881,6 +881,41 @@ h1,h2,h3,h4,h5,h6 {
   display: inline-flex;
 }
 
+.foodie-header-icons a[data-tooltip],
+.cart button[data-tooltip] {
+  position: relative;
+}
+
+.foodie-header-icons a[data-tooltip]::before,
+.cart button[data-tooltip]::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 9px);
+  z-index: 30;
+  min-width: max-content;
+  padding: 5px 9px;
+  border-radius: 7px;
+  background: rgba(33, 37, 41, 0.92);
+  color: #fff;
+  font-size: 0.74rem;
+  font-weight: 800;
+  line-height: 1.2;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(4px);
+  transition: opacity 0.16s ease, transform 0.16s ease;
+  white-space: nowrap;
+}
+
+.foodie-header-icons a[data-tooltip]:hover::before,
+.foodie-header-icons a[data-tooltip]:focus-visible::before,
+.cart button[data-tooltip]:hover::before,
+.cart button[data-tooltip]:focus-visible::before {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
 .mobile-menu-icons {
   display: flex;
   justify-content: center;
