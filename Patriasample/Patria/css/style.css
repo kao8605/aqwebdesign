@@ -2485,7 +2485,37 @@ footer {
   box-shadow: 0 18px 40px rgba(58, 31, 20, 0.06);
 }
 .account-site-links {
-  display: none;
+  display: grid;
+  gap: 6px;
+  padding: 0 0 14px;
+  margin: 0 0 14px;
+  border-bottom: 1px solid #efd7bb;
+}
+.account-site-links a,
+.account-site-links button {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 46px;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #3a1f14;
+  font-weight: 800;
+  text-align: left;
+  text-decoration: none;
+}
+.account-site-links a:hover,
+.account-site-links button:hover {
+  background: #fff7ec;
+  color: var(--primary);
+}
+.account-site-links button {
+  border: 1px solid #efd7bb;
+  justify-content: center;
+  color: var(--primary);
 }
 .account-side button {
   width: 100%;
