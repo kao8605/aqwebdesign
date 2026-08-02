@@ -2549,11 +2549,6 @@ footer {
   background: #fff7ec;
   color: var(--primary);
 }
-.account-site-links button {
-  border: 1px solid #efd7bb;
-  justify-content: flex-start;
-  color: var(--primary);
-}
 .account-side button {
   width: 100%;
   border: none;
@@ -3189,12 +3184,6 @@ footer {
   .account-site-links a:hover,
   .account-site-links button:hover {
     background: #fff7ec;
-    color: var(--primary);
-  }
-  .account-site-links button {
-    margin-top: 6px;
-    border: 1px solid #efd7bb;
-    justify-content: flex-start;
     color: var(--primary);
   }
   .account-side button {
