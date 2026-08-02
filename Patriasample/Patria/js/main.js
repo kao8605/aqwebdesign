@@ -782,6 +782,15 @@ var accountOv = document.getElementById("accountOv");
 var accountOpen = document.getElementById("accountOpen");
 var accountClose = document.getElementById("accountClose");
 var accountDashboard = document.getElementById("accountDashboard");
+var accountMenuToggle = document.getElementById("accountMenuToggle");
+
+function setAccountMenuOpen(open) {
+    if (!accountDashboard || !accountMenuToggle) return;
+    var accountSide = accountDashboard.querySelector(".account-side");
+    accountMenuToggle.classList.toggle("open", open);
+    accountMenuToggle.setAttribute("aria-expanded", open ? "true" : "false");
+    if (accountSide) accountSide.classList.toggle("open", open);
+}
 
 if (accountOv && accountOpen && accountClose) {
     accountOpen.addEventListener("click", function(e) {
@@ -796,6 +805,12 @@ if (accountOv && accountOpen && accountClose) {
     });
 
     accountClose.addEventListener("click", closeAccount);
+
+    if (accountMenuToggle) {
+        accountMenuToggle.addEventListener("click", function() {
+            setAccountMenuOpen(!accountMenuToggle.classList.contains("open"));
+        });
+    }
 
     accountOv.querySelectorAll(".account-nav a").forEach(function(link) {
         link.addEventListener("click", function() {
@@ -824,6 +839,7 @@ function showAccountForm() {
 }
 
 function setAccountPage(page) {
+    setAccountMenuOpen(false);
     accountOv.querySelectorAll("[data-account-page]").forEach(function(btn) {
         btn.classList.toggle("active", btn.getAttribute("data-account-page") === page);
     });
@@ -848,6 +864,7 @@ function showAccountDashboard(page) {
 function closeAccount() {
     accountOv.classList.remove("open");
     document.body.style.overflow = "";
+    setAccountMenuOpen(false);
     stopAccountOrdersPolling();
 }
 

@@ -2426,6 +2426,9 @@ footer {
 .account-dashboard .container {
   max-width: 1360px;
 }
+.account-menu-toggle {
+  display: none;
+}
 .account-dashboard.open {
   display: block;
 }
@@ -2980,8 +2983,55 @@ footer {
   padding-inline: 28px;
 }
 @media (max-width: 991px) {
+  .account-dashboard {
+    padding: 34px 0 70px;
+  }
+  .account-dashboard .container {
+    position: relative;
+  }
+  .account-menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 5px;
+    width: 46px;
+    height: 46px;
+    margin: 0 0 18px auto;
+    border: 1px solid #efd7bb;
+    border-radius: 12px;
+    background: #fffdfa;
+    box-shadow: 0 14px 30px rgba(58, 31, 20, 0.08);
+  }
+  .account-menu-toggle span {
+    width: 21px;
+    height: 2px;
+    border-radius: 999px;
+    background: #3a1f14;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+  .account-menu-toggle.open span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+  .account-menu-toggle.open span:nth-child(2) {
+    opacity: 0;
+  }
+  .account-menu-toggle.open span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
   .account-side {
-    position: static;
+    position: absolute;
+    top: 64px;
+    right: 15px;
+    left: 15px;
+    z-index: 6;
+    display: none;
+    max-width: none;
+    padding: 14px;
+    box-shadow: 0 26px 80px rgba(58, 31, 20, 0.18);
+  }
+  .account-side.open {
+    display: block;
   }
   .account-side button {
     min-height: 50px;
