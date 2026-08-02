@@ -2559,6 +2559,17 @@ footer {
   font-weight: 700;
   text-align: center;
 }
+.account-side .account-site-links button {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 46px;
+  padding: 12px 14px;
+  border-bottom: 0;
+  border-radius: 10px;
+  font-weight: 800;
+  text-align: left;
+}
 .account-side button:last-child {
   border-bottom: none;
 }
