@@ -43,6 +43,37 @@
 		font-weight: 600;
 	}
 
+	.ef-icon-tooltip {
+		position: relative;
+	}
+
+	.ef-icon-tooltip::before {
+		content: attr(data-tooltip);
+		position: absolute;
+		left: 50%;
+		bottom: calc(100% + 9px);
+		z-index: 50;
+		min-width: max-content;
+		padding: 5px 9px;
+		border-radius: 7px;
+		background: rgba(31, 41, 55, 0.94);
+		color: #fff;
+		font-size: 0.74rem;
+		font-weight: 700;
+		line-height: 1.2;
+		opacity: 0;
+		pointer-events: none;
+		transform: translateX(-50%) translateY(4px);
+		transition: opacity 0.16s ease, transform 0.16s ease;
+		white-space: nowrap;
+	}
+
+	.ef-icon-tooltip:hover::before,
+	.ef-icon-tooltip:focus-visible::before {
+		opacity: 1;
+		transform: translateX(-50%) translateY(0);
+	}
+
 	@media (max-width: 640px) {
 		.ef-logo-text {
 			font-size: 1.35rem;
@@ -115,7 +146,7 @@
 					<div class="lg:w-1/5 text-end md:w-1/2 w-3/5">
 						<div class="flex gap-7 items-center justify-end">
 							<div>
-								<a href="javascript:void(0)" class="relative">
+								<a href="javascript:void(0)" class="relative ef-icon-tooltip" aria-label="收藏" title="收藏" data-tooltip="收藏">
 									<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-heart" width="24"
 										height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
 										stroke-linecap="round" stroke-linejoin="round">
@@ -130,7 +161,7 @@
 								</a>
 							</div>
 							<div>
-								<a href="javascript:void(0)" class="text-gray-600" data-bs-toggle="modal" data-bs-target="#userModal">
+								<a href="javascript:void(0)" class="text-gray-600 ef-icon-tooltip" data-bs-toggle="modal" data-bs-target="#userModal" aria-label="會員登入" title="會員登入" data-tooltip="會員登入">
 									<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="22"
 										height="22" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
 										stroke-linecap="round" stroke-linejoin="round">
@@ -141,8 +172,8 @@
 								</a>
 							</div>
 							<div>
-								<button type="button" class="text-gray-600 relative" data-bs-toggle="offcanvas"
-									data-bs-target="#offcanvasRight" role="button" aria-controls="offcanvasRight">
+								<button type="button" class="text-gray-600 relative ef-icon-tooltip" data-bs-toggle="offcanvas"
+									data-bs-target="#offcanvasRight" role="button" aria-controls="offcanvasRight" aria-label="購物車" title="購物車" data-tooltip="購物車">
 									<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-shopping-bag" width="24"
 										height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
 										stroke-linecap="round" stroke-linejoin="round">
@@ -160,8 +191,8 @@
 							</div>
 							<div class="lg:hidden leading-none">
 								<!-- Button -->
-								<button class="collapsed" type="button" data-bs-toggle="offcanvas" data-bs-target="#navbar-default"
-									aria-controls="navbar-default" aria-label="開啟選單">
+								<button class="collapsed ef-icon-tooltip" type="button" data-bs-toggle="offcanvas" data-bs-target="#navbar-default"
+									aria-controls="navbar-default" aria-label="開啟選單" title="選單" data-tooltip="選單">
 									<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-menu-2 text-gray-800"
 										width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none"
 										stroke-linecap="round" stroke-linejoin="round">
@@ -299,13 +330,13 @@
 									<a class="nav-link" href="#service-highlights" role="button">配送服務</a>
 								</li>
 								<li class="nav-item w-full lg:w-auto">
-									<a class="nav-link ef-account-link" href="./customer-dashboard.html" aria-label="帳戶" title="帳戶">
+									<a class="nav-link ef-account-link ef-icon-tooltip" href="./customer-dashboard.html" aria-label="帳戶" title="帳戶" data-tooltip="帳戶">
 										<i class="ti ti-user-circle text-md" aria-hidden="true"></i>
 										<span>帳戶</span>
 									</a>
 								</li>
 								<li class="nav-item w-full lg:w-auto">
-									<a class="nav-link" href="./staff-dashboard.html" aria-label="員工後台" title="員工後台">
+									<a class="nav-link ef-icon-tooltip" href="./staff-dashboard.html" aria-label="員工後台" title="員工後台" data-tooltip="員工後台">
 										<i class="ti ti-layout-dashboard text-md" aria-hidden="true"></i>
 										<span class="invisible hidden">員工後台</span>
 									</a>
