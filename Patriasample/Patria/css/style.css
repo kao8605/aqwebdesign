@@ -204,6 +204,87 @@ img {
   box-shadow: 0 8px 22px rgba(232, 40, 26, 0.4);
 }
 
+@media (max-width: 991px) {
+  #nav {
+    padding: 10px 0;
+  }
+
+  #nav .container {
+    align-items: center;
+  }
+
+  .navbar-toggler {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    margin-left: auto;
+    border-radius: 12px;
+    background: rgba(232, 40, 26, 0.08);
+    box-shadow: none !important;
+  }
+
+  .navbar-toggler:focus {
+    box-shadow: 0 0 0 3px rgba(232, 40, 26, 0.14) !important;
+  }
+
+  #navmenu {
+    flex-basis: 100%;
+    margin-top: 12px;
+    padding: 14px 16px 16px;
+    border: 1px solid rgba(27, 13, 5, 0.08);
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 20px 45px rgba(27, 13, 5, 0.12);
+  }
+
+  #navmenu .navbar-nav {
+    align-items: stretch;
+    gap: 2px;
+    width: 100%;
+    margin: 0 !important;
+  }
+
+  #navmenu .navbar-nav .nav-link {
+    display: block;
+    width: 100%;
+    padding: 12px 10px !important;
+    border-radius: 10px;
+    text-align: left;
+  }
+
+  #navmenu .navbar-nav .nav-link::after {
+    display: none;
+  }
+
+  #navmenu .navbar-nav .nav-link.active,
+  #navmenu .navbar-nav .nav-link:hover {
+    background: rgba(232, 40, 26, 0.08);
+    color: var(--primary) !important;
+  }
+
+  #navmenu .nav-actions {
+    justify-content: flex-start;
+    width: 100%;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(27, 13, 5, 0.08);
+    gap: 14px;
+  }
+
+  #navmenu #navSearchBtn,
+  #navmenu #adminOpen,
+  #navmenu #accountOpen,
+  #navmenu #orderOpen {
+    width: 42px;
+    height: 42px;
+    padding: 0 !important;
+    background: rgba(27, 13, 5, 0.04);
+  }
+}
+
 /* ===================== SECTION COMMONS ===================== */
 section {
   padding: 88px 0;
