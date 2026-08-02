@@ -3026,13 +3026,16 @@ footer {
 }
 @media (max-width: 991px) {
   .account-nav {
+    width: 100%;
     min-height: 78px;
     padding-top: 12px;
     padding-bottom: 12px;
     align-items: center;
+    justify-content: space-between;
   }
   .account-nav-brand {
     align-items: center;
+    flex: 0 1 auto;
     line-height: 1;
   }
   .account-nav-brand > span:last-child {
@@ -3050,6 +3053,7 @@ footer {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    flex: 0 0 46px;
     flex-direction: column;
     gap: 5px;
     width: 46px;
