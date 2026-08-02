@@ -398,7 +398,7 @@
 
             function openPortfolioModal(item) {
                 const image = item.querySelector('img');
-                activePortfolioLoginNotice = item.dataset.loginNotice || '';
+                activePortfolioLoginNotice = (item.dataset.loginNotice || '').replace(/\\n/g, '\n');
                 if (activePortfolioLoginNotice) {
                     alert(activePortfolioLoginNotice);
                 }
