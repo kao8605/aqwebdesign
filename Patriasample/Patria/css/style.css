@@ -266,6 +266,8 @@ img {
   }
 
   #navmenu .nav-actions {
+    display: flex !important;
+    align-items: center !important;
     justify-content: flex-start;
     width: 100%;
     margin-top: 12px;
@@ -278,10 +280,39 @@ img {
   #navmenu #adminOpen,
   #navmenu #accountOpen,
   #navmenu #orderOpen {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 42px;
     width: 42px;
     height: 42px;
+    min-width: 42px;
+    margin: 0 !important;
     padding: 0 !important;
     background: rgba(27, 13, 5, 0.04);
+    border: 0;
+    border-radius: 10px;
+    color: #555 !important;
+    font-size: 1rem;
+    line-height: 1;
+    text-align: center;
+    vertical-align: middle;
+    position: static;
+  }
+
+  #navmenu #adminOpen::after,
+  #navmenu #accountOpen::after,
+  #navmenu #orderOpen::after {
+    display: none !important;
+  }
+
+  #navmenu #navSearchBtn i,
+  #navmenu #adminOpen i,
+  #navmenu #accountOpen i,
+  #navmenu #orderOpen i {
+    display: block;
+    margin: 0;
+    line-height: 1;
   }
 }
 
